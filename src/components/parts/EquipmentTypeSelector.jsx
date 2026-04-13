@@ -137,7 +137,7 @@ export default function EquipmentTypeSelector({ onSelect, counts = {} }) {
             <button
               key={type.value}
               onClick={() => onSelect(type.value)}
-              className="group text-left p-5 rounded-sm border-2 border-[hsl(0,0%,18%)] hover:border-[hsl(0,0%,30%)] bg-[hsl(0,0%,11%)] transition-all duration-150"
+              className="group text-left p-5 rounded-sm border-2 border-[hsl(0,0%,28%)] hover:border-[hsl(0,0%,38%)] bg-[hsl(0,0%,18%)] transition-all duration-150"
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-[hsl(0,0%,16%)] rounded-sm flex items-center justify-center flex-shrink-0">
