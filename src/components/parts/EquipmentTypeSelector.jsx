@@ -141,7 +141,7 @@ export default function EquipmentTypeSelector({ onSelect, counts = {} }) {
             >
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-[hsl(0,0%,45%)] rounded-sm flex items-center justify-center flex-shrink-0">
-                  <Icon className="w-5 h-5 text-black" />
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
