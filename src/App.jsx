@@ -19,6 +19,7 @@ import DispatchPage from './pages/DispatchPage';
 import Invoices from './pages/Invoices';
 import Reports from './pages/Reports';
 import Admin from './pages/Admin';
+import GmailTest from './pages/GmailTest';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -66,6 +67,7 @@ const AuthenticatedApp = () => {
         <Route path="/invoices/:id" element={<Invoices />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/admin" element={<Admin />} />
+        <Route path="/gmail-test" element={<GmailTest />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

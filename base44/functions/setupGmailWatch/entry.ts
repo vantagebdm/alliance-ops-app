@@ -23,7 +23,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         labelIds: ['INBOX'],
-        topicName: 'projects/base44-integrations/topics/gmail-webhook',
+        topicName: 'projects/base44-integrations/topics/webhook',
       }),
     });
 
