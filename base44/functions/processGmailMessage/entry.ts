@@ -49,11 +49,14 @@ function parseEmailBody(message) {
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
+    console.log('Gmail webhook received:', JSON.stringify(body, null, 2));
     const base44 = createClientFromRequest(req);
-    const messageIds = body.data.new_message_ids ?? [];
+    const messageIds = body.data?.new_message_ids ?? [];
+    console.log('New message IDs:', messageIds);
 
     if (messageIds.length === 0) {
-      return Response.json({ processed: 0 });
+      console.log('No new messages found');
+      return Response.json({ processed: 0, message: 'No new message IDs' });
     }
 
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('gmail');
@@ -67,7 +70,10 @@ Deno.serve(async (req) => {
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
 
-      if (!msgRes.ok) continue;
+      if (!msgRes.ok) {
+        console.log(`Failed to fetch message ${messageId}: ${msgRes.status}`);
+        continue;
+      }
 
       const message = await msgRes.json();
       const headers = message.payload.headers || [];
@@ -76,7 +82,9 @@ Deno.serve(async (req) => {
       const toHeader = headers.find(h => h.name === 'To')?.value || '';
       if (!toHeader.includes('info@alliancepartsgroup.com.au')) continue;
 
-      const { subject, body, senderName, senderEmail, attachments } = parseEmailBody(message);
+      const parsed = parseEmailBody(message);
+      const { subject, body: emailBody, senderName, senderEmail, attachments } = parsed;
+      console.log('Parsed email from', senderEmail, ':', subject);
 
       // Try to match existing customer by email
       let customer = null;
@@ -97,7 +105,7 @@ Deno.serve(async (req) => {
         company: customer?.company || '',
         part_description: subject,
         email_subject: subject,
-        email_body: body,
+        email_body: emailBody,
         email_thread_id: message.threadId,
         email_message_id: messageId,
         email_sender_name: senderName,
@@ -118,14 +126,18 @@ Deno.serve(async (req) => {
       );
 
       if (existing.length === 0) {
-        await base44.asServiceRole.entities.Enquiry.create(enquiryData);
+        const created = await base44.asServiceRole.entities.Enquiry.create(enquiryData);
+        console.log('Created enquiry:', enquiryData.enquiry_number);
         processed++;
+      } else {
+        console.log('Enquiry already exists for message', messageId);
       }
     }
 
     return Response.json({ processed, total: messageIds.length });
   } catch (error) {
     console.error('Error processing Gmail:', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('Stack:', error.stack);
+    return Response.json({ error: error.message, stack: error.stack }, { status: 500 });
   }
 });
