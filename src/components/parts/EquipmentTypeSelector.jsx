@@ -7,9 +7,7 @@ const EQUIPMENT_TYPES = [
     code: "LV",
     icon: Car,
     description: "4WDs, utes, passenger vehicles, SUVs",
-    color: "border-blue-500/40 hover:border-blue-500",
     iconColor: "text-blue-400",
-    bg: "bg-blue-500/5",
   },
   {
     value: "light_trucks",
@@ -17,9 +15,7 @@ const EQUIPMENT_TYPES = [
     code: "LT",
     icon: Truck,
     description: "Vans, cab-chassis, light commercials under 4.5T",
-    color: "border-sky-500/40 hover:border-sky-500",
     iconColor: "text-sky-400",
-    bg: "bg-sky-500/5",
   },
   {
     value: "heavy_trucks",
@@ -27,9 +23,7 @@ const EQUIPMENT_TYPES = [
     code: "HT",
     icon: Truck,
     description: "B-doubles, road trains, prime movers, semis",
-    color: "border-amber-500/40 hover:border-amber-500",
     iconColor: "text-amber-400",
-    bg: "bg-amber-500/5",
   },
   {
     value: "trailers",
@@ -37,9 +31,7 @@ const EQUIPMENT_TYPES = [
     code: "TR",
     icon: Container,
     description: "Semi-trailers, flat decks, tippers, tankers",
-    color: "border-orange-500/40 hover:border-orange-500",
     iconColor: "text-orange-400",
-    bg: "bg-orange-500/5",
   },
   {
     value: "earthmoving",
@@ -47,9 +39,7 @@ const EQUIPMENT_TYPES = [
     code: "EM",
     icon: Construction,
     description: "Excavators, dozers, graders, dump trucks, loaders",
-    color: "border-yellow-500/40 hover:border-yellow-500",
     iconColor: "text-yellow-400",
-    bg: "bg-yellow-500/5",
   },
   {
     value: "plant_equipment",
@@ -57,9 +47,7 @@ const EQUIPMENT_TYPES = [
     code: "PE",
     icon: Settings,
     description: "Forklifts, compactors, telehandlers, cranes",
-    color: "border-lime-500/40 hover:border-lime-500",
     iconColor: "text-lime-400",
-    bg: "bg-lime-500/5",
   },
   {
     value: "fixed_plant",
@@ -67,9 +55,7 @@ const EQUIPMENT_TYPES = [
     code: "FP",
     icon: Cpu,
     description: "Conveyors, crushers, screens, fixed machinery",
-    color: "border-green-500/40 hover:border-green-500",
     iconColor: "text-green-400",
-    bg: "bg-green-500/5",
   },
   {
     value: "generators",
@@ -77,9 +63,7 @@ const EQUIPMENT_TYPES = [
     code: "GL",
     icon: Zap,
     description: "Diesel generators, light towers, mobile power",
-    color: "border-primary/40 hover:border-primary",
     iconColor: "text-primary",
-    bg: "bg-primary/5",
   },
   {
     value: "agricultural",
@@ -87,9 +71,7 @@ const EQUIPMENT_TYPES = [
     code: "AG",
     icon: Tractor,
     description: "Tractors, harvesters, headers, farm machinery",
-    color: "border-emerald-500/40 hover:border-emerald-500",
     iconColor: "text-emerald-400",
-    bg: "bg-emerald-500/5",
   },
   {
     value: "marine",
@@ -97,9 +79,7 @@ const EQUIPMENT_TYPES = [
     code: "MR",
     icon: Anchor,
     description: "Vessels, outboard, marine diesel, workboats",
-    color: "border-cyan-500/40 hover:border-cyan-500",
     iconColor: "text-cyan-400",
-    bg: "bg-cyan-500/5",
   },
   {
     value: "other",
@@ -107,9 +87,7 @@ const EQUIPMENT_TYPES = [
     code: "OT",
     icon: HelpCircle,
     description: "Parts not assigned to a specific equipment type",
-    color: "border-gray-500/40 hover:border-gray-500",
     iconColor: "text-gray-400",
-    bg: "bg-gray-500/5",
   },
 ];
 
@@ -159,16 +137,16 @@ export default function EquipmentTypeSelector({ onSelect, counts = {} }) {
             <button
               key={type.value}
               onClick={() => onSelect(type.value)}
-              className={`group text-left p-5 rounded-sm border-2 ${type.color} ${type.bg} transition-all duration-150`}
+              className="group text-left p-5 rounded-sm border-2 border-[hsl(0,0%,18%)] hover:border-[hsl(0,0%,30%)] bg-[hsl(0,0%,11%)] transition-all duration-150"
             >
               <div className="flex items-start gap-4">
-                <div className={`w-10 h-10 bg-black/5 rounded-sm flex items-center justify-center flex-shrink-0`}>
+                <div className="w-10 h-10 bg-[hsl(0,0%,16%)] rounded-sm flex items-center justify-center flex-shrink-0">
                   <Icon className={`w-5 h-5 ${type.iconColor}`} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                     <span className="font-heading text-sm font-bold uppercase tracking-wider text-foreground leading-tight">{type.label}</span>
-                    <span className={`font-heading text-[10px] bg-black/5 px-1.5 py-0.5 rounded-sm font-bold ${type.iconColor}`}>{type.code}</span>
+                    <span className="font-heading text-[10px] bg-[hsl(0,0%,16%)] text-white/50 px-1.5 py-0.5 rounded-sm font-bold">{type.code}</span>
                   </div>
                   <p className="text-xs text-muted-foreground leading-snug">{type.description}</p>
                   {count > 0 && (
