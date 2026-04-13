@@ -61,6 +61,7 @@
       "type": "string",
       "enum": [
         "new",
+        "unread",
         "under_review",
         "waiting_on_customer",
         "pricing_in_progress",
@@ -103,8 +104,44 @@
     "attachments": {
       "type": "array",
       "items": {
-        "type": "string"
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "mimetype": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "size": {
+            "type": "number"
+          }
+        }
       }
+    },
+    "email_thread_id": {
+      "type": "string"
+    },
+    "email_message_id": {
+      "type": "string"
+    },
+    "email_subject": {
+      "type": "string"
+    },
+    "email_body": {
+      "type": "string"
+    },
+    "email_sender_name": {
+      "type": "string"
+    },
+    "email_sender_address": {
+      "type": "string"
+    },
+    "is_unread": {
+      "type": "boolean",
+      "default": true
     }
   },
   "required": [

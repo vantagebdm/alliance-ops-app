@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { X, AlertTriangle, User, Package, Truck, CheckCircle, ArrowRight, Edit3, FileText, ShoppingCart } from "lucide-react";
+import { X, AlertTriangle, User, Package, Truck, CheckCircle, ArrowRight, Edit3, FileText, ShoppingCart, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import StatusBadge from "@/components/ui/StatusBadge";
+import EmailThreadView from "./EmailThreadView";
 import moment from "moment";
 
 const URGENCY_COLORS = {
@@ -13,12 +14,13 @@ const URGENCY_COLORS = {
   standard: "bg-gray-500/10 border-gray-500/40 text-gray-400",
 };
 
-const STATUSES = ["new","under_review","waiting_on_customer","pricing_in_progress","sourcing_in_progress","quoted","converted","closed"];
+const STATUSES = ["unread","under_review","waiting_on_customer","pricing_in_progress","sourcing_in_progress","quoted","converted","closed"];
 
 export default function EnquiryDetail({ enquiry, onClose, onUpdated }) {
   const [status, setStatus] = useState(enquiry.status);
   const [notes, setNotes] = useState(enquiry.internal_notes || "");
   const [saving, setSaving] = useState(false);
+  const [showEmail, setShowEmail] = useState(!!enquiry.email_body);
 
   const handleStatusChange = async (val) => {
     setStatus(val);
@@ -64,6 +66,20 @@ export default function EnquiryDetail({ enquiry, onClose, onUpdated }) {
             <span className="font-heading text-red-400 text-xs uppercase tracking-wider font-semibold">
               Breakdown — Machine Down — Priority Response Required
             </span>
+          </div>
+        )}
+
+        {/* Email Thread (if from Gmail) */}
+        {enquiry.email_body && (
+          <div className="border-b border-border px-6 pt-4 pb-4">
+            <button
+              onClick={() => setShowEmail(!showEmail)}
+              className="flex items-center gap-2 text-primary hover:text-primary/80 font-heading text-xs uppercase tracking-wider font-semibold"
+            >
+              <Mail className="w-4 h-4" />
+              {showEmail ? "Hide" : "Show"} Email Thread
+            </button>
+            {showEmail && <div className="mt-4"><EmailThreadView enquiry={enquiry} /></div>}
           </div>
         )}
 
@@ -122,14 +138,14 @@ export default function EnquiryDetail({ enquiry, onClose, onUpdated }) {
           )}
 
           {/* Notes from customer */}
-          {enquiry.notes && (
+          {(enquiry.notes || enquiry.part_description) && (
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <FileText className="w-4 h-4 text-primary" />
-                <span className="font-heading text-xs uppercase tracking-wider font-semibold text-foreground/60">Customer Notes</span>
+                <span className="font-heading text-xs uppercase tracking-wider font-semibold text-foreground/60">Description</span>
               </div>
               <div className="bg-muted/50 rounded-sm p-3 text-sm text-foreground/80 border-l-2 border-primary/40">
-                {enquiry.notes}
+                {enquiry.notes || enquiry.part_description}
               </div>
             </div>
           )}
@@ -169,8 +185,11 @@ export default function EnquiryDetail({ enquiry, onClose, onUpdated }) {
               onChange={e => setNotes(e.target.value)}
               placeholder="Add internal notes, supplier options, pricing..."
               className="rounded-sm"
-              rows={3}
+              rows={4}
             />
+           {enquiry.email_body && (
+              <p className="text-[10px] text-muted-foreground italic">Email from {enquiry.email_sender_address}</p>
+            )}
           </div>
         </div>
 

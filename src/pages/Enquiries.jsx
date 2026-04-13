@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter, AlertTriangle, Zap } from "lucide-react";
+import { Plus, Filter, AlertTriangle, Zap, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
@@ -28,12 +28,23 @@ export default function Enquiries() {
   const filtered = filter === "all" ? enquiries : enquiries.filter(e => {
     if (filter === "urgent") return e.urgency === "urgent" || e.urgency === "breakdown";
     if (filter === "breakdown") return e.urgency === "breakdown";
+    if (filter === "unread") return e.is_unread;
     return e.status === filter;
   });
+
+  const unreadCount = enquiries.filter(e => e.is_unread).length;
 
   const breakdownCount = enquiries.filter(e => e.urgency === "breakdown").length;
 
   const columns = [
+    {
+      key: "is_unread", label: "", width: "w-8", sortable: false,
+      render: (v, row) => {
+        if (row.email_body) return <Mail className="w-4 h-4 text-blue-500" />;
+        if (v) return <div className="w-2 h-2 bg-primary rounded-full" />;
+        return null;
+      }
+    },
     {
       key: "urgency", label: "", width: "w-8", sortable: false,
       render: (v) => v === "breakdown" ? <AlertTriangle className="w-4 h-4 text-red-500" /> :
@@ -66,6 +77,7 @@ export default function Enquiries() {
 
   const FILTERS = [
     { value: "all", label: `All (${enquiries.length})` },
+    { value: "unread", label: `📧 Unread${unreadCount > 0 ? ` (${unreadCount})` : ""}` },
     { value: "new", label: "New" },
     { value: "breakdown", label: `🔴 Breakdown${breakdownCount > 0 ? ` (${breakdownCount})` : ""}` },
     { value: "urgent", label: "Urgent" },
@@ -111,6 +123,7 @@ export default function Enquiries() {
             data={filtered}
             onRowClick={(row) => setSelected(row)}
             emptyMessage="No enquiries match this filter."
+            rowClassName={(row) => row.is_unread ? "bg-blue-500/5" : ""}
           />
         )}
       </div>

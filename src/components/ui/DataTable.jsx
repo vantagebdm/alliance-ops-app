@@ -1,7 +1,7 @@
 import { ChevronUp, ChevronDown } from "lucide-react";
 import { useState } from "react";
 
-export default function DataTable({ columns, data, onRowClick, emptyMessage = "No records found" }) {
+export default function DataTable({ columns, data, onRowClick, emptyMessage = "No records found", rowClassName }) {
   const [sortCol, setSortCol] = useState(null);
   const [sortDir, setSortDir] = useState("asc");
 
@@ -70,6 +70,7 @@ export default function DataTable({ columns, data, onRowClick, emptyMessage = "N
                 className={`
                   border-b border-border/50 last:border-0 transition-colors
                   ${onRowClick ? "cursor-pointer hover:bg-[hsl(0,0%,97%)]" : ""}
+                  ${rowClassName ? rowClassName(row) : ""}
                 `}
               >
                 {columns.map(col => (
