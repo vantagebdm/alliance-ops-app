@@ -153,7 +153,7 @@ export default function EquipmentTypeSelector({ onSelect, counts = {} }) {
                     <div className="mt-2 font-heading text-xs font-bold text-black">{count} parts</div>
                   )}
                   {count === 0 && (
-                    <div className="mt-2 font-heading text-[10px] text-muted-foreground/50 uppercase tracking-wider">No parts yet</div>
+                    <div className="mt-2 font-heading text-[10px] text-black/60 uppercase tracking-wider">No parts yet</div>
                   )}
                 </div>
               </div>
