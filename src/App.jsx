@@ -5,7 +5,20 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import AppLayout from './components/layout/AppLayout';
+import Dashboard from './pages/Dashboard';
+import Enquiries from './pages/Enquiries';
+import Quotes from './pages/Quotes';
+import SalesOrders from './pages/SalesOrders';
+import Parts from './pages/Parts';
+import Inventory from './pages/Inventory';
+import Purchasing from './pages/Purchasing';
+import Suppliers from './pages/Suppliers';
+import Customers from './pages/Customers';
+import DispatchPage from './pages/DispatchPage';
+import Invoices from './pages/Invoices';
+import Reports from './pages/Reports';
+import Admin from './pages/Admin';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,8 +46,28 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
-      <Route path="*" element={<PageNotFound />} />
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/enquiries" element={<Enquiries />} />
+        <Route path="/enquiries/:id" element={<Enquiries />} />
+        <Route path="/quotes" element={<Quotes />} />
+        <Route path="/quotes/:id" element={<Quotes />} />
+        <Route path="/orders" element={<SalesOrders />} />
+        <Route path="/orders/:id" element={<SalesOrders />} />
+        <Route path="/parts" element={<Parts />} />
+        <Route path="/parts/:id" element={<Parts />} />
+        <Route path="/inventory" element={<Inventory />} />
+        <Route path="/purchasing" element={<Purchasing />} />
+        <Route path="/purchasing/:id" element={<Purchasing />} />
+        <Route path="/suppliers" element={<Suppliers />} />
+        <Route path="/customers" element={<Customers />} />
+        <Route path="/dispatch" element={<DispatchPage />} />
+        <Route path="/invoices" element={<Invoices />} />
+        <Route path="/invoices/:id" element={<Invoices />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<PageNotFound />} />
+      </Route>
     </Routes>
   );
 };

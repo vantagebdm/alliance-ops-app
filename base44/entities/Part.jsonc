@@ -1,0 +1,82 @@
+{
+  "name": "Part",
+  "type": "object",
+  "properties": {
+    "part_number": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "engine",
+        "transmission",
+        "brakes",
+        "suspension",
+        "electrical",
+        "body",
+        "filters",
+        "hydraulic",
+        "other"
+      ]
+    },
+    "brand": {
+      "type": "string"
+    },
+    "oem_number": {
+      "type": "string"
+    },
+    "compatible_vehicles": {
+      "type": "string"
+    },
+    "unit_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "sell_price": {
+      "type": "number",
+      "default": 0
+    },
+    "stock_quantity": {
+      "type": "number",
+      "default": 0
+    },
+    "min_stock_level": {
+      "type": "number",
+      "default": 0
+    },
+    "location": {
+      "type": "string"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "discontinued",
+        "on_order"
+      ],
+      "default": "active"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "weight_kg": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "part_number",
+    "name"
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "name": "Dispatch",
+  "type": "object",
+  "properties": {
+    "dispatch_number": {
+      "type": "string"
+    },
+    "order_id": {
+      "type": "string"
+    },
+    "order_number": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "method": {
+      "type": "string",
+      "enum": [
+        "pickup",
+        "local_delivery",
+        "freight"
+      ],
+      "default": "pickup"
+    },
+    "carrier": {
+      "type": "string"
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "picked",
+        "packed",
+        "dispatched",
+        "delivered"
+      ],
+      "default": "pending"
+    },
+    "dispatch_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "delivery_address": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "part_number": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "order_number",
+    "customer_name"
+  ]
+}
