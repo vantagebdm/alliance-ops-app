@@ -3,9 +3,12 @@ import { Search, Bell, User, Plus, ChevronDown, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import GlobalSearch from "./GlobalSearch";
+import QuickAddButton from "@/components/QuickAdd/QuickAddButton";
+import { useQuickAddContext } from "@/hooks/useQuickAddContext";
 
 export default function TopBar({ onToggleSidebar }) {
   const [searchOpen, setSearchOpen] = useState(false);
+  const contextData = useQuickAddContext();
 
   return (
     <header className="h-14 bg-[hsl(0,0%,4%)] border-b border-[hsl(0,0%,12%)] flex items-center px-4 gap-4 fixed top-0 left-0 right-0 z-50">
@@ -40,10 +43,9 @@ export default function TopBar({ onToggleSidebar }) {
           <Bell className="w-5 h-5" />
           <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
         </button>
-        <Button size="sm" className="hidden sm:flex bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm h-8 px-3">
-          <Plus className="w-4 h-4 mr-1" />
-          Quick Add
-        </Button>
+        <div className="hidden sm:block">
+          <QuickAddButton contextData={contextData} />
+        </div>
         <button className="flex items-center gap-2 p-2 text-white/60 hover:text-white transition-colors">
           <div className="w-7 h-7 bg-[hsl(0,0%,20%)] rounded-sm flex items-center justify-center">
             <User className="w-4 h-4" />
