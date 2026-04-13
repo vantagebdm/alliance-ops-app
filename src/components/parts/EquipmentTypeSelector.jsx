@@ -137,20 +137,20 @@ export default function EquipmentTypeSelector({ onSelect, counts = {} }) {
             <button
               key={type.value}
               onClick={() => onSelect(type.value)}
-              className="group text-left p-5 rounded-sm border-2 border-[hsl(0,0%,28%)] hover:border-[hsl(0,0%,38%)] bg-[hsl(0,0%,18%)] transition-all duration-150"
+              className="group text-left p-5 rounded-sm border-2 border-[hsl(0,0%,50%)] hover:border-[hsl(0,0%,55%)] bg-[hsl(0,0%,45%)] transition-all duration-150"
             >
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[hsl(0,0%,16%)] rounded-sm flex items-center justify-center flex-shrink-0">
-                  <Icon className={`w-5 h-5 ${type.iconColor}`} />
+                <div className="w-10 h-10 bg-[hsl(0,0%,45%)] rounded-sm flex items-center justify-center flex-shrink-0">
+                  <Icon className="w-5 h-5 text-black" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                    <span className="font-heading text-sm font-bold uppercase tracking-wider text-foreground leading-tight">{type.label}</span>
-                    <span className="font-heading text-[10px] bg-[hsl(0,0%,16%)] text-white/50 px-1.5 py-0.5 rounded-sm font-bold">{type.code}</span>
+                    <span className="font-heading text-sm font-bold uppercase tracking-wider text-black leading-tight">{type.label}</span>
+                    <span className="font-heading text-[10px] bg-[hsl(0,0%,45%)] text-black px-1.5 py-0.5 rounded-sm font-bold">{type.code}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-snug">{type.description}</p>
+                  <p className="text-xs text-black/70 leading-snug">{type.description}</p>
                   {count > 0 && (
-                    <div className={`mt-2 font-heading text-xs font-bold ${type.iconColor}`}>{count} parts</div>
+                    <div className="mt-2 font-heading text-xs font-bold text-black">{count} parts</div>
                   )}
                   {count === 0 && (
                     <div className="mt-2 font-heading text-[10px] text-muted-foreground/50 uppercase tracking-wider">No parts yet</div>
