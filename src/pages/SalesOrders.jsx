@@ -1,41 +1,55 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
-import { useNavigate } from "react-router-dom";
+import SalesOrderForm from "../components/orders/SalesOrderForm";
+import SalesOrderDetail from "../components/orders/SalesOrderDetail";
 import moment from "moment";
 
 export default function SalesOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
-  const navigate = useNavigate();
+  const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
 
-  useEffect(() => {
-    base44.entities.SalesOrder.list("-created_date", 100).then(d => {
-      setOrders(d);
-      setLoading(false);
-    });
-  }, []);
+  const load = async () => {
+    setLoading(true);
+    const data = await base44.entities.SalesOrder.list("-created_date", 100);
+    setOrders(data);
+    setLoading(false);
+  };
+
+  useEffect(() => { load(); }, []);
 
   const filtered = filter === "all" ? orders : orders.filter(o => o.status === filter);
 
   const columns = [
-    { key: "order_number", label: "Order #", render: (v) => <span className="font-mono font-semibold">{v || "—"}</span> },
-    { key: "customer_name", label: "Customer" },
-    { key: "company", label: "Company" },
+    {
+      key: "priority", label: "", width: "w-8", sortable: false,
+      render: (v) => v === "breakdown" ? <Zap className="w-4 h-4 text-red-500" /> :
+        v === "urgent" ? <Zap className="w-4 h-4 text-amber-500" /> : null
+    },
+    { key: "order_number", label: "Order #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v || "—"}</span> },
+    { key: "customer_name", label: "Customer", render: (v, row) => (
+      <div>
+        <div className="font-medium">{v}</div>
+        {row.company && <div className="text-xs text-muted-foreground">{row.company}</div>}
+      </div>
+    )},
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
-    { key: "priority", label: "Priority", render: (v) => <StatusBadge status={v} /> },
-    { key: "total", label: "Total", render: (v) => `$${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}` },
-    { key: "delivery_method", label: "Delivery", render: (v) => <span className="text-xs uppercase">{(v || "").replace("_", " ")}</span> },
+    { key: "priority", label: "Priority", render: (v) => v && v !== "normal" ? <StatusBadge status={v} /> : <span className="text-muted-foreground text-xs">Normal</span> },
+    { key: "total", label: "Total", render: (v) => <span className="font-semibold">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
+    { key: "delivery_method", label: "Delivery", render: (v) => <span className="text-xs capitalize">{(v || "").replace(/_/g, " ")}</span> },
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
   ];
 
   const FILTERS = [
-    { value: "all", label: "All" },
+    { value: "all", label: `All (${orders.length})` },
     { value: "pending", label: "Pending" },
     { value: "confirmed", label: "Confirmed" },
     { value: "processing", label: "Processing" },
@@ -48,9 +62,9 @@ export default function SalesOrders() {
     <div>
       <PageHeader
         title="Sales Orders"
-        subtitle="Manage customer orders"
+        subtitle="Customer orders, fulfilment and dispatch tracking"
         actions={
-          <Button className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+          <Button onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
             <Plus className="w-4 h-4 mr-1" /> New Order
           </Button>
         }
@@ -66,11 +80,28 @@ export default function SalesOrders() {
           ))}
         </div>
         {loading ? (
-          <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" /></div>
+          <div className="flex justify-center py-16"><div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" /></div>
         ) : (
-          <DataTable columns={columns} data={filtered} onRowClick={(row) => navigate(`/orders/${row.id}`)} emptyMessage="No orders found." />
+          <DataTable columns={columns} data={filtered} onRowClick={setSelected} emptyMessage="No orders found." />
         )}
       </div>
+
+      {showForm && (
+        <SalesOrderForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />
+      )}
+
+      {editTarget && (
+        <SalesOrderForm initial={editTarget} onClose={() => setEditTarget(null)} onSaved={() => { setEditTarget(null); load(); }} />
+      )}
+
+      {selected && !editTarget && (
+        <SalesOrderDetail
+          order={selected}
+          onClose={() => setSelected(null)}
+          onUpdated={() => { setSelected(null); load(); }}
+          onEdit={() => { setEditTarget(selected); setSelected(null); }}
+        />
+      )}
     </div>
   );
 }

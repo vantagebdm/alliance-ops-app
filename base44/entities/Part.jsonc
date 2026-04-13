@@ -5,6 +5,24 @@
     "part_number": {
       "type": "string"
     },
+    "supplier_sku": {
+      "type": "string"
+    },
+    "oem_number": {
+      "type": "string"
+    },
+    "aftermarket_number": {
+      "type": "string"
+    },
+    "cross_references": {
+      "type": "string"
+    },
+    "superseded_by": {
+      "type": "string"
+    },
+    "supersedes": {
+      "type": "string"
+    },
     "name": {
       "type": "string"
     },
@@ -22,35 +40,51 @@
         "body",
         "filters",
         "hydraulic",
+        "driveline",
+        "cooling",
+        "fuel",
+        "exhaust",
+        "steering",
+        "tyres",
         "other"
       ]
+    },
+    "subcategory": {
+      "type": "string"
     },
     "brand": {
       "type": "string"
     },
-    "oem_number": {
+    "make": {
+      "type": "string"
+    },
+    "model": {
       "type": "string"
     },
     "compatible_vehicles": {
       "type": "string"
     },
-    "unit_cost": {
-      "type": "number",
-      "default": 0
+    "unit_of_measure": {
+      "type": "string",
+      "default": "each"
     },
-    "sell_price": {
-      "type": "number",
-      "default": 0
+    "barcode": {
+      "type": "string"
     },
-    "stock_quantity": {
-      "type": "number",
-      "default": 0
+    "weight_kg": {
+      "type": "number"
     },
-    "min_stock_level": {
-      "type": "number",
-      "default": 0
+    "dimensions": {
+      "type": "string"
     },
-    "location": {
+    "hazardous": {
+      "type": "boolean",
+      "default": false
+    },
+    "freight_class": {
+      "type": "string"
+    },
+    "preferred_supplier": {
       "type": "string"
     },
     "supplier_id": {
@@ -59,20 +93,79 @@
     "supplier_name": {
       "type": "string"
     },
+    "unit_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "landed_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "sell_price": {
+      "type": "number",
+      "default": 0
+    },
+    "trade_price": {
+      "type": "number",
+      "default": 0
+    },
+    "fleet_price": {
+      "type": "number",
+      "default": 0
+    },
+    "retail_price": {
+      "type": "number",
+      "default": 0
+    },
+    "margin_target": {
+      "type": "number",
+      "default": 30
+    },
+    "stock_quantity": {
+      "type": "number",
+      "default": 0
+    },
+    "allocated_stock": {
+      "type": "number",
+      "default": 0
+    },
+    "min_stock_level": {
+      "type": "number",
+      "default": 0
+    },
+    "max_stock_level": {
+      "type": "number",
+      "default": 0
+    },
+    "reorder_qty": {
+      "type": "number",
+      "default": 0
+    },
+    "location": {
+      "type": "string"
+    },
+    "bin": {
+      "type": "string"
+    },
+    "image_url": {
+      "type": "string"
+    },
     "status": {
       "type": "string",
       "enum": [
         "active",
         "discontinued",
-        "on_order"
+        "on_order",
+        "inactive"
       ],
       "default": "active"
     },
-    "image_url": {
-      "type": "string"
+    "is_critical": {
+      "type": "boolean",
+      "default": false
     },
-    "weight_kg": {
-      "type": "number"
+    "notes": {
+      "type": "string"
     }
   },
   "required": [
