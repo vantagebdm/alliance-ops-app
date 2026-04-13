@@ -23,7 +23,19 @@ export default function Enquiries() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+    const unsubscribe = base44.entities.Enquiry.subscribe((event) => {
+      if (event.type === 'create') {
+        setEnquiries(prev => [event.data, ...prev]);
+      } else if (event.type === 'update') {
+        setEnquiries(prev => prev.map(e => e.id === event.id ? event.data : e));
+      } else if (event.type === 'delete') {
+        setEnquiries(prev => prev.filter(e => e.id !== event.id));
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const filtered = filter === "all" ? enquiries : enquiries.filter(e => {
     if (filter === "urgent") return e.urgency === "urgent" || e.urgency === "breakdown";
