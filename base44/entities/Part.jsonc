@@ -29,6 +29,22 @@
     "description": {
       "type": "string"
     },
+    "equipment_type": {
+      "type": "string",
+      "enum": [
+        "light_vehicles",
+        "light_trucks",
+        "heavy_trucks",
+        "trailers",
+        "earthmoving",
+        "plant_equipment",
+        "fixed_plant",
+        "generators",
+        "agricultural",
+        "marine",
+        "other"
+      ]
+    },
     "category": {
       "type": "string",
       "enum": [

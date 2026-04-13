@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { EQUIPMENT_TYPES } from "./EquipmentTypeSelector";
 import { base44 } from "@/api/base44Client";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
     part_number: "", name: "", description: "", category: "other", brand: "",
     oem_number: "", compatible_vehicles: "", unit_cost: 0, sell_price: 0,
     stock_quantity: 0, min_stock_level: 0, location: "", supplier_name: "", status: "active",
+    equipment_type: "",
   });
   const [saving, setSaving] = useState(false);
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -26,7 +28,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
     onSaved();
   };
 
-  const CATEGORIES = ["engine", "transmission", "brakes", "suspension", "electrical", "body", "filters", "hydraulic", "other"];
+  const CATEGORIES = ["engine","transmission","brakes","suspension","electrical","body","filters","hydraulic","driveline","cooling","fuel","tyres","other"];
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-10 overflow-y-auto">
@@ -54,6 +56,16 @@ export default function PartForm({ onClose, onSaved, initial }) {
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Name *</label>
                 <Input value={form.name} onChange={e => update("name", e.target.value)} className="rounded-sm" />
+              </div>
+              <div className="col-span-2">
+                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Equipment Type</label>
+                <Select value={form.equipment_type || ""} onValueChange={v => update("equipment_type", v)}>
+                  <SelectTrigger className="rounded-sm"><SelectValue placeholder="Select equipment type..." /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>— Not specified —</SelectItem>
+                    {EQUIPMENT_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Category</label>

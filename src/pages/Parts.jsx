@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Search, Filter, AlertTriangle, Tag, TrendingDown } from "lucide-react";
+import { Plus, Search, Filter, AlertTriangle, ChevronLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/ui/PageHeader";
@@ -8,6 +8,7 @@ import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PartForm from "../components/parts/PartForm";
 import PartDetail from "../components/parts/PartDetail";
+import EquipmentTypeSelector, { EQUIPMENT_TYPES } from "../components/parts/EquipmentTypeSelector";
 
 export default function Parts() {
   const [parts, setParts] = useState([]);
@@ -17,6 +18,7 @@ export default function Parts() {
   const [editTarget, setEditTarget] = useState(null);
   const [search, setSearch] = useState("");
   const [catFilter, setCatFilter] = useState("all");
+  const [equipmentType, setEquipmentType] = useState(null); // null = show selector
 
   const load = async () => {
     setLoading(true);
@@ -27,7 +29,22 @@ export default function Parts() {
 
   useEffect(() => { load(); }, []);
 
+  // Count parts per equipment type for the selector
+  const equipmentCounts = parts.reduce((acc, p) => {
+    const et = p.equipment_type || "other";
+    acc[et] = (acc[et] || 0) + 1;
+    acc["all"] = (acc["all"] || 0) + 1;
+    return acc;
+  }, {});
+
+  // Filter by equipment type + search + category
   const filtered = parts.filter(p => {
+    // Equipment type filter
+    if (equipmentType && equipmentType !== "all") {
+      const partType = p.equipment_type || "other";
+      if (partType !== equipmentType) return false;
+    }
+    // Search
     const q = search.toLowerCase();
     const matchSearch = !q ||
       p.part_number?.toLowerCase().includes(q) ||
@@ -37,11 +54,16 @@ export default function Parts() {
       p.aftermarket_number?.toLowerCase().includes(q) ||
       p.cross_references?.toLowerCase().includes(q) ||
       p.compatible_vehicles?.toLowerCase().includes(q);
+    // Category
     const matchCat = catFilter === "all" || p.category === catFilter;
     return matchSearch && matchCat;
   });
 
-  const lowStockCount = parts.filter(p => p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level).length;
+  const lowStockCount = filtered.filter(p => p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level).length;
+
+  const selectedTypeLabel = equipmentType === "all"
+    ? "All Parts"
+    : EQUIPMENT_TYPES.find(t => t.value === equipmentType)?.label || "";
 
   const columns = [
     { key: "part_number", label: "Part #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v}</span> },
@@ -71,17 +93,69 @@ export default function Parts() {
 
   const CATEGORIES = ["all","engine","transmission","brakes","suspension","electrical","body","filters","hydraulic","driveline","cooling","fuel","tyres","other"];
 
+  // Show equipment selector if no type chosen yet
+  if (!equipmentType) {
+    return (
+      <div className="flex flex-col min-h-full">
+        <PageHeader
+          title="Parts Master"
+          subtitle={`${parts.length} parts in catalogue`}
+          actions={
+            <Button onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+              <Plus className="w-4 h-4 mr-1" /> Add Part
+            </Button>
+          }
+        />
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
+          </div>
+        ) : (
+          <EquipmentTypeSelector onSelect={setEquipmentType} counts={equipmentCounts} />
+        )}
+        {showForm && (
+          <PartForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />
+        )}
+      </div>
+    );
+  }
+
+  // Show parts table filtered by equipment type
   return (
     <div>
       <PageHeader
         title="Parts Master"
-        subtitle={`${parts.length} parts in catalogue${lowStockCount > 0 ? ` · ${lowStockCount} low stock` : ""}`}
+        subtitle={`${filtered.length} parts · ${selectedTypeLabel}${lowStockCount > 0 ? ` · ${lowStockCount} low stock` : ""}`}
         actions={
-          <Button onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
-            <Plus className="w-4 h-4 mr-1" /> Add Part
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => { setEquipmentType(null); setSearch(""); setCatFilter("all"); }}
+              className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10"
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" /> Change Type
+            </Button>
+            <Button onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+              <Plus className="w-4 h-4 mr-1" /> Add Part
+            </Button>
+          </div>
         }
       />
+
+      {/* Equipment type badge */}
+      <div className="px-6 pt-4 pb-0">
+        <div className="inline-flex items-center gap-2 bg-[hsl(0,0%,8%)] border border-[hsl(0,0%,18%)] rounded-sm px-3 py-1.5">
+          <span className="font-heading text-[10px] uppercase tracking-widest text-white/40">Viewing:</span>
+          <span className="font-heading text-xs font-bold text-primary uppercase tracking-wider">{selectedTypeLabel}</span>
+          <button
+            onClick={() => { setEquipmentType(null); setSearch(""); setCatFilter("all"); }}
+            className="ml-1 text-white/30 hover:text-white/70 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+      </div>
+
       <div className="p-6 space-y-4">
         {/* Search + Categories */}
         <div className="flex flex-col gap-3">
@@ -108,12 +182,21 @@ export default function Parts() {
         {loading ? (
           <div className="flex justify-center py-16"><div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" /></div>
         ) : (
-          <DataTable columns={columns} data={filtered} onRowClick={setSelected} emptyMessage="No parts found." />
+          <DataTable
+            columns={columns}
+            data={filtered}
+            onRowClick={setSelected}
+            emptyMessage={`No parts found for ${selectedTypeLabel}. Add a part or change equipment type.`}
+          />
         )}
       </div>
 
       {showForm && (
-        <PartForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />
+        <PartForm
+          initial={equipmentType && equipmentType !== "all" ? { equipment_type: equipmentType } : undefined}
+          onClose={() => setShowForm(false)}
+          onSaved={() => { setShowForm(false); load(); }}
+        />
       )}
 
       {editTarget && (
