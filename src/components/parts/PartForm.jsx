@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import Autocomplete from "@/components/ui/Autocomplete";
+import { useAutocomplete } from "@/hooks/useAutocomplete";
 
 export default function PartForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
@@ -15,6 +17,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
     equipment_type: "",
   });
   const [saving, setSaving] = useState(false);
+  const supplierAC = useAutocomplete("Supplier", "name");
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const save = async () => {
@@ -125,7 +128,22 @@ export default function PartForm({ onClose, onSaved, initial }) {
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Supplier</label>
-                <Input value={form.supplier_name} onChange={e => update("supplier_name", e.target.value)} className="rounded-sm" />
+                <Autocomplete
+                 value={form.supplier_name}
+                 suggestions={supplierAC.suggestions}
+                 open={supplierAC.open}
+                 loading={supplierAC.loading}
+                 onInputChange={(val) => {
+                   update("supplier_name", val);
+                   supplierAC.handleInputChange(val);
+                 }}
+                 onSelect={(item) => {
+                   update("supplier_name", item.name);
+                   supplierAC.handleSelectSuggestion(item);
+                 }}
+                 placeholder="Search supplier..."
+                 className="rounded-sm"
+               />
               </div>
             </div>
           </div>

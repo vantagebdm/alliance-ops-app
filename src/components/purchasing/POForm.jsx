@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import Autocomplete from "@/components/ui/Autocomplete";
+import { useAutocomplete } from "@/hooks/useAutocomplete";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_cost: 0, total: 0 });
 
@@ -14,6 +16,8 @@ export default function POForm({ onClose, onSaved, initial }) {
     items: [newLine()], subtotal: 0, gst: 0, total: 0,
   });
   const [saving, setSaving] = useState(false);
+  const supplierAC = useAutocomplete("Supplier", "name");
+  const partAC = useAutocomplete("Part", "part_number");
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -71,7 +75,22 @@ export default function POForm({ onClose, onSaved, initial }) {
             <div className="grid grid-cols-3 gap-3">
               <div className="col-span-2">
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Supplier *</label>
-                <Input value={form.supplier_name} onChange={e => u("supplier_name", e.target.value)} className="rounded-sm" placeholder="Supplier name" />
+                <Autocomplete
+                  value={form.supplier_name}
+                  suggestions={supplierAC.suggestions}
+                  open={supplierAC.open}
+                  loading={supplierAC.loading}
+                  onInputChange={(val) => {
+                    u("supplier_name", val);
+                    supplierAC.handleInputChange(val);
+                  }}
+                  onSelect={(item) => {
+                    u("supplier_name", item.name);
+                    supplierAC.handleSelectSuggestion(item);
+                  }}
+                  placeholder="Search supplier..."
+                  className="rounded-sm"
+                />
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Status</label>
@@ -114,8 +133,23 @@ export default function POForm({ onClose, onSaved, initial }) {
                   {form.items.map((line, i) => (
                     <tr key={i} className="border-b border-border/50">
                       <td className="px-2 py-1.5">
-                        <Input value={line.part_number} onChange={e => updateLine(i, "part_number", e.target.value)}
-                          placeholder="SKU" className="rounded-sm h-8 text-xs font-mono" />
+                        <Autocomplete
+                          value={line.part_number}
+                          suggestions={partAC.suggestions}
+                          open={partAC.open}
+                          loading={partAC.loading}
+                          onInputChange={(val) => {
+                            updateLine(i, "part_number", val);
+                            partAC.handleInputChange(val);
+                          }}
+                          onSelect={(item) => {
+                            updateLine(i, "part_number", item.part_number);
+                            updateLine(i, "description", item.name);
+                            partAC.handleSelectSuggestion(item);
+                          }}
+                          placeholder="SKU"
+                          className="rounded-sm h-8 text-xs font-mono"
+                        />
                       </td>
                       <td className="px-2 py-1.5">
                         <Input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}

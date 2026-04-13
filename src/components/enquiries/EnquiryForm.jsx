@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import Autocomplete from "@/components/ui/Autocomplete";
+import { useAutocomplete } from "@/hooks/useAutocomplete";
 
 export default function EnquiryForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
@@ -13,6 +15,9 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
     vehicle_year: "", quantity: 1, urgency: "standard", source: "phone", notes: "",
   });
   const [saving, setSaving] = useState(false);
+  const customerAC = useAutocomplete("Customer", "name");
+  const companyAC = useAutocomplete("Customer", "company");
+  const partAC = useAutocomplete("Part", "part_number");
 
   const update = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
@@ -56,11 +61,41 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Name *</label>
-                <Input value={form.customer_name} onChange={e => update("customer_name", e.target.value)} className="rounded-sm" />
+                <Autocomplete
+                  value={form.customer_name}
+                  suggestions={customerAC.suggestions}
+                  open={customerAC.open}
+                  loading={customerAC.loading}
+                  onInputChange={(val) => {
+                    update("customer_name", val);
+                    customerAC.handleInputChange(val);
+                  }}
+                  onSelect={(item) => {
+                    update("customer_name", item.name);
+                    customerAC.handleSelectSuggestion(item);
+                  }}
+                  placeholder="Search customer..."
+                  className="rounded-sm"
+                />
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Company</label>
-                <Input value={form.company} onChange={e => update("company", e.target.value)} className="rounded-sm" />
+                <Autocomplete
+                  value={form.company}
+                  suggestions={companyAC.suggestions}
+                  open={companyAC.open}
+                  loading={companyAC.loading}
+                  onInputChange={(val) => {
+                    update("company", val);
+                    companyAC.handleInputChange(val);
+                  }}
+                  onSelect={(item) => {
+                    update("company", item.company);
+                    companyAC.handleSelectSuggestion(item);
+                  }}
+                  placeholder="Search company..."
+                  className="rounded-sm"
+                />
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Email</label>
@@ -88,7 +123,22 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Part Number</label>
-                <Input value={form.part_number} onChange={e => update("part_number", e.target.value)} className="rounded-sm" />
+                <Autocomplete
+                  value={form.part_number}
+                  suggestions={partAC.suggestions}
+                  open={partAC.open}
+                  loading={partAC.loading}
+                  onInputChange={(val) => {
+                    update("part_number", val);
+                    partAC.handleInputChange(val);
+                  }}
+                  onSelect={(item) => {
+                    update("part_number", item.part_number);
+                    partAC.handleSelectSuggestion(item);
+                  }}
+                  placeholder="Search part number..."
+                  className="rounded-sm"
+                />
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Quantity</label>

@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import Autocomplete from "@/components/ui/Autocomplete";
+import { useAutocomplete } from "@/hooks/useAutocomplete";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
@@ -15,6 +17,9 @@ export default function SalesOrderForm({ onClose, onSaved, initial }) {
     items: [newLine()], subtotal: 0, gst: 0, total: 0,
   });
   const [saving, setSaving] = useState(false);
+  const customerAC = useAutocomplete("Customer", "name");
+  const companyAC = useAutocomplete("Customer", "company");
+  const partAC = useAutocomplete("Part", "part_number");
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -73,11 +78,41 @@ export default function SalesOrderForm({ onClose, onSaved, initial }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Customer Name *</label>
-                <Input value={form.customer_name} onChange={e => u("customer_name", e.target.value)} className="rounded-sm" />
+                <Autocomplete
+                  value={form.customer_name}
+                  suggestions={customerAC.suggestions}
+                  open={customerAC.open}
+                  loading={customerAC.loading}
+                  onInputChange={(val) => {
+                    u("customer_name", val);
+                    customerAC.handleInputChange(val);
+                  }}
+                  onSelect={(item) => {
+                    u("customer_name", item.name);
+                    customerAC.handleSelectSuggestion(item);
+                  }}
+                  placeholder="Search customer..."
+                  className="rounded-sm"
+                />
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Company</label>
-                <Input value={form.company} onChange={e => u("company", e.target.value)} className="rounded-sm" />
+                <Autocomplete
+                  value={form.company}
+                  suggestions={companyAC.suggestions}
+                  open={companyAC.open}
+                  loading={companyAC.loading}
+                  onInputChange={(val) => {
+                    u("company", val);
+                    companyAC.handleInputChange(val);
+                  }}
+                  onSelect={(item) => {
+                    u("company", item.company);
+                    companyAC.handleSelectSuggestion(item);
+                  }}
+                  placeholder="Search company..."
+                  className="rounded-sm"
+                />
               </div>
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Priority</label>
@@ -134,8 +169,23 @@ export default function SalesOrderForm({ onClose, onSaved, initial }) {
                   {form.items.map((line, i) => (
                     <tr key={i} className="border-b border-border/50">
                       <td className="px-2 py-1.5">
-                        <Input value={line.part_number} onChange={e => updateLine(i, "part_number", e.target.value)}
-                          placeholder="SKU" className="rounded-sm h-8 text-xs font-mono" />
+                        <Autocomplete
+                          value={line.part_number}
+                          suggestions={partAC.suggestions}
+                          open={partAC.open}
+                          loading={partAC.loading}
+                          onInputChange={(val) => {
+                            updateLine(i, "part_number", val);
+                            partAC.handleInputChange(val);
+                          }}
+                          onSelect={(item) => {
+                            updateLine(i, "part_number", item.part_number);
+                            updateLine(i, "description", item.name);
+                            partAC.handleSelectSuggestion(item);
+                          }}
+                          placeholder="SKU"
+                          className="rounded-sm h-8 text-xs font-mono"
+                        />
                       </td>
                       <td className="px-2 py-1.5">
                         <Input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
