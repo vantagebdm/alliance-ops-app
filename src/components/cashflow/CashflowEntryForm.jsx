@@ -26,7 +26,7 @@ export default function CashflowEntryForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
     title: "", type: "outgoing", category: "other",
     amount: "", due_date: "", status: "scheduled",
-    recurrence: "once", supplier_name: "", reference: "", notes: "",
+    recurrence: "once", recurrence_end: "", supplier_name: "", reference: "", notes: "",
   });
   const [saving, setSaving] = useState(false);
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
@@ -98,13 +98,19 @@ export default function CashflowEntryForm({ onClose, onSaved, initial }) {
             <Select value={form.recurrence} onValueChange={v => update("recurrence", v)}>
               <SelectTrigger className="rounded-sm"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="once">Once</SelectItem>
+                <SelectItem value="once">Once (no repeat)</SelectItem>
                 <SelectItem value="weekly">Weekly</SelectItem>
                 <SelectItem value="fortnightly">Fortnightly</SelectItem>
                 <SelectItem value="monthly">Monthly</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          {form.recurrence !== "once" && (
+            <div>
+              <label className="font-heading text-[11px] uppercase tracking-wider text-muted-foreground mb-1 block">Repeat Until</label>
+              <Input type="date" value={form.recurrence_end || ""} onChange={e => update("recurrence_end", e.target.value)} className="rounded-sm" />
+            </div>
+          )}
           <div>
             <label className="font-heading text-[11px] uppercase tracking-wider text-muted-foreground mb-1 block">Supplier / Party</label>
             <Input value={form.supplier_name} onChange={e => update("supplier_name", e.target.value)} className="rounded-sm" />

@@ -21,7 +21,7 @@ function getColor(entry) {
   return CAT_COLORS[entry.category] || TYPE_COLORS.outgoing;
 }
 
-export default function CashflowCalendar({ entries, onEntryClick }) {
+export default function CashflowCalendar({ entries, onEntryClick, onDayClick }) {
   const [current, setCurrent] = useState(moment().startOf("month"));
 
   const weeks = useMemo(() => {
@@ -100,21 +100,27 @@ export default function CashflowCalendar({ entries, onEntryClick }) {
               const dayTotal = dayEntries.reduce((a, e) => a + (e.type === "incoming" ? e.amount : -e.amount), 0);
 
               return (
-                <div key={di} className={`min-h-[90px] p-1.5 border-r border-border last:border-r-0 ${!isCurrentMonth ? "opacity-30" : ""}`}>
+                <div
+                  key={di}
+                  onClick={() => isCurrentMonth && onDayClick && onDayClick(key)}
+                  className={`min-h-[90px] p-1.5 border-r border-border last:border-r-0 transition-colors
+                    ${!isCurrentMonth ? "opacity-30" : ""}
+                    ${isCurrentMonth && onDayClick ? "cursor-pointer hover:bg-muted/20" : ""}`}
+                >
                   <div className="flex justify-between items-center mb-1">
                     <span className={`font-heading text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full
                       ${isToday ? "bg-primary text-black" : "text-muted-foreground"}`}>
                       {day.format("D")}
                     </span>
-                    {dayEntries.length > 0 && dayTotal !== 0 && (
+                    {dayEntries.length > 0 && (
                       <span className={`font-heading text-[9px] font-bold ${dayTotal >= 0 ? "text-green-400" : "text-red-400"}`}>
-                        {dayTotal >= 0 ? "+" : ""}${Math.abs(dayTotal).toLocaleString()}
+                        {dayTotal >= 0 ? "+" : "-"}${Math.abs(dayTotal).toLocaleString()}
                       </span>
                     )}
                   </div>
                   <div className="space-y-0.5">
                     {dayEntries.slice(0, 3).map((e, i) => (
-                      <button key={i} onClick={() => onEntryClick(e)}
+                      <button key={i} onClick={ev => { ev.stopPropagation(); onEntryClick(e); }}
                         className={`w-full text-left text-[10px] px-1.5 py-0.5 rounded-sm truncate font-medium ${getColor(e)}`}>
                         {e.title}
                       </button>

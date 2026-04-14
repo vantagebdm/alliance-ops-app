@@ -64,6 +64,10 @@
       ],
       "default": "once"
     },
+    "recurrence_end": {
+      "type": "string",
+      "format": "date"
+    },
     "supplier_id": {
       "type": "string"
     },

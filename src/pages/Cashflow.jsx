@@ -25,12 +25,35 @@ const CATEGORY_LABELS = {
   invoice_payment: "Invoice Payment", other: "Other",
 };
 
+// Expand a single recurring entry into all its projected occurrences within a 12-month window
+function expandRecurring(entries) {
+  const expanded = [];
+  const windowEnd = moment().add(12, "months");
+  entries.forEach(entry => {
+    expanded.push(entry);
+    if (!entry.recurrence || entry.recurrence === "once" || !entry.due_date) return;
+    const intervalMap = { weekly: [1, "week"], fortnightly: [2, "weeks"], monthly: [1, "month"] };
+    const [amount, unit] = intervalMap[entry.recurrence] || [];
+    if (!unit) return;
+    const end = entry.recurrence_end ? moment(entry.recurrence_end) : windowEnd;
+    let next = moment(entry.due_date).add(amount, unit);
+    let count = 0;
+    while (next.isSameOrBefore(end, "day") && count < 100) {
+      expanded.push({ ...entry, id: `${entry.id}_r${count}`, due_date: next.format("YYYY-MM-DD"), _projected: true });
+      next = next.add(amount, unit);
+      count++;
+    }
+  });
+  return expanded;
+}
+
 export default function Cashflow() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState("overview");
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [newEntryDate, setNewEntryDate] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
   const [listView, setListView] = useState("list"); // "list" | "calendar"
@@ -44,6 +67,9 @@ export default function Cashflow() {
 
   useEffect(() => { load(); }, []);
 
+  // All entries expanded with recurrence projections for calendar views
+  const expandedEntries = expandRecurring(entries);
+
   const listEntries = (type) => {
     return entries
       .filter(e => e.type === type)
@@ -53,7 +79,14 @@ export default function Cashflow() {
   };
 
   const handleEntryClick = (entry) => {
+    if (entry._projected) return; // projected recurrences can't be edited directly
     setEditing(entry);
+    setShowForm(true);
+  };
+
+  const handleDayClick = (dateStr) => {
+    setEditing(null);
+    setNewEntryDate(dateStr);
     setShowForm(true);
   };
 
@@ -92,8 +125,8 @@ export default function Cashflow() {
           </div>
         ) : (
           <>
-            {tab === "overview" && <CashflowOverview entries={entries} />}
-            {tab === "calendar" && <CashflowCalendar entries={entries} onEntryClick={handleEntryClick} />}
+            {tab === "overview" && <CashflowOverview entries={expandedEntries} />}
+            {tab === "calendar" && <CashflowCalendar entries={expandedEntries} onEntryClick={handleEntryClick} onDayClick={handleDayClick} />}
             {(tab === "outgoing" || tab === "incoming") && (
               <>
                 {/* View toggle */}
@@ -124,8 +157,9 @@ export default function Cashflow() {
                   />
                 ) : (
                   <CashflowCalendar
-                    entries={entries.filter(e => e.type === (tab === "outgoing" ? "outgoing" : "incoming"))}
+                    entries={expandedEntries.filter(e => e.type === (tab === "outgoing" ? "outgoing" : "incoming"))}
                     onEntryClick={handleEntryClick}
+                    onDayClick={handleDayClick}
                   />
                 )}
               </>
@@ -136,9 +170,9 @@ export default function Cashflow() {
 
       {showForm && (
         <CashflowEntryForm
-          initial={editing}
-          onClose={() => { setShowForm(false); setEditing(null); }}
-          onSaved={() => { setShowForm(false); setEditing(null); load(); }}
+          initial={editing || (newEntryDate ? { due_date: newEntryDate } : null)}
+          onClose={() => { setShowForm(false); setEditing(null); setNewEntryDate(null); }}
+          onSaved={() => { setShowForm(false); setEditing(null); setNewEntryDate(null); load(); }}
         />
       )}
     </div>
