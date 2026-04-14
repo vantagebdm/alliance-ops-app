@@ -28,16 +28,21 @@ export default function Enquiries() {
 
   useEffect(() => {
     load();
-    const unsubscribe = base44.entities.Enquiry.subscribe((event) => {
-      if (event.type === 'create') {
-        setEnquiries(prev => [event.data, ...prev]);
-      } else if (event.type === 'update') {
-        setEnquiries(prev => prev.map(e => e.id === event.id ? event.data : e));
-      } else if (event.type === 'delete') {
-        setEnquiries(prev => prev.filter(e => e.id !== event.id));
-      }
-    });
-    return () => unsubscribe();
+    let unsubscribe;
+    try {
+      unsubscribe = base44.entities.Enquiry.subscribe((event) => {
+        if (event.type === 'create') {
+          setEnquiries(prev => [event.data, ...prev]);
+        } else if (event.type === 'update') {
+          setEnquiries(prev => prev.map(e => e.id === event.id ? event.data : e));
+        } else if (event.type === 'delete') {
+          setEnquiries(prev => prev.filter(e => e.id !== event.id));
+        }
+      });
+    } catch (e) {
+      // subscription unavailable (e.g. not authenticated yet)
+    }
+    return () => { if (unsubscribe) unsubscribe(); };
   }, []);
 
   const filtered = filter === "all" ? enquiries : enquiries.filter(e => {
