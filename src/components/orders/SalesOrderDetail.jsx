@@ -8,7 +8,7 @@ import moment from "moment";
 
 const STATUSES = ["pending","confirmed","processing","ready","dispatched","delivered","cancelled"];
 
-export default function SalesOrderDetail({ order, onClose, onUpdated, onEdit }) {
+export default function SalesOrderDetail({ order, onClose, onUpdated, onEdit, onCreateInvoice }) {
   const [status, setStatus] = useState(order.status);
 
   const handleStatusChange = async (val) => {
@@ -128,7 +128,9 @@ export default function SalesOrderDetail({ order, onClose, onUpdated, onEdit }) 
             <Button variant="outline" onClick={onEdit} className="rounded-sm font-heading text-xs uppercase tracking-wider">
               <Edit3 className="w-4 h-4 mr-1" /> Edit
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
+            <Button
+              onClick={() => onCreateInvoice?.(order)}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
               <FileText className="w-4 h-4 mr-1" /> Create Invoice
             </Button>
             <Button className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">

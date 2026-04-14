@@ -1,13 +1,26 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter, Zap } from "lucide-react";
+import { Plus, Filter, Zap, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SalesOrderForm from "../components/orders/SalesOrderForm";
 import SalesOrderDetail from "../components/orders/SalesOrderDetail";
+import InvoiceFromOrderModal from "../components/orders/InvoiceFromOrderModal";
 import moment from "moment";
+
+const INVOICE_STATUS_STYLES = {
+  fully_invoiced: "bg-green-500/10 text-green-600 border-green-500/30",
+  partially_invoiced: "bg-blue-500/10 text-blue-600 border-blue-500/30",
+  not_invoiced: "bg-gray-500/10 text-gray-500 border-gray-500/30",
+};
+const INVOICE_STATUS_LABELS = {
+  fully_invoiced: "Fully Invoiced",
+  partially_invoiced: "Partial",
+  not_invoiced: "Not Invoiced",
+};
+const INVOICEABLE = ["confirmed","processing","ready","dispatched","delivered"];
 
 export default function SalesOrders() {
   const [orders, setOrders] = useState([]);
@@ -16,6 +29,7 @@ export default function SalesOrders() {
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
+  const [invoiceTarget, setInvoiceTarget] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -46,6 +60,29 @@ export default function SalesOrders() {
     { key: "total", label: "Total", render: (v) => <span className="font-semibold">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
     { key: "delivery_method", label: "Delivery", render: (v) => <span className="text-xs capitalize">{(v || "").replace(/_/g, " ")}</span> },
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
+    {
+      key: "invoice_status", label: "Invoice", sortable: false,
+      render: (v, row) => {
+        const status = v || "not_invoiced";
+        return (
+          <span className={`px-2 py-0.5 rounded-sm border text-[10px] font-heading font-semibold uppercase tracking-wider ${INVOICE_STATUS_STYLES[status] || INVOICE_STATUS_STYLES.not_invoiced}`}>
+            {INVOICE_STATUS_LABELS[status] || "Not Invoiced"}
+          </span>
+        );
+      }
+    },
+    {
+      key: "id", label: "", sortable: false, width: "w-10",
+      render: (v, row) => INVOICEABLE.includes(row.status) && row.invoice_status !== "fully_invoiced" ? (
+        <button
+          onClick={(e) => { e.stopPropagation(); setInvoiceTarget(row); }}
+          title="Create Invoice"
+          className="p-1.5 rounded-sm bg-primary/10 hover:bg-primary/20 text-primary border border-primary/30 transition-colors"
+        >
+          <Receipt className="w-3.5 h-3.5" />
+        </button>
+      ) : null
+    },
   ];
 
   const FILTERS = [
@@ -94,12 +131,21 @@ export default function SalesOrders() {
         <SalesOrderForm initial={editTarget} onClose={() => setEditTarget(null)} onSaved={() => { setEditTarget(null); load(); }} />
       )}
 
-      {selected && !editTarget && (
+      {selected && !editTarget && !invoiceTarget && (
         <SalesOrderDetail
           order={selected}
           onClose={() => setSelected(null)}
           onUpdated={() => { setSelected(null); load(); }}
           onEdit={() => { setEditTarget(selected); setSelected(null); }}
+          onCreateInvoice={(order) => { setSelected(null); setInvoiceTarget(order); }}
+        />
+      )}
+
+      {invoiceTarget && (
+        <InvoiceFromOrderModal
+          order={invoiceTarget}
+          onClose={() => setInvoiceTarget(null)}
+          onSaved={() => { setInvoiceTarget(null); load(); }}
         />
       )}
     </div>
