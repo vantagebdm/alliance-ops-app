@@ -18,6 +18,16 @@ export default function QuickEnquiryForm({ onClose, onSaved }) {
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  const fillCustomer = (item) => {
+    setForm(f => ({
+      ...f,
+      customer_name: item.name || f.customer_name,
+      company: item.company || f.company,
+      customer_email: item.email || f.customer_email,
+      customer_phone: item.phone || f.customer_phone,
+    }));
+  };
+
   const save = async () => {
     setSaving(true);
     try {
@@ -55,7 +65,7 @@ export default function QuickEnquiryForm({ onClose, onSaved }) {
                 customerAC.handleInputChange(val);
               }}
               onSelect={(item) => {
-                u("customer_name", item.name);
+                fillCustomer(item);
                 customerAC.handleSelectSuggestion(item);
               }}
               placeholder="Search customer..."

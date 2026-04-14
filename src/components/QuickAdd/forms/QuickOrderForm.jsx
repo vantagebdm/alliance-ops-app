@@ -18,6 +18,14 @@ export default function QuickOrderForm({ onClose, onSaved }) {
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  const fillCustomer = (item) => {
+    setForm(f => ({
+      ...f,
+      customer_name: item.name || f.customer_name,
+      company: item.company || f.company,
+    }));
+  };
+
   const updateLine = (i, k, v) => {
     const items = form.items.map((line, idx) => (idx === i ? { ...line, [k]: v } : line));
     setForm(f => ({ ...f, items }));
@@ -73,7 +81,7 @@ export default function QuickOrderForm({ onClose, onSaved }) {
                 customerAC.handleInputChange(val);
               }}
               onSelect={(item) => {
-                u("customer_name", item.name);
+                fillCustomer(item);
                 customerAC.handleSelectSuggestion(item);
               }}
               placeholder="Search customer..."

@@ -24,6 +24,15 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  const fillCustomer = (item) => {
+    setForm(f => ({
+      ...f,
+      customer_name: item.name || f.customer_name,
+      company: item.company || f.company,
+      customer_email: item.email || f.customer_email,
+    }));
+  };
+
   const updateLine = (i, k, v) => {
     const items = form.items.map((line, idx) => {
       if (idx !== i) return line;
@@ -90,7 +99,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
                    customerAC.handleInputChange(val);
                  }}
                  onSelect={(item) => {
-                   u("customer_name", item.name);
+                   fillCustomer(item);
                    customerAC.handleSelectSuggestion(item);
                  }}
                  placeholder="Search customer..."
@@ -109,7 +118,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
                    companyAC.handleInputChange(val);
                  }}
                  onSelect={(item) => {
-                   u("company", item.company);
+                   fillCustomer(item);
                    companyAC.handleSelectSuggestion(item);
                  }}
                  placeholder="Search company..."
