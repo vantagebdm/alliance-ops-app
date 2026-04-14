@@ -1,10 +1,9 @@
-import { useState, useRef, useEffect } from "react";
-import { Search, Bell, User, Plus, ChevronDown, Menu } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { User, Menu } from "lucide-react";
 import GlobalSearch from "./GlobalSearch";
 import QuickAddButton from "@/components/QuickAdd/QuickAddButton";
 import { useQuickAddContext } from "@/hooks/useQuickAddContext";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 export default function TopBar({ onToggleSidebar }) {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -39,10 +38,7 @@ export default function TopBar({ onToggleSidebar }) {
 
       {/* Right actions */}
       <div className="flex items-center gap-2">
-        <button className="relative p-2 text-white/60 hover:text-white transition-colors">
-          <Bell className="w-5 h-5" />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full" />
-        </button>
+        <NotificationBell />
         <div className="hidden sm:block">
           <QuickAddButton contextData={contextData} />
         </div>

@@ -1,0 +1,154 @@
+{
+  "name": "Notification",
+  "type": "object",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "enquiry_new",
+        "enquiry_urgent",
+        "enquiry_assigned",
+        "enquiry_updated",
+        "enquiry_converted",
+        "enquiry_waiting",
+        "breakdown_created",
+        "urgent_request",
+        "critical_order",
+        "quote_new",
+        "quote_assigned",
+        "quote_approved",
+        "quote_expired",
+        "quote_followup",
+        "order_new",
+        "order_status",
+        "order_ready_pick",
+        "order_partial",
+        "order_awaiting_stock",
+        "order_urgent",
+        "order_invoiced",
+        "stock_low",
+        "stock_out",
+        "stock_reorder",
+        "stock_adjustment",
+        "stock_discrepancy",
+        "stock_critical",
+        "po_created",
+        "po_overdue",
+        "po_delayed",
+        "po_received",
+        "po_partial",
+        "po_backorder",
+        "po_approval",
+        "dispatch_created",
+        "dispatch_ready",
+        "dispatch_packed",
+        "dispatch_sent",
+        "dispatch_delivered",
+        "dispatch_delayed",
+        "dispatch_urgent",
+        "invoice_created",
+        "invoice_emailed",
+        "invoice_overdue",
+        "credit_limit_exceeded",
+        "account_on_hold",
+        "payment_received",
+        "part_payment",
+        "credit_app_uploaded",
+        "credit_app_extracted",
+        "credit_app_review",
+        "credit_app_approved",
+        "credit_app_declined",
+        "credit_app_missing",
+        "task_assigned",
+        "approval_required",
+        "template_updated",
+        "sync_failure",
+        "gmail_sync_failure",
+        "pdf_extraction_failed",
+        "system"
+      ]
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "enquiry",
+        "breakdown",
+        "quote",
+        "order",
+        "inventory",
+        "purchasing",
+        "dispatch",
+        "finance",
+        "credit",
+        "admin"
+      ]
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "normal",
+        "important",
+        "urgent",
+        "critical"
+      ],
+      "default": "normal"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "entity_type": {
+      "type": "string"
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "entity_ref": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "target_user": {
+      "type": "string"
+    },
+    "target_role": {
+      "type": "string"
+    },
+    "is_read": {
+      "type": "boolean",
+      "default": false
+    },
+    "read_at": {
+      "type": "string"
+    },
+    "is_dismissed": {
+      "type": "boolean",
+      "default": false
+    },
+    "dismissed_at": {
+      "type": "string"
+    },
+    "is_pinned": {
+      "type": "boolean",
+      "default": false
+    },
+    "action_url": {
+      "type": "string"
+    },
+    "escalated": {
+      "type": "boolean",
+      "default": false
+    },
+    "escalated_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "title"
+  ]
+}
