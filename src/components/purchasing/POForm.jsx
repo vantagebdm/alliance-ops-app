@@ -108,8 +108,8 @@ export default function POForm({ onClose, onSaved, initial }) {
                 <Input type="date" value={form.expected_date} onChange={e => u("expected_date", e.target.value)} className="rounded-sm" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Reference</label>
-                <Input value={form.reference} onChange={e => u("reference", e.target.value)} placeholder="e.g. Job #, enquiry ref..." className="rounded-sm" />
+                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Purchase Order Number</label>
+                <Input value={form.reference} onChange={e => u("reference", e.target.value)} placeholder="e.g. PO-12345..." className="rounded-sm" />
               </div>
             </div>
           </div>
