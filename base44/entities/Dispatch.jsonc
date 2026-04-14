@@ -5,6 +5,16 @@
     "dispatch_number": {
       "type": "string"
     },
+    "dispatch_source": {
+      "type": "string",
+      "enum": [
+        "sales_order",
+        "customer_order",
+        "manual",
+        "urgent_breakdown"
+      ],
+      "default": "manual"
+    },
     "order_id": {
       "type": "string"
     },
@@ -14,41 +24,57 @@
     "customer_name": {
       "type": "string"
     },
+    "customer_po_number": {
+      "type": "string"
+    },
+    "job_number": {
+      "type": "string"
+    },
+    "site_contact_name": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
     "method": {
       "type": "string",
       "enum": [
         "pickup",
         "local_delivery",
-        "freight"
+        "freight",
+        "remote_site",
+        "internal_transfer"
       ],
       "default": "pickup"
     },
-    "carrier": {
-      "type": "string"
-    },
-    "tracking_number": {
-      "type": "string"
+    "priority": {
+      "type": "string",
+      "enum": [
+        "standard",
+        "same_day",
+        "urgent",
+        "breakdown_critical"
+      ],
+      "default": "standard"
     },
     "status": {
       "type": "string",
       "enum": [
-        "pending",
+        "draft",
+        "ready_to_pick",
         "picked",
         "packed",
         "dispatched",
-        "delivered"
+        "in_transit",
+        "delivered",
+        "collected",
+        "partial",
+        "cancelled"
       ],
-      "default": "pending"
-    },
-    "dispatch_date": {
-      "type": "string",
-      "format": "date"
-    },
-    "delivery_address": {
-      "type": "string"
-    },
-    "notes": {
-      "type": "string"
+      "default": "draft"
     },
     "items": {
       "type": "array",
@@ -61,15 +87,126 @@
           "description": {
             "type": "string"
           },
-          "quantity": {
+          "ordered_qty": {
             "type": "number"
+          },
+          "available_qty": {
+            "type": "number"
+          },
+          "dispatch_qty": {
+            "type": "number"
+          },
+          "remaining_qty": {
+            "type": "number"
+          },
+          "location": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "pickup_contact": {
+      "type": "string"
+    },
+    "pickup_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "pickup_notes": {
+      "type": "string"
+    },
+    "delivery_address": {
+      "type": "string"
+    },
+    "delivery_suburb": {
+      "type": "string"
+    },
+    "delivery_contact": {
+      "type": "string"
+    },
+    "delivery_instructions": {
+      "type": "string"
+    },
+    "requested_delivery_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "freight_company": {
+      "type": "string"
+    },
+    "consignment_number": {
+      "type": "string"
+    },
+    "site_name": {
+      "type": "string"
+    },
+    "site_access_instructions": {
+      "type": "string"
+    },
+    "from_location": {
+      "type": "string"
+    },
+    "to_location": {
+      "type": "string"
+    },
+    "transfer_reference": {
+      "type": "string"
+    },
+    "carrier": {
+      "type": "string"
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "eta": {
+      "type": "string",
+      "format": "date"
+    },
+    "warehouse_location": {
+      "type": "string"
+    },
+    "assigned_staff": {
+      "type": "string"
+    },
+    "picked_by": {
+      "type": "string"
+    },
+    "packed_by": {
+      "type": "string"
+    },
+    "dispatch_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "customer_notes": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
           }
         }
       }
     }
   },
   "required": [
-    "order_number",
-    "customer_name"
+    "customer_name",
+    "dispatch_number"
   ]
 }

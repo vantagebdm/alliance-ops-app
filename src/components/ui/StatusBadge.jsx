@@ -27,6 +27,10 @@ const STATUS_STYLES = {
   packed: "bg-blue-500/10 text-blue-400 border border-blue-500/30",
   picked: "bg-blue-500/10 text-blue-400 border border-blue-500/30",
   dispatched: "bg-blue-500/10 text-blue-400 border border-blue-500/30",
+  in_transit: "bg-blue-500/10 text-blue-400 border border-blue-500/30",
+  ready_to_pick: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
+  collected: "bg-green-500/10 text-green-400 border border-green-500/30",
+  partial: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
   // Red
   urgent: "bg-red-500/10 text-red-400 border border-red-500/30",
   breakdown: "bg-red-600/15 text-red-400 border border-red-500/40 animate-pulse",
