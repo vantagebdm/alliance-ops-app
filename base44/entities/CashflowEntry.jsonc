@@ -1,0 +1,85 @@
+{
+  "name": "CashflowEntry",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "outgoing",
+        "incoming"
+      ],
+      "default": "outgoing"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "wages",
+        "rent",
+        "utilities",
+        "insurance",
+        "supplier_payment",
+        "cogs",
+        "freight",
+        "maintenance",
+        "tax",
+        "loan",
+        "sales_revenue",
+        "invoice_payment",
+        "other"
+      ],
+      "default": "other"
+    },
+    "amount": {
+      "type": "number",
+      "default": 0
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "paid_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "paid",
+        "overdue",
+        "cancelled"
+      ],
+      "default": "scheduled"
+    },
+    "recurrence": {
+      "type": "string",
+      "enum": [
+        "once",
+        "weekly",
+        "fortnightly",
+        "monthly"
+      ],
+      "default": "once"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "amount",
+    "due_date"
+  ]
+}

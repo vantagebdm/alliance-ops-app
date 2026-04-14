@@ -2,7 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, FileText, ShoppingCart,
   Package, Warehouse, ShoppingBag, Truck, Users,
-  Receipt, BarChart3, Settings, X, Send
+  Receipt, BarChart3, Settings, X, Send, TrendingUp
 } from "lucide-react";
 
 const NAV_SECTIONS = [
@@ -30,6 +30,7 @@ const NAV_SECTIONS = [
       { label: "Customers", icon: Users, path: "/customers" },
       { label: "Dispatch", icon: Send, path: "/dispatch" },
       { label: "Invoices", icon: Receipt, path: "/invoices" },
+      { label: "Cashflow", icon: TrendingUp, path: "/cashflow" },
     ]
   },
   {
