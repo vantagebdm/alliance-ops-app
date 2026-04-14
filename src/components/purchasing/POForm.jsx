@@ -12,7 +12,7 @@ const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_cos
 
 export default function POForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
-    supplier_name: "", status: "draft", expected_date: "", notes: "",
+    supplier_name: "", status: "draft", expected_date: "", reference: "", notes: "",
     items: [newLine()], subtotal: 0, gst: 0, total: 0,
   });
   const [saving, setSaving] = useState(false);
@@ -106,6 +106,10 @@ export default function POForm({ onClose, onSaved, initial }) {
               <div>
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Expected Date</label>
                 <Input type="date" value={form.expected_date} onChange={e => u("expected_date", e.target.value)} className="rounded-sm" />
+              </div>
+              <div>
+                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/50 mb-1 block">Reference</label>
+                <Input value={form.reference} onChange={e => u("reference", e.target.value)} placeholder="e.g. Job #, enquiry ref..." className="rounded-sm" />
               </div>
             </div>
           </div>
