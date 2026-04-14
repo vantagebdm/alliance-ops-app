@@ -1,0 +1,104 @@
+{
+  "name": "CreditAppTemplate",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "company_name": {
+      "type": "string"
+    },
+    "company_abn": {
+      "type": "string"
+    },
+    "company_acn": {
+      "type": "string"
+    },
+    "company_address": {
+      "type": "string"
+    },
+    "company_state": {
+      "type": "string"
+    },
+    "company_postcode": {
+      "type": "string"
+    },
+    "company_phone": {
+      "type": "string"
+    },
+    "company_email": {
+      "type": "string"
+    },
+    "company_web": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "declaration_text": {
+      "type": "string"
+    },
+    "guarantee_intro_text": {
+      "type": "string"
+    },
+    "guarantee_clauses": {
+      "type": "string"
+    },
+    "terms_definitions": {
+      "type": "string"
+    },
+    "terms_acceptance": {
+      "type": "string"
+    },
+    "terms_errors_omissions": {
+      "type": "string"
+    },
+    "terms_price_payment": {
+      "type": "string"
+    },
+    "terms_delivery": {
+      "type": "string"
+    },
+    "terms_risk": {
+      "type": "string"
+    },
+    "terms_title": {
+      "type": "string"
+    },
+    "terms_ppsa": {
+      "type": "string"
+    },
+    "terms_security_charge": {
+      "type": "string"
+    },
+    "terms_defects_warranties": {
+      "type": "string"
+    },
+    "terms_default": {
+      "type": "string"
+    },
+    "terms_cancellation": {
+      "type": "string"
+    },
+    "terms_privacy": {
+      "type": "string"
+    },
+    "terms_service_notices": {
+      "type": "string"
+    },
+    "terms_trusts": {
+      "type": "string"
+    },
+    "terms_general": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "version",
+    "company_name"
+  ]
+}

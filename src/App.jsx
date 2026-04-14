@@ -21,6 +21,7 @@ import Reports from './pages/Reports';
 import Admin from './pages/Admin';
 import GmailTest from './pages/GmailTest';
 import Cashflow from './pages/Cashflow';
+import CreditAppTemplates from './pages/CreditAppTemplates';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -70,6 +71,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin" element={<Admin />} />
         <Route path="/cashflow" element={<Cashflow />} />
         <Route path="/gmail-test" element={<GmailTest />} />
+        <Route path="/credit-application" element={<CreditAppTemplates />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
