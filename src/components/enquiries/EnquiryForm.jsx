@@ -21,6 +21,16 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
 
   const update = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
+  const fillCustomer = (item) => {
+    setForm(f => ({
+      ...f,
+      customer_name: item.name || f.customer_name,
+      company: item.company || f.company,
+      customer_email: item.email || f.customer_email,
+      customer_phone: item.phone || f.customer_phone,
+    }));
+  };
+
   const save = async () => {
     setSaving(true);
     const data = { ...form };
@@ -71,7 +81,7 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
                     customerAC.handleInputChange(val);
                   }}
                   onSelect={(item) => {
-                    update("customer_name", item.name);
+                    fillCustomer(item);
                     customerAC.handleSelectSuggestion(item);
                   }}
                   placeholder="Search customer..."
@@ -90,7 +100,7 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
                     companyAC.handleInputChange(val);
                   }}
                   onSelect={(item) => {
-                    update("company", item.company);
+                    fillCustomer(item);
                     companyAC.handleSelectSuggestion(item);
                   }}
                   placeholder="Search company..."
