@@ -99,13 +99,25 @@ export default function CashflowCalendar({ entries, onEntryClick, onDayClick }) 
               const isCurrentMonth = day.isSame(current, "month");
               const dayTotal = dayEntries.reduce((a, e) => a + (e.type === "incoming" ? e.amount : -e.amount), 0);
 
+              const hasMixed = dayEntries.length > 0;
+              const dayBg = !isCurrentMonth
+                ? ""
+                : hasMixed && dayTotal > 0
+                ? "bg-green-500/10"
+                : hasMixed && dayTotal < 0
+                ? "bg-red-500/10"
+                : hasMixed
+                ? "bg-yellow-500/10"
+                : "";
+
               return (
                 <div
                   key={di}
                   onClick={() => isCurrentMonth && onDayClick && onDayClick(key)}
                   className={`min-h-[90px] p-1.5 border-r border-border last:border-r-0 transition-colors
                     ${!isCurrentMonth ? "opacity-30" : ""}
-                    ${isCurrentMonth && onDayClick ? "cursor-pointer hover:bg-muted/20" : ""}`}
+                    ${dayBg}
+                    ${isCurrentMonth && onDayClick ? "cursor-pointer hover:brightness-110" : ""}`}
                 >
                   <div className="flex justify-between items-center mb-1">
                     <span className={`font-heading text-xs font-bold w-6 h-6 flex items-center justify-center rounded-full

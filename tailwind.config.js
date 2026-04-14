@@ -8,6 +8,7 @@ module.exports = {
     'bg-red-500/10', 'text-red-400', 'border-red-500/30',
     'bg-blue-500/10', 'text-blue-400', 'border-blue-500/30',
     'bg-gray-500/10', 'text-gray-400', 'border-gray-500/30',
+    'bg-green-500/10', 'bg-red-500/10', 'bg-yellow-500/10',
   ],
   theme: {
     extend: {
