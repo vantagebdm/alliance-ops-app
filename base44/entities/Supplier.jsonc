@@ -5,16 +5,104 @@
     "name": {
       "type": "string"
     },
-    "contact_person": {
+    "trading_name": {
       "type": "string"
     },
-    "email": {
+    "supplier_code": {
+      "type": "string"
+    },
+    "abn": {
+      "type": "string"
+    },
+    "acn": {
+      "type": "string"
+    },
+    "website": {
       "type": "string"
     },
     "phone": {
       "type": "string"
     },
+    "email": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "preferred",
+        "inactive",
+        "on_hold",
+        "under_review"
+      ],
+      "default": "active"
+    },
+    "contact_person": {
+      "type": "string"
+    },
+    "contact_position": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "contact_mobile": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "contact_method": {
+      "type": "string"
+    },
+    "additional_contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "accounts_contact_name": {
+      "type": "string"
+    },
+    "accounts_phone": {
+      "type": "string"
+    },
+    "accounts_email": {
+      "type": "string"
+    },
+    "statement_email": {
+      "type": "string"
+    },
+    "orders_email": {
+      "type": "string"
+    },
+    "returns_email": {
+      "type": "string"
+    },
+    "invoice_email": {
+      "type": "string"
+    },
     "address": {
+      "type": "string"
+    },
+    "address2": {
       "type": "string"
     },
     "city": {
@@ -26,6 +114,57 @@
     "postcode": {
       "type": "string"
     },
+    "country": {
+      "type": "string",
+      "default": "Australia"
+    },
+    "warehouse_same_as_head": {
+      "type": "boolean",
+      "default": true
+    },
+    "warehouse_address": {
+      "type": "string"
+    },
+    "warehouse_address2": {
+      "type": "string"
+    },
+    "warehouse_city": {
+      "type": "string"
+    },
+    "warehouse_state": {
+      "type": "string"
+    },
+    "warehouse_postcode": {
+      "type": "string"
+    },
+    "warehouse_country": {
+      "type": "string"
+    },
+    "returns_same_as_warehouse": {
+      "type": "boolean",
+      "default": true
+    },
+    "returns_address": {
+      "type": "string"
+    },
+    "returns_address2": {
+      "type": "string"
+    },
+    "returns_city": {
+      "type": "string"
+    },
+    "returns_state": {
+      "type": "string"
+    },
+    "returns_postcode": {
+      "type": "string"
+    },
+    "returns_country": {
+      "type": "string"
+    },
+    "account_number": {
+      "type": "string"
+    },
     "payment_terms": {
       "type": "string",
       "enum": [
@@ -33,26 +172,276 @@
         "Net_7",
         "Net_14",
         "Net_30",
-        "Net_60"
+        "Net_30_EOM",
+        "Net_60",
+        "Custom"
       ],
       "default": "Net_30"
     },
-    "status": {
-      "type": "string",
-      "enum": [
-        "active",
-        "inactive",
-        "pending"
-      ],
-      "default": "active"
+    "payment_terms_custom": {
+      "type": "string"
     },
-    "notes": {
+    "credit_limit": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string",
+      "default": "AUD"
+    },
+    "gst_registered": {
+      "type": "boolean",
+      "default": true
+    },
+    "bank_name": {
+      "type": "string"
+    },
+    "bank_account_name": {
+      "type": "string"
+    },
+    "bank_bsb": {
+      "type": "string"
+    },
+    "bank_account_number": {
+      "type": "string"
+    },
+    "accepts_credit_card": {
+      "type": "boolean",
+      "default": false
+    },
+    "card_surcharge": {
+      "type": "string"
+    },
+    "purchase_method": {
+      "type": "string"
+    },
+    "preferred_supplier": {
+      "type": "boolean",
+      "default": false
+    },
+    "categories_supplied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "equipment_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "brands_supplied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "oem_aftermarket": {
+      "type": "string"
+    },
+    "warranty_support": {
+      "type": "boolean",
+      "default": false
+    },
+    "returns_accepted": {
+      "type": "boolean",
+      "default": false
+    },
+    "core_exchange": {
+      "type": "boolean",
+      "default": false
+    },
+    "lead_time_standard": {
+      "type": "number"
+    },
+    "lead_time_express": {
+      "type": "number"
+    },
+    "emergency_supply": {
+      "type": "boolean",
+      "default": false
+    },
+    "ships_karratha": {
+      "type": "boolean",
+      "default": false
+    },
+    "ships_pilbara": {
+      "type": "boolean",
+      "default": false
+    },
+    "freight_methods": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "freight_account_option": {
+      "type": "string"
+    },
+    "free_freight_threshold": {
+      "type": "string"
+    },
+    "dangerous_goods_notes": {
+      "type": "string"
+    },
+    "cutoff_time": {
+      "type": "string"
+    },
+    "dispatch_origin": {
+      "type": "string"
+    },
+    "sales_territory": {
+      "type": "string"
+    },
+    "business_hours": {
+      "type": "string"
+    },
+    "afterhours_contact": {
+      "type": "string"
+    },
+    "breakdown_contact": {
+      "type": "string"
+    },
+    "min_order_value": {
+      "type": "string"
+    },
+    "moq_notes": {
+      "type": "string"
+    },
+    "price_file_available": {
+      "type": "boolean",
+      "default": false
+    },
+    "live_stock_feed": {
+      "type": "boolean",
+      "default": false
+    },
+    "api_portal_available": {
+      "type": "boolean",
+      "default": false
+    },
+    "portal_url": {
+      "type": "string"
+    },
+    "portal_username": {
+      "type": "string"
+    },
+    "portal_notes": {
+      "type": "string"
+    },
+    "pricing_basis": {
+      "type": "string"
+    },
+    "discount_notes": {
+      "type": "string"
+    },
+    "rebate_agreement": {
+      "type": "boolean",
+      "default": false
+    },
+    "volume_agreement": {
+      "type": "boolean",
+      "default": false
+    },
+    "special_contract_terms": {
+      "type": "string"
+    },
+    "margin_notes": {
+      "type": "string"
+    },
+    "competitive_position": {
+      "type": "string"
+    },
+    "preferred_breakdown": {
+      "type": "boolean",
+      "default": false
+    },
+    "returns_contact": {
+      "type": "string"
+    },
+    "warranty_contact": {
+      "type": "string"
+    },
+    "return_window": {
+      "type": "string"
+    },
+    "restocking_fee": {
+      "type": "string"
+    },
+    "rma_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "warranty_claim_notes": {
+      "type": "string"
+    },
+    "core_return_notes": {
+      "type": "string"
+    },
+    "faulty_goods_notes": {
+      "type": "string"
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "pricing_notes": {
+      "type": "string"
+    },
+    "freight_notes": {
+      "type": "string"
+    },
+    "reliability_notes": {
+      "type": "string"
+    },
+    "risk_notes": {
       "type": "string"
     },
     "rating": {
       "type": "number",
       "minimum": 1,
       "maximum": 5
+    },
+    "preferred_ranking": {
+      "type": "number"
+    },
+    "last_review_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "review_frequency": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "managed_by": {
+      "type": "string"
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc_type": {
+            "type": "string"
+          },
+          "filename": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "uploaded_by": {
+            "type": "string"
+          },
+          "upload_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
     }
   },
   "required": [

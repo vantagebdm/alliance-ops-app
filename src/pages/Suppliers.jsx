@@ -1,48 +1,72 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Search, Star } from "lucide-react";
+import { Plus, Search, Star, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PageHeader from "@/components/ui/PageHeader";
-import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
-import SupplierForm from "../components/suppliers/SupplierForm";
+import SupplierOnboardingForm from "../components/suppliers/SupplierOnboardingForm";
+import SupplierDetail from "../components/suppliers/SupplierDetail";
+
+function StarRating({ value }) {
+  if (!value) return <span className="text-muted-foreground text-xs">—</span>;
+  return (
+    <div className="flex items-center gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star key={i} className={`w-3 h-3 ${i < value ? "text-amber-400 fill-amber-400" : "text-gray-300"}`} />
+      ))}
+    </div>
+  );
+}
 
 export default function Suppliers() {
   const [suppliers, setSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [editTarget, setEditTarget] = useState(null);
   const [search, setSearch] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterCategory, setFilterCategory] = useState("all");
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.Supplier.list("-created_date", 100);
+    const data = await base44.entities.Supplier.list("-created_date", 200);
     setSuppliers(data);
     setLoading(false);
   };
 
   useEffect(() => { load(); }, []);
 
-  const filtered = search
-    ? suppliers.filter(s => s.name?.toLowerCase().includes(search.toLowerCase()) || s.contact_person?.toLowerCase().includes(search.toLowerCase()))
-    : suppliers;
+  const allCategories = [...new Set(suppliers.flatMap(s => s.categories_supplied || []))].sort();
 
-  const columns = [
-    { key: "name", label: "Supplier Name", render: (v) => <span className="font-semibold">{v}</span> },
-    { key: "contact_person", label: "Contact" },
-    { key: "phone", label: "Phone" },
-    { key: "email", label: "Email" },
-    { key: "city", label: "City" },
-    { key: "payment_terms", label: "Terms", render: (v) => <span className="text-xs uppercase">{(v || "").replace("_", " ")}</span> },
-    { key: "rating", label: "Rating", render: (v) => v ? (
-      <div className="flex items-center gap-0.5">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Star key={i} className={`w-3 h-3 ${i < v ? "text-amber-400 fill-amber-400" : "text-gray-300"}`} />
-        ))}
-      </div>
-    ) : "—" },
-    { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
-  ];
+  const filtered = suppliers.filter(s => {
+    const matchSearch = !search ||
+      s.name?.toLowerCase().includes(search.toLowerCase()) ||
+      s.trading_name?.toLowerCase().includes(search.toLowerCase()) ||
+      s.supplier_code?.toLowerCase().includes(search.toLowerCase()) ||
+      s.city?.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = filterStatus === "all" || s.status === filterStatus;
+    const matchCat = filterCategory === "all" || (s.categories_supplied || []).includes(filterCategory);
+    return matchSearch && matchStatus && matchCat;
+  });
+
+  const handleSaved = (saved) => {
+    setShowForm(false);
+    setEditTarget(null);
+    load().then(() => {
+      if (saved?.id) {
+        setSelected(saved);
+      }
+    });
+  };
+
+  const handleEdit = () => {
+    setEditTarget(selected);
+    setSelected(null);
+    setShowForm(true);
+  };
 
   return (
     <div>
@@ -50,23 +74,126 @@ export default function Suppliers() {
         title="Suppliers"
         subtitle={`${suppliers.length} suppliers registered`}
         actions={
-          <Button onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+          <Button onClick={() => { setEditTarget(null); setShowForm(true); }}
+            className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
             <Plus className="w-4 h-4 mr-1" /> Add Supplier
           </Button>
         }
       />
+
       <div className="p-6 space-y-4">
-        <div className="relative max-w-sm">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search suppliers..." className="pl-9 rounded-sm" />
+        {/* Filters */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[200px] max-w-sm">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search suppliers..." className="pl-9 rounded-sm" />
+          </div>
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="w-36 rounded-sm text-xs font-heading uppercase tracking-wider">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="preferred">Preferred</SelectItem>
+              <SelectItem value="on_hold">On Hold</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="under_review">Under Review</SelectItem>
+            </SelectContent>
+          </Select>
+          {allCategories.length > 0 && (
+            <Select value={filterCategory} onValueChange={setFilterCategory}>
+              <SelectTrigger className="w-44 rounded-sm text-xs font-heading uppercase tracking-wider">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {allCategories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          )}
+          {(filterStatus !== "all" || filterCategory !== "all" || search) && (
+            <button onClick={() => { setSearch(""); setFilterStatus("all"); setFilterCategory("all"); }}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-heading uppercase tracking-wider">
+              <X className="w-3 h-3" /> Clear
+            </button>
+          )}
         </div>
+
+        {/* Table */}
         {loading ? (
-          <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" /></div>
+          <div className="flex justify-center py-12">
+            <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center py-16 text-muted-foreground/50 font-heading uppercase tracking-wider text-xs">
+            No suppliers found
+          </div>
         ) : (
-          <DataTable columns={columns} data={filtered} emptyMessage="No suppliers found." />
+          <div className="border border-border rounded-sm overflow-hidden">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  {["Supplier Name","Code","Categories","City","Terms","Lead Time","Preferred","Rating","Status"].map(h => (
+                    <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filtered.map(s => (
+                  <tr key={s.id}
+                    onClick={() => setSelected(s)}
+                    className="hover:bg-muted/30 cursor-pointer transition-colors">
+                    <td className="px-4 py-2.5">
+                      <div className="font-semibold text-foreground">{s.name}</div>
+                      {s.trading_name && <div className="text-[10px] text-muted-foreground">{s.trading_name}</div>}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground font-mono">{s.supplier_code || "—"}</td>
+                    <td className="px-4 py-2.5">
+                      {(s.categories_supplied || []).length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {(s.categories_supplied || []).slice(0, 2).map(c => (
+                            <span key={c} className="px-1.5 py-0.5 text-[9px] font-heading uppercase tracking-wider bg-muted border border-border rounded-sm">{c}</span>
+                          ))}
+                          {(s.categories_supplied || []).length > 2 && (
+                            <span className="text-[9px] text-muted-foreground">+{(s.categories_supplied || []).length - 2}</span>
+                          )}
+                        </div>
+                      ) : <span className="text-muted-foreground text-xs">—</span>}
+                    </td>
+                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{[s.city, s.state].filter(Boolean).join(", ") || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs">{(s.payment_terms || "").replace(/_/g, " ") || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs">{s.lead_time_standard ? `${s.lead_time_standard}d` : "—"}</td>
+                    <td className="px-4 py-2.5 text-center">
+                      {s.preferred_supplier
+                        ? <span className="text-primary text-sm font-bold">★</span>
+                        : <span className="text-muted-foreground text-xs">—</span>}
+                    </td>
+                    <td className="px-4 py-2.5"><StarRating value={s.rating} /></td>
+                    <td className="px-4 py-2.5"><StatusBadge status={s.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
-      {showForm && <SupplierForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
+
+      {showForm && (
+        <SupplierOnboardingForm
+          initial={editTarget}
+          onClose={() => { setShowForm(false); setEditTarget(null); }}
+          onSaved={handleSaved}
+        />
+      )}
+
+      {selected && !showForm && (
+        <SupplierDetail
+          supplier={selected}
+          onClose={() => setSelected(null)}
+          onEdit={handleEdit}
+        />
+      )}
     </div>
   );
 }
