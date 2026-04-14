@@ -1,0 +1,112 @@
+import { Edit, FileText, Plus, Receipt, ShoppingCart, Upload, FileSearch } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import StatusBadge from "@/components/ui/StatusBadge";
+import moment from "moment";
+
+const ACCOUNT_STATUS_LABELS = {
+  cash_sale: "Cash Sale", credit_pending: "Credit Pending", under_review: "Under Review",
+  active_credit: "Active Credit", on_hold: "On Hold", declined: "Declined",
+};
+const ACCOUNT_STATUS_COLORS = {
+  cash_sale: "text-gray-400 bg-gray-500/10 border border-gray-500/20",
+  credit_pending: "text-amber-400 bg-amber-500/10 border border-amber-500/20",
+  under_review: "text-blue-400 bg-blue-500/10 border border-blue-500/20",
+  active_credit: "text-green-400 bg-green-500/10 border border-green-500/20",
+  on_hold: "text-red-400 bg-red-500/10 border border-red-500/20",
+  declined: "text-red-600 bg-red-900/20 border border-red-700/30",
+};
+const TIER_COLORS = {
+  retail: "text-gray-400", trade: "text-blue-400", fleet: "text-purple-400",
+  workshop: "text-amber-400", contract: "text-green-400", custom: "text-pink-400",
+};
+
+const quickActions = [
+  { icon: ShoppingCart, label: "New Order" },
+  { icon: FileText, label: "New Quote" },
+  { icon: Receipt, label: "New Invoice" },
+  { icon: Upload, label: "Upload Doc" },
+  { icon: FileSearch, label: "Credit App" },
+];
+
+export default function ProfileHeader({ customer, onEdit, onClose }) {
+  const acctColor = ACCOUNT_STATUS_COLORS[customer.account_status] || ACCOUNT_STATUS_COLORS.cash_sale;
+  const tierColor = TIER_COLORS[customer.pricing_tier] || "text-gray-400";
+
+  return (
+    <div className="bg-[hsl(0,0%,6%)] px-6 py-5 rounded-t-sm">
+      {/* Top row */}
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-3 flex-wrap">
+            <h2 className="font-heading text-xl font-bold text-white uppercase tracking-widest leading-tight">
+              {customer.name}
+            </h2>
+            <StatusBadge status={customer.status || "active"} />
+            <span className={`text-[10px] font-heading uppercase tracking-wider px-2 py-0.5 rounded-sm ${acctColor}`}>
+              {ACCOUNT_STATUS_LABELS[customer.account_status] || customer.account_status}
+            </span>
+            {customer.created_by_method === "pdf_extraction" && (
+              <span className="text-[10px] font-heading uppercase tracking-wider px-2 py-0.5 rounded-sm bg-blue-500/10 text-blue-400 border border-blue-500/20 flex items-center gap-1">
+                <FileSearch className="w-3 h-3" /> PDF Extracted
+              </span>
+            )}
+          </div>
+          {customer.trading_name && customer.trading_name !== customer.name && (
+            <p className="text-white/50 text-xs font-heading uppercase tracking-wider mt-1">
+              Trading as: {customer.trading_name}
+            </p>
+          )}
+          {/* Meta row */}
+          <div className="flex flex-wrap items-center gap-4 mt-3">
+            {customer.customer_type && (
+              <span className="text-xs text-white/40 font-heading uppercase tracking-wider">
+                {customer.customer_type.replace(/_/g, " ")}
+              </span>
+            )}
+            {customer.pricing_tier && (
+              <span className={`text-xs font-heading uppercase tracking-wider ${tierColor}`}>
+                {customer.pricing_tier} pricing
+              </span>
+            )}
+            {customer.payment_terms && (
+              <span className="text-xs text-white/40">
+                {customer.payment_terms.replace(/_/g, " ")} terms
+              </span>
+            )}
+            {customer.service_region && (
+              <span className="text-xs text-white/40 font-heading uppercase tracking-wider">
+                {customer.service_region.replace(/_/g, " ")}
+              </span>
+            )}
+            {customer.account_manager && (
+              <span className="text-xs text-white/40">Mgr: {customer.account_manager}</span>
+            )}
+            <span className="text-xs text-white/30">
+              Since {moment(customer.created_date).format("DD/MM/YYYY")}
+            </span>
+          </div>
+        </div>
+        {/* Actions */}
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Button size="sm" variant="outline" onClick={onEdit}
+            className="border-white/20 text-white hover:bg-white/10 rounded-sm font-heading text-xs uppercase tracking-wider">
+            <Edit className="w-3 h-3 mr-1" /> Edit
+          </Button>
+          <button onClick={onClose} className="text-white/40 hover:text-white ml-1">
+            <span className="text-lg">×</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Quick action strip */}
+      <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
+        {quickActions.map(({ icon: Icon, label }) => (
+          <button key={label}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-sm transition-colors bg-white/0 hover:bg-white/5">
+            <Icon className="w-3 h-3" /> {label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}

@@ -1,95 +1,88 @@
-import { useState, useEffect } from "react";
-import { base44 } from "@/api/base44Client";
-import { X, Mail, MessageSquare, Clock, ChevronRight, Edit } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import StatusBadge from "@/components/ui/StatusBadge";
-import CustomerForm from "./CustomerForm";
-import CustomerCommunication from "./CustomerCommunication";
-import moment from "moment";
+import { useState } from "react";
+import CustomerOnboardingForm from "./CustomerOnboardingForm";
+import ProfileHeader from "./profile/ProfileHeader";
+import TabOverview from "./profile/TabOverview";
+import TabContacts from "./profile/TabContacts";
+import TabAddresses from "./profile/TabAddresses";
+import TabCredit from "./profile/TabCredit";
+import TabDirectors from "./profile/TabDirectors";
+import TabTradeRefs from "./profile/TabTradeRefs";
+import TabDocuments from "./profile/TabDocuments";
+import TabActivity from "./profile/TabActivity";
+import TabHistory from "./profile/TabHistory";
 
-const TABS = ["Details", "Communication"];
+const TABS = [
+  { key: "overview",   label: "Overview" },
+  { key: "contacts",   label: "Contacts" },
+  { key: "addresses",  label: "Addresses" },
+  { key: "credit",     label: "Credit & Terms" },
+  { key: "directors",  label: "Directors" },
+  { key: "refs",       label: "Trade References" },
+  { key: "documents",  label: "Documents" },
+  { key: "activity",   label: "Activity" },
+  { key: "history",    label: "Orders & Invoices" },
+];
 
-export default function CustomerDetail({ customer, onClose, onUpdated }) {
-  const [tab, setTab] = useState("Details");
+export default function CustomerDetail({ customer: initialCustomer, onClose, onUpdated }) {
+  const [tab, setTab] = useState("overview");
   const [editing, setEditing] = useState(false);
+  const [customer, setCustomer] = useState(initialCustomer);
 
   if (editing) {
     return (
-      <CustomerForm
+      <CustomerOnboardingForm
         initial={customer}
         onClose={() => setEditing(false)}
-        onSaved={() => { setEditing(false); onUpdated(); }}
+        onSaved={(saved) => {
+          setCustomer(saved);
+          setEditing(false);
+          onUpdated?.();
+        }}
       />
     );
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-6 overflow-y-auto">
-      <div className="bg-card w-full max-w-3xl rounded-sm shadow-2xl mb-10">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-6 overflow-y-auto">
+      <div className="bg-card w-full max-w-5xl rounded-sm shadow-2xl mx-4 mb-4">
+
         {/* Header */}
-        <div className="bg-[hsl(0,0%,8%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
-          <div>
-            <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">{customer.name}</h2>
-            {customer.company && <p className="text-white/50 text-xs mt-0.5">{customer.company}</p>}
-          </div>
-          <div className="flex items-center gap-3">
-            <Button size="sm" variant="outline" onClick={() => setEditing(true)}
-              className="border-white/20 text-white hover:bg-white/10 rounded-sm font-heading text-xs uppercase tracking-wider">
-              <Edit className="w-3 h-3 mr-1" /> Edit
-            </Button>
-            <button onClick={onClose} className="text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
-          </div>
-        </div>
+        <ProfileHeader
+          customer={customer}
+          onEdit={() => setEditing(true)}
+          onClose={onClose}
+        />
 
         {/* Tabs */}
-        <div className="flex border-b border-border bg-muted/20">
+        <div className="flex overflow-x-auto border-b border-border bg-muted/10 scrollbar-none">
           {TABS.map(t => (
-            <button key={t} onClick={() => setTab(t)}
-              className={`px-6 py-3 font-heading text-xs uppercase tracking-wider font-semibold transition-colors ${
-                tab === t ? "border-b-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
-              }`}>
-              {t}
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex-shrink-0 px-4 py-3 font-heading text-[11px] uppercase tracking-wider whitespace-nowrap border-b-2 transition-colors ${
+                tab === t.key
+                  ? "border-primary text-primary"
+                  : "border-transparent text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {t.label}
             </button>
           ))}
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {tab === "Details" && <CustomerDetailsTab customer={customer} />}
-          {tab === "Communication" && <CustomerCommunication customer={customer} />}
+        {/* Tab Content */}
+        <div className="p-6 min-h-[400px]">
+          {tab === "overview"  && <TabOverview   customer={customer} />}
+          {tab === "contacts"  && <TabContacts   customer={customer} />}
+          {tab === "addresses" && <TabAddresses  customer={customer} />}
+          {tab === "credit"    && <TabCredit     customer={customer} />}
+          {tab === "directors" && <TabDirectors  customer={customer} />}
+          {tab === "refs"      && <TabTradeRefs  customer={customer} />}
+          {tab === "documents" && <TabDocuments  customer={customer} />}
+          {tab === "activity"  && <TabActivity   customer={customer} />}
+          {tab === "history"   && <TabHistory    customer={customer} />}
         </div>
       </div>
-    </div>
-  );
-}
-
-function CustomerDetailsTab({ customer }) {
-  const fields = [
-    { label: "Email", value: customer.email },
-    { label: "Phone", value: customer.phone },
-    { label: "Type", value: customer.type?.replace(/_/g, " ") },
-    { label: "Status", value: <StatusBadge status={customer.status} /> },
-    { label: "Payment Terms", value: customer.payment_terms?.replace(/_/g, " ") },
-    { label: "Address", value: [customer.address, customer.city, customer.state, customer.postcode].filter(Boolean).join(", ") },
-    { label: "Total Orders", value: customer.total_orders || 0 },
-    { label: "Total Revenue", value: customer.total_revenue ? `$${customer.total_revenue.toLocaleString()}` : "$0" },
-    { label: "Customer Since", value: moment(customer.created_date).format("DD/MM/YYYY") },
-  ];
-
-  return (
-    <div className="space-y-1">
-      {fields.map(f => f.value ? (
-        <div key={f.label} className="flex items-center gap-4 py-2 border-b border-border/50 last:border-0">
-          <span className="font-heading text-[11px] uppercase tracking-wider text-muted-foreground w-36 shrink-0">{f.label}</span>
-          <span className="text-sm">{f.value}</span>
-        </div>
-      ) : null)}
-      {customer.notes && (
-        <div className="mt-4 p-3 bg-muted/30 rounded-sm">
-          <p className="font-heading text-[11px] uppercase tracking-wider text-muted-foreground mb-1">Notes</p>
-          <p className="text-sm">{customer.notes}</p>
-        </div>
-      )}
     </div>
   );
 }

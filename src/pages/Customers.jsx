@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,8 +64,29 @@ export default function Customers() {
           <DataTable columns={columns} data={filtered} emptyMessage="No customers found." onRowClick={row => setSelected(row)} />
         )}
       </div>
-      {showForm && <CustomerOnboardingForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
-      {selected && <CustomerDetail customer={selected} onClose={() => setSelected(null)} onUpdated={() => { setSelected(null); load(); }} />}
+      {showForm && (
+        <CustomerOnboardingForm
+          onClose={() => setShowForm(false)}
+          onSaved={(saved, opts) => {
+            setShowForm(false);
+            load();
+            if (opts?.openAfter && saved) setSelected(saved);
+          }}
+        />
+      )}
+      {selected && (
+        <CustomerDetail
+          customer={selected}
+          onClose={() => setSelected(null)}
+          onUpdated={async () => {
+            const data = await base44.entities.Customer.list("-created_date", 200);
+            setCustomers(data);
+            setLoading(false);
+            const refreshed = data.find(c => c.id === selected.id);
+            if (refreshed) setSelected(refreshed);
+          }}
+        />
+      )}
     </div>
   );
 }
