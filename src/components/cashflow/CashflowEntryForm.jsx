@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { X } from "lucide-react";
+import { X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +29,7 @@ export default function CashflowEntryForm({ onClose, onSaved, initial }) {
     recurrence: "once", recurrence_end: "", supplier_name: "", reference: "", notes: "",
   });
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const save = async () => {
@@ -37,6 +38,14 @@ export default function CashflowEntryForm({ onClose, onSaved, initial }) {
     if (initial?.id) await base44.entities.CashflowEntry.update(initial.id, payload);
     else await base44.entities.CashflowEntry.create(payload);
     setSaving(false);
+    onSaved();
+  };
+
+  const handleDelete = async () => {
+    if (!confirm("Delete this entry? This cannot be undone.")) return;
+    setDeleting(true);
+    await base44.entities.CashflowEntry.delete(initial.id);
+    setDeleting(false);
     onSaved();
   };
 
@@ -124,11 +133,17 @@ export default function CashflowEntryForm({ onClose, onSaved, initial }) {
             <Textarea value={form.notes} onChange={e => update("notes", e.target.value)} className="rounded-sm" rows={2} />
           </div>
         </div>
-        <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
+        <div className="px-6 py-4 bg-muted/30 border-t border-border flex items-center gap-3">
+          {initial?.id && (
+            <Button variant="outline" onClick={handleDelete} disabled={deleting}
+              className="rounded-sm font-heading text-xs uppercase tracking-wider text-red-400 border-red-500/40 hover:bg-red-500/10 hover:text-red-400 mr-auto">
+              <Trash2 className="w-3.5 h-3.5 mr-1" />{deleting ? "Deleting..." : "Delete"}
+            </Button>
+          )}
           <Button variant="outline" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">Cancel</Button>
           <Button onClick={save} disabled={saving || !form.title || !form.amount || !form.due_date}
             className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
-            {saving ? "Saving..." : initial ? "Update" : "Add Entry"}
+            {saving ? "Saving..." : initial?.id ? "Update" : "Add Entry"}
           </Button>
         </div>
       </div>
