@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, LayoutDashboard, CalendarDays, ArrowDownCircle, ArrowUpCircle, List } from "lucide-react";
+import { Plus, LayoutDashboard, CalendarDays, ArrowDownCircle, ArrowUpCircle, List, LayoutList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import PageHeader from "@/components/ui/PageHeader";
@@ -33,6 +33,7 @@ export default function Cashflow() {
   const [editing, setEditing] = useState(null);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [listView, setListView] = useState("list"); // "list" | "calendar"
 
   const load = async () => {
     setLoading(true);
@@ -94,16 +95,40 @@ export default function Cashflow() {
             {tab === "overview" && <CashflowOverview entries={entries} />}
             {tab === "calendar" && <CashflowCalendar entries={entries} onEntryClick={handleEntryClick} />}
             {(tab === "outgoing" || tab === "incoming") && (
-              <EntriesList
-                entries={listEntries(tab === "outgoing" ? "outgoing" : "incoming")}
-                type={tab === "outgoing" ? "outgoing" : "incoming"}
-                filterStatus={filterStatus}
-                filterCategory={filterCategory}
-                onFilterStatus={setFilterStatus}
-                onFilterCategory={setFilterCategory}
-                onEdit={handleEntryClick}
-                onDelete={async (id) => { await base44.entities.CashflowEntry.delete(id); load(); }}
-              />
+              <>
+                {/* View toggle */}
+                <div className="flex justify-end mb-4">
+                  <div className="flex border border-border rounded-sm overflow-hidden">
+                    <button onClick={() => setListView("list")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-heading uppercase tracking-wider transition-colors
+                        ${listView === "list" ? "bg-primary text-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
+                      <LayoutList className="w-3.5 h-3.5" /> List
+                    </button>
+                    <button onClick={() => setListView("calendar")}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-heading uppercase tracking-wider transition-colors border-l border-border
+                        ${listView === "calendar" ? "bg-primary text-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
+                      <CalendarDays className="w-3.5 h-3.5" /> Calendar
+                    </button>
+                  </div>
+                </div>
+                {listView === "list" ? (
+                  <EntriesList
+                    entries={listEntries(tab === "outgoing" ? "outgoing" : "incoming")}
+                    type={tab === "outgoing" ? "outgoing" : "incoming"}
+                    filterStatus={filterStatus}
+                    filterCategory={filterCategory}
+                    onFilterStatus={setFilterStatus}
+                    onFilterCategory={setFilterCategory}
+                    onEdit={handleEntryClick}
+                    onDelete={async (id) => { await base44.entities.CashflowEntry.delete(id); load(); }}
+                  />
+                ) : (
+                  <CashflowCalendar
+                    entries={entries.filter(e => e.type === (tab === "outgoing" ? "outgoing" : "incoming"))}
+                    onEntryClick={handleEntryClick}
+                  />
+                )}
+              </>
             )}
           </>
         )}
