@@ -18,9 +18,12 @@ export default function Enquiries() {
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.Enquiry.list("-created_date", 200);
-    setEnquiries(data);
-    setLoading(false);
+    try {
+      const data = await base44.entities.Enquiry.list("-created_date", 200);
+      setEnquiries(data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
