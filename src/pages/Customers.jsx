@@ -7,11 +7,13 @@ import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import CustomerForm from "../components/customers/CustomerForm";
+import CustomerDetail from "../components/customers/CustomerDetail";
 
 export default function Customers() {
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
+  const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState("");
 
   const load = async () => {
@@ -58,10 +60,11 @@ export default function Customers() {
         {loading ? (
           <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" /></div>
         ) : (
-          <DataTable columns={columns} data={filtered} emptyMessage="No customers found." />
+          <DataTable columns={columns} data={filtered} emptyMessage="No customers found." onRowClick={row => setSelected(row)} />
         )}
       </div>
       {showForm && <CustomerForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
+      {selected && <CustomerDetail customer={selected} onClose={() => setSelected(null)} onUpdated={() => { setSelected(null); load(); }} />}
     </div>
   );
 }
