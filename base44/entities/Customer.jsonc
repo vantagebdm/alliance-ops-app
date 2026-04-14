@@ -5,6 +5,24 @@
     "name": {
       "type": "string"
     },
+    "trading_name": {
+      "type": "string"
+    },
+    "customer_type": {
+      "type": "string",
+      "enum": [
+        "individual",
+        "sole_trader",
+        "trust",
+        "partnership",
+        "company",
+        "other"
+      ],
+      "default": "company"
+    },
+    "customer_type_other": {
+      "type": "string"
+    },
     "company": {
       "type": "string"
     },
@@ -12,6 +30,36 @@
       "type": "string"
     },
     "phone": {
+      "type": "string"
+    },
+    "fax": {
+      "type": "string"
+    },
+    "mobile": {
+      "type": "string"
+    },
+    "physical_address_1": {
+      "type": "string"
+    },
+    "physical_address_2": {
+      "type": "string"
+    },
+    "physical_state": {
+      "type": "string"
+    },
+    "physical_postcode": {
+      "type": "string"
+    },
+    "billing_address_1": {
+      "type": "string"
+    },
+    "billing_address_2": {
+      "type": "string"
+    },
+    "billing_state": {
+      "type": "string"
+    },
+    "billing_postcode": {
       "type": "string"
     },
     "address": {
@@ -26,6 +74,138 @@
     "postcode": {
       "type": "string"
     },
+    "abn": {
+      "type": "string"
+    },
+    "acn": {
+      "type": "string"
+    },
+    "date_established": {
+      "type": "string"
+    },
+    "nature_of_business": {
+      "type": "string"
+    },
+    "paid_up_capital": {
+      "type": "string"
+    },
+    "estimated_monthly_purchases": {
+      "type": "string"
+    },
+    "credit_limit_required": {
+      "type": "string"
+    },
+    "premises_type": {
+      "type": "string",
+      "enum": [
+        "owned",
+        "rented",
+        "mortgaged",
+        "other"
+      ]
+    },
+    "premises_type_other": {
+      "type": "string"
+    },
+    "directors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "full_name": {
+            "type": "string"
+          },
+          "dob": {
+            "type": "string"
+          },
+          "address_1": {
+            "type": "string"
+          },
+          "address_2": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "postcode": {
+            "type": "string"
+          },
+          "licence_number": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "mobile": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "account_terms": {
+      "type": "string",
+      "enum": [
+        "30_days",
+        "cod",
+        "other"
+      ],
+      "default": "30_days"
+    },
+    "account_terms_other": {
+      "type": "string"
+    },
+    "po_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "accounts_emailed": {
+      "type": "boolean",
+      "default": false
+    },
+    "accounts_email": {
+      "type": "string"
+    },
+    "accounts_contact_name": {
+      "type": "string"
+    },
+    "accounts_contact_phone": {
+      "type": "string"
+    },
+    "bank_branch": {
+      "type": "string"
+    },
+    "bank_account_number": {
+      "type": "string"
+    },
+    "trade_references": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "business_name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "contact": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "account_status": {
+      "type": "string",
+      "enum": [
+        "cash_sale",
+        "credit_pending",
+        "under_review",
+        "active_credit",
+        "on_hold",
+        "declined"
+      ],
+      "default": "cash_sale"
+    },
     "payment_terms": {
       "type": "string",
       "enum": [
@@ -35,6 +215,46 @@
         "Net_30"
       ],
       "default": "Net_30"
+    },
+    "pricing_tier": {
+      "type": "string",
+      "enum": [
+        "retail",
+        "trade",
+        "fleet",
+        "workshop",
+        "contract",
+        "custom"
+      ],
+      "default": "trade"
+    },
+    "account_manager": {
+      "type": "string"
+    },
+    "service_region": {
+      "type": "string",
+      "enum": [
+        "karratha",
+        "pilbara",
+        "regional_wa",
+        "statewide",
+        "other"
+      ]
+    },
+    "internal_notes": {
+      "type": "string"
+    },
+    "credit_risk_notes": {
+      "type": "string"
+    },
+    "special_pricing_notes": {
+      "type": "string"
+    },
+    "delivery_notes": {
+      "type": "string"
+    },
+    "customer_tags": {
+      "type": "string"
     },
     "status": {
       "type": "string",
@@ -65,6 +285,12 @@
     "total_revenue": {
       "type": "number",
       "default": 0
+    },
+    "created_by_method": {
+      "type": "string"
+    },
+    "pdf_attachment_url": {
+      "type": "string"
     }
   },
   "required": [

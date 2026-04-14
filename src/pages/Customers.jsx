@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
-import CustomerForm from "../components/customers/CustomerForm";
+import CustomerOnboardingForm from "../components/customers/CustomerOnboardingForm";
 import CustomerDetail from "../components/customers/CustomerDetail";
 
 export default function Customers() {
@@ -63,7 +63,7 @@ export default function Customers() {
           <DataTable columns={columns} data={filtered} emptyMessage="No customers found." onRowClick={row => setSelected(row)} />
         )}
       </div>
-      {showForm && <CustomerForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
+      {showForm && <CustomerOnboardingForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />}
       {selected && <CustomerDetail customer={selected} onClose={() => setSelected(null)} onUpdated={() => { setSelected(null); load(); }} />}
     </div>
   );
