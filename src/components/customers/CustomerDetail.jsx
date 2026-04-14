@@ -51,6 +51,7 @@ export default function CustomerDetail({ customer: initialCustomer, onClose, onU
           customer={customer}
           onEdit={() => setEditing(true)}
           onClose={onClose}
+          onUpdated={(updated) => { setCustomer(updated); onUpdated?.(); }}
         />
 
         {/* Tabs */}

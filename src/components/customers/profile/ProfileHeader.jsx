@@ -1,7 +1,8 @@
-import { Edit, FileText, Plus, Receipt, ShoppingCart, Upload, FileSearch } from "lucide-react";
+import { Edit, FileText, Receipt, ShoppingCart, Upload, FileSearch, PauseCircle, PlayCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
+import { base44 } from "@/api/base44Client";
 
 const ACCOUNT_STATUS_LABELS = {
   cash_sale: "Cash Sale", credit_pending: "Credit Pending", under_review: "Under Review",
@@ -28,9 +29,16 @@ const quickActions = [
   { icon: FileSearch, label: "Credit App" },
 ];
 
-export default function ProfileHeader({ customer, onEdit, onClose }) {
+export default function ProfileHeader({ customer, onEdit, onClose, onUpdated }) {
   const acctColor = ACCOUNT_STATUS_COLORS[customer.account_status] || ACCOUNT_STATUS_COLORS.cash_sale;
   const tierColor = TIER_COLORS[customer.pricing_tier] || "text-gray-400";
+  const isOnHold = customer.account_status === "on_hold";
+
+  const toggleHold = async () => {
+    const newStatus = isOnHold ? "active_credit" : "on_hold";
+    await base44.entities.Customer.update(customer.id, { account_status: newStatus });
+    onUpdated?.({ ...customer, account_status: newStatus });
+  };
 
   return (
     <div className="bg-[hsl(0,0%,6%)] px-6 py-5 rounded-t-sm">
@@ -88,6 +96,17 @@ export default function ProfileHeader({ customer, onEdit, onClose }) {
         </div>
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
+          <Button size="sm" variant="outline" onClick={toggleHold}
+            className={`rounded-sm font-heading text-xs uppercase tracking-wider ${
+              isOnHold
+                ? "border-green-500/40 text-green-400 hover:bg-green-500/10"
+                : "border-red-500/40 text-red-400 hover:bg-red-500/10"
+            }`}>
+            {isOnHold
+              ? <><PlayCircle className="w-3 h-3 mr-1" /> Remove Hold</>
+              : <><PauseCircle className="w-3 h-3 mr-1" /> Put On Hold</>
+            }
+          </Button>
           <Button size="sm" variant="outline" onClick={onEdit}
             className="border-white/20 text-white hover:bg-white/10 rounded-sm font-heading text-xs uppercase tracking-wider">
             <Edit className="w-3 h-3 mr-1" /> Edit
