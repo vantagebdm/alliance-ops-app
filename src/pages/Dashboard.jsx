@@ -27,19 +27,22 @@ export default function Dashboard() {
 
   useEffect(() => {
     const load = async () => {
-      const [enq, qt, ord, pt, po] = await Promise.all([
-        base44.entities.Enquiry.list("-created_date", 100),
-        base44.entities.Quote.list("-created_date", 100),
-        base44.entities.SalesOrder.list("-created_date", 100),
-        base44.entities.Part.list("-created_date", 200),
-        base44.entities.PurchaseOrder.list("-created_date", 50),
-      ]);
-      setEnquiries(enq);
-      setQuotes(qt);
-      setOrders(ord);
-      setParts(pt);
-      setPOs(po);
-      setLoading(false);
+      try {
+        const [enq, qt, ord, pt, po] = await Promise.all([
+          base44.entities.Enquiry.list("-created_date", 100),
+          base44.entities.Quote.list("-created_date", 100),
+          base44.entities.SalesOrder.list("-created_date", 100),
+          base44.entities.Part.list("-created_date", 200),
+          base44.entities.PurchaseOrder.list("-created_date", 50),
+        ]);
+        setEnquiries(enq);
+        setQuotes(qt);
+        setOrders(ord);
+        setParts(pt);
+        setPOs(po);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, []);
