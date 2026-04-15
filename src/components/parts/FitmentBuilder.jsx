@@ -140,10 +140,10 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
               const selected = value.includes(val);
               return (
                 <div
-                  key={val}
-                  className={`flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground ${selected ? "bg-primary/5 text-primary" : ""}`}
-                  onMouseDown={e => { e.preventDefault(); toggle(val); }}
-                >
+                   key={val}
+                   className={`flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground ${selected ? "bg-primary/5 text-primary" : ""}`}
+                   onMouseDown={e => { e.preventDefault(); e.stopPropagation(); toggle(val); }}
+                 >
                   <div className={`w-3.5 h-3.5 border rounded-sm flex items-center justify-center flex-shrink-0 ${selected ? "bg-primary border-primary" : "border-input"}`}>
                     {selected && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
                   </div>
