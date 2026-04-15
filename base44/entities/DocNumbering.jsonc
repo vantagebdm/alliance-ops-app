@@ -1,0 +1,47 @@
+{
+  "name": "DocNumbering",
+  "type": "object",
+  "properties": {
+    "document_type": {
+      "type": "string",
+      "enum": [
+        "purchase_order",
+        "sales_order",
+        "invoice",
+        "quote",
+        "enquiry",
+        "credit_return",
+        "warranty"
+      ]
+    },
+    "subtype": {
+      "type": "string",
+      "description": "e.g. 'parts' or 'company_expense' for purchase_order"
+    },
+    "prefix": {
+      "type": "string",
+      "description": "e.g. PO-PS, Q-, SO-, I-"
+    },
+    "current_sequence": {
+      "type": "number",
+      "default": 1
+    },
+    "number_padding": {
+      "type": "number",
+      "default": 5
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "label": {
+      "type": "string",
+      "description": "Human readable label"
+    }
+  },
+  "required": [
+    "document_type",
+    "prefix",
+    "current_sequence"
+  ]
+}

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
+import { generateDocNumber } from "@/hooks/useDocNumber";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
@@ -57,7 +58,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
   const save = async () => {
     setSaving(true);
     const data = { ...form };
-    if (!data.quote_number) data.quote_number = `QT-${Date.now().toString(36).toUpperCase()}`;
+    if (!data.quote_number) data.quote_number = await generateDocNumber("quote");
     if (initial?.id) {
       await base44.entities.Quote.update(initial.id, data);
     } else {

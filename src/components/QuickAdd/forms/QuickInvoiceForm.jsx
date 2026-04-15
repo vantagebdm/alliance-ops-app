@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
+import { generateDocNumber } from "@/hooks/useDocNumber";
 import { format } from "date-fns";
 
 const today = format(new Date(), "yyyy-MM-dd");
@@ -67,7 +68,7 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
     customer_name: "", billing_contact: "", billing_email: "", billing_address: "",
     delivery_address: "", customer_po_number: "", job_number: "", account_status: "",
     payment_terms: "30_days_eom", pricing_tier: "standard",
-    invoice_number: `INV-${Date.now().toString(36).toUpperCase()}`,
+    invoice_number: "",
     invoice_date: today, due_date: "", reference: "",
     sales_order_reference: "", dispatch_reference: "", internal_notes: "", customer_notes: "",
     items: [newLine()],
@@ -209,8 +210,10 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
     setSaving(true);
     try {
       const status = action === "draft" ? "draft" : action === "paid" ? "paid" : "sent";
+      const invoiceNumber = form.invoice_number || await generateDocNumber("invoice");
       const data = {
         ...form,
+        invoice_number: invoiceNumber,
         status,
         subtotal,
         gst: gstAmount,
@@ -233,7 +236,7 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm sticky top-0 z-10">
           <div>
             <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">Create Invoice</h2>
-            <p className="text-white/40 text-xs font-body mt-0.5">{form.invoice_number}</p>
+            <p className="text-white/40 text-xs font-body mt-0.5">{form.invoice_number || "Auto-generated on save"}</p>
           </div>
           <div className="flex items-center gap-3">
             <span className="bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2 py-0.5 text-[10px] font-heading font-semibold tracking-wider rounded-sm uppercase">Draft</span>

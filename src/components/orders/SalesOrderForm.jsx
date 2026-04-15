@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
+import { generateDocNumber } from "@/hooks/useDocNumber";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
@@ -54,7 +55,7 @@ export default function SalesOrderForm({ onClose, onSaved, initial }) {
   const save = async () => {
     setSaving(true);
     const data = { ...form };
-    if (!data.order_number) data.order_number = `SO-${Date.now().toString(36).toUpperCase()}`;
+    if (!data.order_number) data.order_number = await generateDocNumber("sales_order");
     if (initial?.id) {
       await base44.entities.SalesOrder.update(initial.id, data);
     } else {

@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
+import { generateDocNumber } from "@/hooks/useDocNumber";
 
 export default function EnquiryForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
@@ -34,7 +35,7 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
   const save = async () => {
     setSaving(true);
     const data = { ...form };
-    if (!data.enquiry_number) data.enquiry_number = `ENQ-${Date.now().toString(36).toUpperCase()}`;
+    if (!data.enquiry_number) data.enquiry_number = await generateDocNumber("enquiry");
     if (initial?.id) {
       await base44.entities.Enquiry.update(initial.id, data);
     } else {

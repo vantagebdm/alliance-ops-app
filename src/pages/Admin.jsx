@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Users, Shield, Settings, Database } from "lucide-react";
+import { Users, Shield, Settings, Database, Hash } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
+import DocumentNumberingSettings from "@/components/admin/DocumentNumberingSettings";
 
 export default function Admin() {
   const [users, setUsers] = useState([]);
@@ -29,6 +30,7 @@ export default function Admin() {
     { icon: Shield, label: "Security", desc: "Authentication and access control" },
     { icon: Database, label: "Data Management", desc: "Import, export, and backup data" },
     { icon: Settings, label: "System Settings", desc: "Configure ERP preferences" },
+    { icon: Hash, label: "Document Numbering", desc: "Configure auto-sequencing for all document types" },
   ];
 
   return (
@@ -47,6 +49,15 @@ export default function Admin() {
               </div>
             );
           })}
+        </div>
+
+        {/* Document Numbering Settings */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <Hash className="w-5 h-5 text-primary" />
+            <h2 className="font-heading text-lg font-bold uppercase tracking-wider">Document Numbering Settings</h2>
+          </div>
+          <DocumentNumberingSettings />
         </div>
 
         {/* Users table */}
