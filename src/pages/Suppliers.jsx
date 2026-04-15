@@ -192,6 +192,11 @@ export default function Suppliers() {
           supplier={selected}
           onClose={() => setSelected(null)}
           onEdit={handleEdit}
+          onStatusChanged={async () => {
+            await load();
+            // update selected supplier's status optimistically
+            setSelected(prev => prev ? { ...prev, status: prev.status === "inactive" ? "active" : "inactive" } : prev);
+          }}
         />
       )}
     </div>

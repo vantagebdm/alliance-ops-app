@@ -1,4 +1,6 @@
-import { Star, ShoppingCart, Upload, FileText, Phone, Edit2, CheckCircle, PauseCircle } from "lucide-react";
+import { useState } from "react";
+import { Star, ShoppingCart, Upload, FileText, Edit2, CheckCircle, PauseCircle, PowerOff, RotateCcw } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 const STATUS_COLORS = {
   active: "bg-green-500/20 text-green-300 border-green-500/30",
@@ -8,18 +10,34 @@ const STATUS_COLORS = {
   under_review: "bg-blue-500/20 text-blue-300 border-blue-500/30",
 };
 
-const QUICK_ACTIONS = [
-  { icon: Edit2, label: "Edit" },
-  { icon: ShoppingCart, label: "New PO" },
-  { icon: Upload, label: "Upload Price List" },
-  { icon: FileText, label: "View Open POs" },
-  { icon: CheckCircle, label: "Mark Preferred" },
-  { icon: PauseCircle, label: "Set On Hold" },
-];
-
-export default function SupplierProfileHeader({ supplier, onEdit, onClose }) {
+export default function SupplierProfileHeader({ supplier, onEdit, onClose, onStatusChanged }) {
+  const [saving, setSaving] = useState(false);
   const statusColor = STATUS_COLORS[supplier.status] || STATUS_COLORS.active;
   const statusLabel = (supplier.status || "active").replace("_", " ").toUpperCase();
+  const isInactive = supplier.status === "inactive";
+
+  const handleDeactivate = async () => {
+    if (!confirm(isInactive ? "Reactivate this supplier?" : "Deactivate this supplier? It will remain in the system for record keeping.")) return;
+    setSaving(true);
+    await base44.entities.Supplier.update(supplier.id, { status: isInactive ? "active" : "inactive" });
+    setSaving(false);
+    onStatusChanged?.();
+  };
+
+  const QUICK_ACTIONS = [
+    { icon: Edit2, label: "Edit", onClick: onEdit },
+    { icon: ShoppingCart, label: "New PO", onClick: undefined },
+    { icon: Upload, label: "Upload Price List", onClick: undefined },
+    { icon: FileText, label: "View Open POs", onClick: undefined },
+    { icon: CheckCircle, label: "Mark Preferred", onClick: undefined },
+    { icon: PauseCircle, label: "Set On Hold", onClick: undefined },
+    {
+      icon: isInactive ? RotateCcw : PowerOff,
+      label: isInactive ? "Reactivate" : "Deactivate",
+      onClick: handleDeactivate,
+      danger: !isInactive,
+    },
+  ];
 
   return (
     <div className="bg-[hsl(0,0%,8%)] px-6 py-5 rounded-t-sm">
@@ -74,10 +92,15 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose }) {
       </div>
 
       <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
-        {QUICK_ACTIONS.map(({ icon: Icon, label }) => (
+        {QUICK_ACTIONS.map(({ icon: Icon, label, onClick, danger }) => (
           <button key={label}
-            onClick={label === "Edit" ? onEdit : undefined}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-sm transition-colors bg-white/0 hover:bg-white/5">
+            onClick={onClick}
+            disabled={saving && (label === "Deactivate" || label === "Reactivate")}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider border rounded-sm transition-colors bg-white/0 hover:bg-white/5 disabled:opacity-50 ${
+              danger
+                ? "text-red-400/70 hover:text-red-400 border-red-500/20 hover:border-red-500/40"
+                : "text-white/50 hover:text-white border-white/10 hover:border-white/30"
+            }`}>
             <Icon className="w-3 h-3" /> {label}
           </button>
         ))}
