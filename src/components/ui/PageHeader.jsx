@@ -10,7 +10,7 @@ export default function PageHeader({ title, subtitle, actions }) {
             <p className="text-white/40 text-sm mt-1 font-body">{subtitle}</p>
           )}
         </div>
-        {actions && <div className="flex items-center gap-2">{actions}</div>}
+        {actions && <div className="flex items-center gap-2 text-white">{actions}</div>}
       </div>
     </div>
   );
