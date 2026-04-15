@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,19 +7,24 @@ import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+import QuickInvoiceForm from "@/components/QuickAdd/forms/QuickInvoiceForm";
 
 export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
+  const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    base44.entities.Invoice.list("-created_date", 100).then(d => {
+  const load = useCallback(() => {
+    setLoading(true);
+    return base44.entities.Invoice.list("-created_date", 100).then(d => {
       setInvoices(d);
       setLoading(false);
     });
   }, []);
+
+  useEffect(() => { load(); }, [load]);
 
   const filtered = filter === "all" ? invoices : invoices.filter(inv => inv.status === filter);
 
@@ -48,7 +53,9 @@ export default function Invoices() {
         title="Invoices"
         subtitle="Manage billing and invoices"
         actions={
-          <Button className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+          <Button
+            onClick={() => setShowForm(true)}
+            className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
             <Plus className="w-4 h-4 mr-1" /> New Invoice
           </Button>
         }
@@ -69,6 +76,13 @@ export default function Invoices() {
           <DataTable columns={columns} data={filtered} onRowClick={(row) => navigate(`/invoices/${row.id}`)} emptyMessage="No invoices found." />
         )}
       </div>
+
+      {showForm && (
+        <QuickInvoiceForm
+          onClose={() => setShowForm(false)}
+          onSaved={() => { setShowForm(false); load(); }}
+        />
+      )}
     </div>
   );
 }
