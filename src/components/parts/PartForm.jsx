@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EQUIPMENT_TYPES } from "./EquipmentTypeSelector";
 import { base44 } from "@/api/base44Client";
 import { X } from "lucide-react";
@@ -25,6 +25,14 @@ export default function PartForm({ onClose, onSaved, initial }) {
   const supplierAC = useAutocomplete("Supplier", "name");
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
+  useEffect(() => {
+    if (!initial && !form.app_part_number && form.category) {
+      generateNextPartNumber(form.category).then(nextNum => {
+        setForm(f => ({ ...f, app_part_number: nextNum }));
+      });
+    }
+  }, []);
+
   const getCategoryPrefix = (category) => {
     const prefixMap = {
       engine: "APP-ENG", transmission: "APP-TRM", brakes: "APP-BRK", suspension: "APP-SUS",
@@ -36,11 +44,34 @@ export default function PartForm({ onClose, onSaved, initial }) {
     return prefixMap[category] || "";
   };
 
-  const handleCategoryChange = (newCategory) => {
-    const prefix = getCategoryPrefix(newCategory);
+  const generateNextPartNumber = async (category) => {
+    try {
+      const prefix = getCategoryPrefix(category);
+      const allParts = await base44.entities.Part.list();
+      const matchingParts = allParts.filter(p => p.app_part_number?.startsWith(prefix));
+      let nextNum = 1;
+      if (matchingParts.length > 0) {
+        const numbers = matchingParts
+          .map(p => {
+            const num = p.app_part_number?.replace(prefix, "").trim();
+            return parseInt(num) || 0;
+          })
+          .filter(n => n > 0);
+        nextNum = Math.max(...numbers) + 1;
+      }
+      const paddedNum = String(nextNum).padStart(4, "0");
+      return `${prefix}${paddedNum}`;
+    } catch (err) {
+      console.error("Error generating part number:", err);
+      return getCategoryPrefix(category);
+    }
+  };
+
+  const handleCategoryChange = async (newCategory) => {
     update("category", newCategory);
     update("subcategory", "");
-    update("app_part_number", prefix);
+    const nextPartNumber = await generateNextPartNumber(newCategory);
+    update("app_part_number", nextPartNumber);
   };
 
   const save = async () => {
@@ -125,8 +156,9 @@ export default function PartForm({ onClose, onSaved, initial }) {
                 <Input 
                   value={form.app_part_number} 
                   onChange={e => update("app_part_number", e.target.value.toUpperCase())}
-                  className="rounded-sm font-mono font-semibold text-primary"
-                  placeholder="Category prefix will appear above"
+                  className="rounded-sm font-mono font-semibold text-primary bg-primary/5 border-primary/30"
+                  placeholder="Auto-generated based on category"
+                  readOnly={form.app_part_number && form.app_part_number.match(/^APP-[A-Z]{3}\d{4}$/)}
                 />
               </div>
               {isExtended && (
