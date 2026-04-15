@@ -1,10 +1,12 @@
 import { SectionTitle } from "./ProfileField";
 import ProfileField from "./ProfileField";
-import { FileSearch, AlertTriangle } from "lucide-react";
+import { FileSearch, AlertTriangle, Zap } from "lucide-react";
 import moment from "moment";
 import ExternalRiskPanel from "../actions/ExternalRiskPanel";
 import { base44 } from "@/api/base44Client";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const ACCOUNT_STATUS_LABELS = {
   cash_sale: "Cash Sale", credit_pending: "Credit Pending", under_review: "Under Review",
@@ -89,19 +91,33 @@ export default function TabCredit({ customer }) {
         </div>
       )}
 
-      {(customer.external_risk_level || customer.external_findings?.length > 0) && (
-        <div>
+      <div>
+        <div className="flex items-center justify-between mb-4">
           <SectionTitle>External Risk Intelligence</SectionTitle>
+          <Button
+            onClick={handleRunAssessment}
+            disabled={isAssessing}
+            className="bg-blue-600 text-white hover:bg-blue-700 rounded-sm font-heading text-xs uppercase tracking-wider"
+            size="sm"
+          >
+            <Zap className="w-3 h-3 mr-2" />
+            {isAssessing ? "Running Check..." : "Run Credit Check"}
+          </Button>
+        </div>
+        {(customer.external_risk_level || customer.external_findings?.length > 0) ? (
           <ExternalRiskPanel
             external_risk_level={customer.external_risk_level}
             external_findings_summary={customer.external_findings_summary}
             external_findings={customer.external_findings}
             external_assessment_date={customer.external_assessment_date}
-            onRunAssessment={handleRunAssessment}
             isAssessing={isAssessing}
           />
-        </div>
-      )}
+        ) : (
+          <div className="bg-muted/20 border border-border rounded-sm p-4 text-center">
+            <p className="text-sm text-muted-foreground">No external risk assessment completed yet. Click "Run Credit Check" above to perform one.</p>
+          </div>
+        )}
+      </div>
 
       {(customer.credit_risk_notes || customer.special_pricing_notes) && (
         <div>
