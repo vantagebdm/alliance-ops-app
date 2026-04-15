@@ -1,4 +1,5 @@
-import { Edit, FileText, Receipt, ShoppingCart, Upload, FileSearch, PauseCircle, PlayCircle } from "lucide-react";
+import { useState } from "react";
+import { Edit, FileText, Receipt, ShoppingCart, Upload, FileSearch, PauseCircle, PlayCircle, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
@@ -30,14 +31,38 @@ const quickActions = [
 ];
 
 export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, onAction }) {
+  const [showDeactivateModal, setShowDeactivateModal] = useState(false);
+  const [deactivateReason, setDeactivateReason] = useState("");
+  const [deactivateNotes, setDeactivateNotes] = useState("");
+  const [deactivating, setDeactivating] = useState(false);
+
   const acctColor = ACCOUNT_STATUS_COLORS[customer.account_status] || ACCOUNT_STATUS_COLORS.cash_sale;
   const tierColor = TIER_COLORS[customer.pricing_tier] || "text-gray-400";
   const isOnHold = customer.account_status === "on_hold";
+  const isInactive = customer.status === "inactive";
 
   const toggleHold = async () => {
     const newStatus = isOnHold ? "active_credit" : "on_hold";
     await base44.entities.Customer.update(customer.id, { account_status: newStatus });
     onUpdated?.({ ...customer, account_status: newStatus });
+  };
+
+  const handleDeactivate = async () => {
+    if (!deactivateReason) {
+      alert("Please select a deactivation reason");
+      return;
+    }
+    setDeactivating(true);
+    try {
+      await base44.entities.Customer.update(customer.id, {
+        status: "inactive",
+        internal_notes: `[DEACTIVATED ${moment().format("DD/MM/YYYY HH:mm")}]\nReason: ${deactivateReason}\nNotes: ${deactivateNotes}\n\n${customer.internal_notes || ""}`,
+      });
+      onUpdated?.({ ...customer, status: "inactive" });
+      setShowDeactivateModal(false);
+    } finally {
+      setDeactivating(false);
+    }
   };
 
   return (
@@ -96,17 +121,25 @@ export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, on
         </div>
         {/* Actions */}
         <div className="flex items-center gap-2 flex-shrink-0">
-          <Button size="sm" variant="outline" onClick={toggleHold}
-            className={`rounded-sm font-heading text-xs uppercase tracking-wider ${
-              isOnHold
-                ? "border-green-500/40 text-green-400 hover:bg-green-500/10"
-                : "border-red-500/40 text-red-400 hover:bg-red-500/10"
-            }`}>
-            {isOnHold
-              ? <><PlayCircle className="w-3 h-3 mr-1" /> Remove Hold</>
-              : <><PauseCircle className="w-3 h-3 mr-1" /> Put On Hold</>
-            }
-          </Button>
+          {!isInactive && (
+            <Button size="sm" variant="outline" onClick={() => setShowDeactivateModal(true)}
+              className="border-red-600/60 text-red-400 hover:bg-red-500/10 rounded-sm font-heading text-xs uppercase tracking-wider">
+              <XCircle className="w-3 h-3 mr-1" /> Deactivate
+            </Button>
+          )}
+          {!isInactive && (
+            <Button size="sm" variant="outline" onClick={toggleHold}
+              className={`rounded-sm font-heading text-xs uppercase tracking-wider ${
+                isOnHold
+                  ? "border-green-500/40 text-green-400 hover:bg-green-500/10"
+                  : "border-red-500/40 text-red-400 hover:bg-red-500/10"
+              }`}>
+              {isOnHold
+                ? <><PlayCircle className="w-3 h-3 mr-1" /> Remove Hold</>
+                : <><PauseCircle className="w-3 h-3 mr-1" /> Put On Hold</>
+              }
+            </Button>
+          )}
           <Button size="sm" variant="outline" onClick={onEdit}
             className="border-white/20 text-white hover:bg-white/10 rounded-sm font-heading text-xs uppercase tracking-wider">
             <Edit className="w-3 h-3 mr-1" /> Edit
@@ -118,24 +151,71 @@ export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, on
       </div>
 
       {/* Quick action strip */}
-      <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
-        {quickActions.map(({ icon: Icon, label }) => {
-          const actionMap = {
-            "New Order": "new-order",
-            "New Quote": "new-quote",
-            "New Invoice": "new-invoice",
-            "Upload Doc": "upload-doc",
-            "Credit App": "credit-app"
-          };
-          return (
-            <button key={label}
-              onClick={() => onAction?.(actionMap[label])}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-sm transition-colors bg-white/0 hover:bg-white/5">
-              <Icon className="w-3 h-3" /> {label}
-            </button>
-          );
-        })}
+      {!isInactive && (
+        <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
+          {quickActions.map(({ icon: Icon, label }) => {
+            const actionMap = {
+              "New Order": "new-order",
+              "New Quote": "new-quote",
+              "New Invoice": "new-invoice",
+              "Upload Doc": "upload-doc",
+              "Credit App": "credit-app"
+            };
+            return (
+              <button key={label}
+                onClick={() => onAction?.(actionMap[label])}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-sm transition-colors bg-white/0 hover:bg-white/5">
+                <Icon className="w-3 h-3" /> {label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Deactivate Modal */}
+      {showDeactivateModal && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-sm shadow-2xl max-w-md w-full">
+            <div className="bg-red-950/80 px-6 py-4 flex items-center gap-3 rounded-t-sm">
+              <XCircle className="w-5 h-5 text-red-400" />
+              <h3 className="font-heading text-sm font-bold text-white uppercase tracking-wider">Deactivate Customer</h3>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-foreground/70">This will deactivate the customer account and archive all associated records.</p>
+              <div>
+                <label className="block text-xs font-heading uppercase tracking-wider text-foreground/50 mb-2">Deactivation Reason *</label>
+                <select value={deactivateReason} onChange={(e) => setDeactivateReason(e.target.value)}
+                  className="w-full h-9 px-3 border border-input rounded-sm text-sm bg-white">
+                  <option value="">Select a reason...</option>
+                  <option value="No longer in business">No longer in business</option>
+                  <option value="Bankruptcy">Bankruptcy</option>
+                  <option value="Payment default">Payment default</option>
+                  <option value="Fraud/dispute">Fraud/dispute</option>
+                  <option value="Duplicate account">Duplicate account</option>
+                  <option value="Customer request">Customer request</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-heading uppercase tracking-wider text-foreground/50 mb-2">Additional Notes</label>
+                <textarea value={deactivateNotes} onChange={(e) => setDeactivateNotes(e.target.value)}
+                  placeholder="Optional record keeping notes..."
+                  className="w-full h-20 px-3 py-2 border border-input rounded-sm text-sm resize-none" />
+              </div>
+              <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-sm px-3 py-2">
+                Deactivation will be logged with timestamp and stored in customer notes for record keeping.
+              </p>
+            </div>
+            <div className="px-6 py-4 bg-foreground/5 border-t border-border flex gap-2 justify-end rounded-b-sm">
+              <Button variant="outline" onClick={() => setShowDeactivateModal(false)} size="sm">Cancel</Button>
+              <Button onClick={handleDeactivate} disabled={deactivating || !deactivateReason} size="sm"
+                className="bg-red-600 hover:bg-red-700 text-white">
+                {deactivating ? "Deactivating..." : "Deactivate"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       </div>
-    </div>
-  );
-}
+      );
+      }
