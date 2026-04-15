@@ -7,6 +7,7 @@ export default function Autocomplete({
   loading,
   onInputChange,
   onSelect,
+  onShowAll,
   placeholder = "Type to search...",
   className = "",
 }) {
@@ -16,6 +17,8 @@ export default function Autocomplete({
         type="text"
         value={value}
         onChange={(e) => onInputChange(e.target.value)}
+        onFocus={() => { if (!value && onShowAll) onShowAll(); }}
+        onKeyDown={(e) => { if (e.key === "ArrowDown" && onShowAll) onShowAll(); }}
         placeholder={placeholder}
         className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       />
