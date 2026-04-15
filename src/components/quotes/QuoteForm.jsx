@@ -68,8 +68,8 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 z-50 flex items-start justify-center pt-8 pb-8 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl mx-4">
+    <div className="fixed inset-0 bg-black/75 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl mx-4">
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
           <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">
             {initial ? "Edit Quote" : "New Quote"}
@@ -164,11 +164,11 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
               <table className="w-full text-sm">
                 <thead className="bg-[hsl(0,0%,96%)] border-b border-border">
                   <tr>
-                    <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Part #</th>
+                    <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-44">Part #</th>
                     <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
-                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-16">Qty</th>
-                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Unit Price</th>
-                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Total</th>
+                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20">Qty</th>
+                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">Unit Price</th>
+                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Total</th>
                     <th className="w-10" />
                   </tr>
                 </thead>
