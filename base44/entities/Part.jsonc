@@ -2,6 +2,10 @@
   "name": "Part",
   "type": "object",
   "properties": {
+    "app_part_number": {
+      "type": "string",
+      "description": "Internal APP generated part number (e.g. APP-ENG0001)"
+    },
     "part_number": {
       "type": "string"
     },

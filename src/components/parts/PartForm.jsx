@@ -13,8 +13,8 @@ import { PART_CATEGORIES, SUBCATEGORIES, EXTENDED_CATEGORIES, HAZMAT_CATEGORIES 
 
 export default function PartForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
-    part_number: "", name: "", description: "", category: "other", subcategory: "", brand: "",
-    oem_number: "", fitments: [], unit_cost: 0, sell_price: 0,
+    app_part_number: "", part_number: "", name: "", description: "", category: "other", subcategory: "", brand: "",
+    oem_number: "", supplier_sku: "", aftermarket_number: "", fitments: [], unit_cost: 0, sell_price: 0,
     stock_quantity: 0, min_stock_level: 0, location: "", supplier_name: "", status: "active",
     equipment_type: "", hazardous: false, dangerous_goods: false, sds_required: false,
     storage_notes: "", expiry_date: "", batch_lot_number: "",
@@ -22,18 +22,63 @@ export default function PartForm({ onClose, onSaved, initial }) {
     workshop_use: false, pack_size: "", volume_size: "", issue_method: "each",
   });
   const [saving, setSaving] = useState(false);
+  const [appNumberError, setAppNumberError] = useState("");
   const supplierAC = useAutocomplete("Supplier", "name");
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const save = async () => {
-    setSaving(true);
-    if (initial?.id) {
-      await base44.entities.Part.update(initial.id, form);
-    } else {
-      await base44.entities.Part.create(form);
+  const generateAppNumber = async (category) => {
+    try {
+      setAppNumberError("");
+      const res = await base44.functions.invoke("generateAppPartNumber", { category });
+      if (res.data.success) {
+        update("app_part_number", res.data.app_part_number);
+      } else {
+        setAppNumberError(res.data.error || "Failed to generate number");
+      }
+    } catch (err) {
+      setAppNumberError(err.message || "Error generating number");
     }
-    setSaving(false);
-    onSaved();
+  };
+
+  const handleCategoryChange = (newCategory) => {
+    update("category", newCategory);
+    update("subcategory", "");
+    if (!initial?.id) {
+      generateAppNumber(newCategory);
+    }
+  };
+
+  const save = async () => {
+    if (!form.app_part_number) {
+      setAppNumberError("APP Internal Part Number is required");
+      return;
+    }
+    if (!form.part_number) {
+      setAppNumberError("Part Number is required");
+      return;
+    }
+    if (!form.name) {
+      setAppNumberError("Part Name is required");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      if (initial?.id) {
+        await base44.entities.Part.update(initial.id, form);
+      } else {
+        await base44.entities.Part.create(form);
+      }
+      setSaving(false);
+      onSaved();
+    } catch (err) {
+      setSaving(false);
+      if (err.message?.includes("already exists")) {
+        setAppNumberError("APP internal part number already exists. Please use the next available sequence or review category settings.");
+      } else {
+        setAppNumberError(err.message || "Error saving part");
+      }
+    }
   };
 
   const isExtended = EXTENDED_CATEGORIES.includes(form.category);
@@ -77,12 +122,27 @@ export default function PartForm({ onClose, onSaved, initial }) {
               </div>
               <div>
                 <FieldLabel>Category</FieldLabel>
-                <Select value={form.category} onValueChange={v => { update("category", v); update("subcategory", ""); }}>
+                <Select value={form.category} onValueChange={handleCategoryChange}>
                   <SelectTrigger className="rounded-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {PART_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <FieldLabel>APP Internal Part Number</FieldLabel>
+                <Input 
+                  value={form.app_part_number} 
+                  readOnly
+                  className="rounded-sm bg-muted text-foreground font-mono font-semibold"
+                  placeholder="Auto-generated based on category"
+                />
+                {form.app_part_number && (
+                  <p className="text-xs text-green-600 mt-1">✓ Available</p>
+                )}
+                {appNumberError && (
+                  <p className="text-xs text-red-600 mt-1">{appNumberError}</p>
+                )}
               </div>
               {isExtended && (
                 <div>
@@ -103,6 +163,14 @@ export default function PartForm({ onClose, onSaved, initial }) {
               <div>
                 <FieldLabel>OEM Number</FieldLabel>
                 <Input value={form.oem_number} onChange={e => update("oem_number", e.target.value)} className="rounded-sm" />
+              </div>
+              <div>
+                <FieldLabel>Supplier Part Number</FieldLabel>
+                <Input value={form.supplier_sku} onChange={e => update("supplier_sku", e.target.value)} className="rounded-sm" />
+              </div>
+              <div>
+                <FieldLabel>Aftermarket Number</FieldLabel>
+                <Input value={form.aftermarket_number} onChange={e => update("aftermarket_number", e.target.value)} className="rounded-sm" />
               </div>
               <div className="col-span-2">
                 <FieldLabel>Description</FieldLabel>
@@ -258,7 +326,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
 
         <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
           <Button variant="outline" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">Cancel</Button>
-          <Button onClick={save} disabled={saving || !form.part_number || !form.name}
+          <Button onClick={save} disabled={saving || !form.part_number || !form.name || !form.app_part_number}
             className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
             {saving ? "Saving..." : initial ? "Update Part" : "Add Part"}
           </Button>

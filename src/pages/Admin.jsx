@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Users, Shield, Settings, Database, Hash } from "lucide-react";
+import { Users, Shield, Settings, Database, Hash, Package } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
 import DocumentNumberingSettings from "@/components/admin/DocumentNumberingSettings";
+import PartNumberingSettings from "@/components/admin/PartNumberingSettings";
 
 export default function Admin() {
   const [users, setUsers] = useState([]);
@@ -31,6 +32,7 @@ export default function Admin() {
     { icon: Database, label: "Data Management", desc: "Import, export, and backup data" },
     { icon: Settings, label: "System Settings", desc: "Configure ERP preferences" },
     { icon: Hash, label: "Document Numbering", desc: "Configure auto-sequencing for all document types" },
+    { icon: Package, label: "Part Numbering", desc: "Configure APP internal part number generation" },
   ];
 
   return (
@@ -58,6 +60,15 @@ export default function Admin() {
             <h2 className="font-heading text-lg font-bold uppercase tracking-wider">Document Numbering Settings</h2>
           </div>
           <DocumentNumberingSettings />
+        </div>
+
+        {/* Part Numbering Settings */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <Package className="w-5 h-5 text-primary" />
+            <h2 className="font-heading text-lg font-bold uppercase tracking-wider">Part Numbering Settings</h2>
+          </div>
+          <PartNumberingSettings />
         </div>
 
         {/* Users table */}

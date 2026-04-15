@@ -1,0 +1,56 @@
+{
+  "name": "PartNumbering",
+  "type": "object",
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": [
+        "engine",
+        "transmission",
+        "brakes",
+        "suspension",
+        "electrical",
+        "body",
+        "filters",
+        "hydraulic",
+        "driveline",
+        "cooling",
+        "fuel",
+        "tyres",
+        "oils",
+        "sprays",
+        "consumables",
+        "compliance",
+        "chemicals",
+        "other"
+      ]
+    },
+    "prefix": {
+      "type": "string",
+      "description": "e.g. APP-ENG, APP-TRM"
+    },
+    "current_sequence": {
+      "type": "number",
+      "default": 0,
+      "description": "Current sequence number for this category"
+    },
+    "number_padding": {
+      "type": "number",
+      "default": 4,
+      "description": "Number of digits to pad with zeros"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "allow_manual_override": {
+      "type": "boolean",
+      "default": false,
+      "description": "Allow non-admin users to override generated numbers"
+    }
+  },
+  "required": [
+    "category",
+    "prefix"
+  ]
+}
