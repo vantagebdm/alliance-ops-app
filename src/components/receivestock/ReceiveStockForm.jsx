@@ -111,7 +111,8 @@ export default function ReceiveStockForm({ onClose, onSaved, initialPO }) {
   };
 
   const receiptTotal = (form.lines || []).reduce((sum, l) => {
-    return sum + ((l.unit_cost || 0) + (l.freight_allocated || 0)) * (l.qty_received_now || 0);
+    const qty = (l.qty_received_now || 0) > 0 ? l.qty_received_now : (l.outstanding_qty || l.ordered_qty || 0);
+    return sum + ((l.unit_cost || 0) + (l.freight_allocated || 0)) * qty;
   }, 0);
 
   const canPost = () => {

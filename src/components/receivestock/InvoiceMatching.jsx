@@ -10,15 +10,13 @@ const MATCH_STATUSES = {
 export default function InvoiceMatching({ form, update, receiptTotal }) {
   const invoiceTotal = parseFloat(form.supplier_invoice_total || 0);
   const variance = invoiceTotal - receiptTotal;
-  const hasVariance = Math.abs(variance) > 0.01;
+  const hasVariance = invoiceTotal > 0 && Math.abs(variance) > 0.01;
 
-  const matchStatus = !form.supplier_invoice_number
+  const matchStatus = !form.supplier_invoice_number || invoiceTotal === 0
     ? "not_matched"
     : hasVariance
     ? "variance_detected"
-    : invoiceTotal > 0
-    ? "matched"
-    : "not_matched";
+    : "matched";
 
   const StatusInfo = MATCH_STATUSES[matchStatus];
   const StatusIcon = StatusInfo.icon;
