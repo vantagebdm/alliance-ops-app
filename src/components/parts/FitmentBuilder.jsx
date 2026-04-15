@@ -166,6 +166,15 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
               {customInput && <button type="button" className="text-primary text-xs font-heading" onMouseDown={e => { e.preventDefault(); addCustom(); }}>Add</button>}
             </div>
           )}
+          <div className="p-2 border-t border-border">
+            <button
+              type="button"
+              onMouseDown={e => { e.preventDefault(); setOpen(false); }}
+              className="w-full px-3 py-1.5 text-xs bg-primary text-primary-foreground hover:bg-primary/90 rounded-sm font-heading uppercase tracking-wider"
+            >
+              Done
+            </button>
+          </div>
         </div>
       )}
     </div>
