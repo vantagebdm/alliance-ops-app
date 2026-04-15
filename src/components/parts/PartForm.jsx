@@ -22,43 +22,38 @@ export default function PartForm({ onClose, onSaved, initial }) {
     workshop_use: false, pack_size: "", volume_size: "", issue_method: "each",
   });
   const [saving, setSaving] = useState(false);
-  const [appNumberError, setAppNumberError] = useState("");
   const supplierAC = useAutocomplete("Supplier", "name");
   const update = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const generateAppNumber = async (category) => {
-    try {
-      setAppNumberError("");
-      const res = await base44.functions.invoke("generateAppPartNumber", { category });
-      if (res.data.success) {
-        update("app_part_number", res.data.app_part_number);
-      } else {
-        setAppNumberError(res.data.error || "Failed to generate number");
-      }
-    } catch (err) {
-      setAppNumberError(err.message || "Error generating number");
-    }
+  const getCategoryPrefix = (category) => {
+    const prefixMap = {
+      engine: "APP-ENG", transmission: "APP-TRM", brakes: "APP-BRK", suspension: "APP-SUS",
+      electrical: "APP-ELE", body: "APP-BOD", filters: "APP-FLT", hydraulic: "APP-HYD",
+      driveline: "APP-DRV", cooling: "APP-COL", fuel: "APP-FUL", tyres: "APP-TYR",
+      oils: "APP-OIL", sprays: "APP-SPR", consumables: "APP-CON", compliance: "APP-COM",
+      chemicals: "APP-CHM", other: "APP-OTH"
+    };
+    return prefixMap[category] || "";
   };
 
   const handleCategoryChange = (newCategory) => {
+    const prefix = getCategoryPrefix(newCategory);
     update("category", newCategory);
     update("subcategory", "");
-    if (!initial?.id) {
-      generateAppNumber(newCategory);
-    }
+    update("app_part_number", prefix);
   };
 
   const save = async () => {
-    if (!form.app_part_number) {
-      setAppNumberError("APP Internal Part Number is required");
-      return;
-    }
     if (!form.part_number) {
-      setAppNumberError("Part Number is required");
+      alert("Part Number is required");
       return;
     }
     if (!form.name) {
-      setAppNumberError("Part Name is required");
+      alert("Part Name is required");
+      return;
+    }
+    if (!form.app_part_number || form.app_part_number.length < 7) {
+      alert("APP Internal Part Number is required");
       return;
     }
 
@@ -73,11 +68,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
       onSaved();
     } catch (err) {
       setSaving(false);
-      if (err.message?.includes("already exists")) {
-        setAppNumberError("APP internal part number already exists. Please use the next available sequence or review category settings.");
-      } else {
-        setAppNumberError(err.message || "Error saving part");
-      }
+      alert(err.message || "Error saving part");
     }
   };
 
@@ -133,16 +124,10 @@ export default function PartForm({ onClose, onSaved, initial }) {
                 <FieldLabel>APP Internal Part Number</FieldLabel>
                 <Input 
                   value={form.app_part_number} 
-                  readOnly
-                  className="rounded-sm bg-muted text-foreground font-mono font-semibold"
-                  placeholder="Auto-generated based on category"
+                  onChange={e => update("app_part_number", e.target.value)}
+                  className="rounded-sm font-mono font-semibold text-primary"
+                  placeholder="Category prefix will appear above"
                 />
-                {form.app_part_number && (
-                  <p className="text-xs text-green-600 mt-1">✓ Available</p>
-                )}
-                {appNumberError && (
-                  <p className="text-xs text-red-600 mt-1">{appNumberError}</p>
-                )}
               </div>
               {isExtended && (
                 <div>
