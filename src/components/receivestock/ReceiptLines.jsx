@@ -108,12 +108,27 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
         </div>
       )}
 
-      <div className="overflow-x-auto border border-border rounded-sm">
-        <table className="w-full text-xs">
+      <div className="border border-border rounded-sm overflow-hidden">
+        <table className="w-full text-xs table-fixed">
+          <colgroup>
+            <col className="w-8" />
+            <col className="w-32" />
+            <col className="w-auto" />
+            <col className="w-16" />
+            <col className="w-16" />
+            <col className="w-16" />
+            <col className="w-16" />
+            <col className="w-24" />
+            <col className="w-20" />
+            <col className="w-20" />
+            <col className="w-24" />
+            <col className="w-20" />
+            <col className="w-28" />
+          </colgroup>
           <thead className="bg-[hsl(0,0%,8%)] text-white">
             <tr>
-              {["", "Part #", "Description", "Ordered", "Prev Rcvd", "Outstanding", "Qty Now", "Unit Cost $", "Freight $", "Landed $", "Warehouse", "Bin", "Condition", "Destination", "Notes"].map(h => (
-                <th key={h} className="font-heading text-[9px] uppercase tracking-wider px-2 py-2 text-left font-semibold whitespace-nowrap">{h}</th>
+              {["", "Part #", "Description", "Ord", "Prev", "O/S", "Qty", "Unit $", "Freight $", "Landed $", "Warehouse", "Bin", "Condition"].map(h => (
+                <th key={h} className="font-heading text-[9px] uppercase tracking-wider px-2 py-2 text-left font-semibold">{h}</th>
               ))}
             </tr>
           </thead>
@@ -123,97 +138,79 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
               const isDiscrepancy = line.condition !== "good";
               return (
                 <tr key={idx} className={`border-b border-border ${isDiscrepancy ? "bg-yellow-50/60" : idx % 2 === 0 ? "bg-white" : "bg-muted/10"}`}>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2">
                     <button type="button" onClick={() => toggleSelect(idx)}>
                       {line.selected
                         ? <CheckSquare className="w-4 h-4 text-primary" />
                         : <Square className="w-4 h-4 text-muted-foreground" />}
                     </button>
                   </td>
-                  <td className="px-2 py-1.5 font-heading font-bold whitespace-nowrap">{line.part_number}</td>
-                  <td className="px-2 py-1.5 max-w-[140px]">
-                    <div className="truncate">{line.description}</div>
-                    {line.supplier_part_number && <div className="text-muted-foreground text-[9px]">Sup: {line.supplier_part_number}</div>}
+                  <td className="px-2 py-2 font-heading font-bold text-[11px] truncate">{line.part_number}</td>
+                  <td className="px-2 py-2">
+                    <div className="truncate text-[11px]">{line.description}</div>
+                    {line.supplier_part_number && <div className="text-muted-foreground text-[9px] truncate">Sup: {line.supplier_part_number}</div>}
                   </td>
-                  <td className="px-2 py-1.5 text-center">{line.ordered_qty || 0}</td>
-                  <td className="px-2 py-1.5 text-center text-muted-foreground">{line.previously_received_qty || 0}</td>
-                  <td className="px-2 py-1.5 text-center font-bold text-primary">{outstanding}</td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2 text-center">{line.ordered_qty || 0}</td>
+                  <td className="px-2 py-2 text-center text-muted-foreground">{line.previously_received_qty || 0}</td>
+                  <td className="px-2 py-2 text-center font-bold text-primary">{outstanding}</td>
+                  <td className="px-2 py-2">
                     <input
                       type="number"
                       min="0"
                       value={line.qty_received_now ?? 0}
                       onChange={e => updateLine(idx, "qty_received_now", parseFloat(e.target.value) || 0)}
-                      className="w-16 h-7 px-2 border border-input rounded-sm text-center"
+                      className="w-full h-7 px-1 border border-input rounded-sm text-center"
                     />
                   </td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2">
                     <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={line.unit_cost ?? 0}
                       onChange={e => updateLine(idx, "unit_cost", parseFloat(e.target.value) || 0)}
-                      className="w-20 h-7 px-2 border border-input rounded-sm text-right"
+                      className="w-full h-7 px-1 border border-input rounded-sm text-right"
                     />
                   </td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2">
                     <input
                       type="number"
                       min="0"
                       step="0.01"
                       value={line.freight_allocated ?? 0}
                       onChange={e => updateLine(idx, "freight_allocated", parseFloat(e.target.value) || 0)}
-                      className="w-20 h-7 px-2 border border-input rounded-sm text-right"
+                      className="w-full h-7 px-1 border border-input rounded-sm text-right"
                     />
                   </td>
-                  <td className="px-2 py-1.5 font-bold whitespace-nowrap">
+                  <td className="px-2 py-2 font-bold text-[11px]">
                     ${((line.unit_cost || 0) + (line.freight_allocated || 0) + (line.surcharge_allocated || 0) - (line.discount || 0)).toFixed(2)}
                   </td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       value={line.warehouse || ""}
                       onChange={e => updateLine(idx, "warehouse", e.target.value)}
                       placeholder="Warehouse"
-                      className="w-24 h-7 px-2 border border-input rounded-sm"
+                      className="w-full h-7 px-1 border border-input rounded-sm text-[11px]"
                     />
                   </td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2">
                     <input
                       type="text"
                       value={line.bin || ""}
                       onChange={e => updateLine(idx, "bin", e.target.value)}
-                      placeholder="Bin/Bay"
-                      className="w-20 h-7 px-2 border border-input rounded-sm"
+                      placeholder="Bin"
+                      className="w-full h-7 px-1 border border-input rounded-sm text-[11px]"
                     />
                   </td>
-                  <td className="px-2 py-1.5">
+                  <td className="px-2 py-2">
                     <select
                       value={line.condition || "good"}
                       onChange={e => updateLine(idx, "condition", e.target.value)}
-                      className={`h-7 px-1 border rounded-sm text-[10px] ${isDiscrepancy ? "border-yellow-400 bg-yellow-50" : "border-input bg-transparent"}`}
+                      className={`w-full h-7 px-1 border rounded-sm text-[10px] ${isDiscrepancy ? "border-yellow-400 bg-yellow-50" : "border-input bg-transparent"}`}
                     >
                       {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
-                  </td>
-                  <td className="px-2 py-1.5">
-                    <select
-                      value={line.destination || "available_stock"}
-                      onChange={e => updateLine(idx, "destination", e.target.value)}
-                      className="h-7 px-1 border border-input rounded-sm text-[10px] bg-transparent"
-                    >
-                      {DESTINATIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-                    </select>
-                  </td>
-                  <td className="px-2 py-1.5">
-                    <input
-                      type="text"
-                      value={line.notes || ""}
-                      onChange={e => updateLine(idx, "notes", e.target.value)}
-                      placeholder={isDiscrepancy ? "Required" : "Optional"}
-                      className={`w-32 h-7 px-2 border rounded-sm text-[10px] ${isDiscrepancy && !line.notes ? "border-yellow-400 bg-yellow-50" : "border-input"}`}
-                    />
                   </td>
                 </tr>
               );
@@ -221,6 +218,37 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
           </tbody>
         </table>
       </div>
+
+      {/* Per-line destination & notes — expanded below table */}
+      {lines.some(l => l.condition !== "good") && (
+        <div className="mt-3 space-y-2">
+          <div className="font-heading text-[10px] uppercase tracking-wider text-muted-foreground">Discrepancy Details</div>
+          {lines.map((line, idx) => line.condition !== "good" && (
+            <div key={idx} className="grid grid-cols-2 gap-3 bg-yellow-50 border border-yellow-200 rounded-sm px-3 py-2">
+              <div>
+                <div className="font-heading text-[9px] uppercase tracking-wider text-yellow-700 mb-1">{line.part_number} — Destination</div>
+                <select
+                  value={line.destination || "available_stock"}
+                  onChange={e => updateLine(idx, "destination", e.target.value)}
+                  className="w-full h-7 px-2 border border-yellow-400 rounded-sm text-[11px] bg-white"
+                >
+                  {DESTINATIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                </select>
+              </div>
+              <div>
+                <div className="font-heading text-[9px] uppercase tracking-wider text-yellow-700 mb-1">Notes *</div>
+                <input
+                  type="text"
+                  value={line.notes || ""}
+                  onChange={e => updateLine(idx, "notes", e.target.value)}
+                  placeholder="Describe the issue..."
+                  className="w-full h-7 px-2 border border-yellow-400 rounded-sm text-[11px] bg-white"
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Manual add line for manual receipts */}
     </div>
