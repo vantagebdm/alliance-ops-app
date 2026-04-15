@@ -117,8 +117,8 @@ export default function QuickOrderForm({ onClose, onSaved }) {
                   <th className="text-left px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-40">Part #</th>
                   <th className="text-left px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50">Description</th>
                   <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-20">Qty</th>
-                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-28">Unit Price (ex GST)</th>
-                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-24">Line Total (ex GST)</th>
+                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-28">Unit Price</th>
+                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-24">Line Total</th>
                   <th className="w-8" />
                 </tr>
               </thead>
@@ -199,7 +199,7 @@ export default function QuickOrderForm({ onClose, onSaved }) {
 
             <div className="text-sm space-y-1 text-right">
               <div className="flex justify-between gap-12 text-foreground/60">
-                <span className="font-heading text-[11px] uppercase tracking-wider">Subtotal (ex GST)</span>
+                <span className="font-heading text-[11px] uppercase tracking-wider">Subtotal</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
               <div className="flex justify-between gap-12 text-foreground/60">
