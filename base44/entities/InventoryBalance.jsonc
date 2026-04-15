@@ -1,0 +1,145 @@
+{
+  "name": "InventoryBalance",
+  "type": "object",
+  "properties": {
+    "part_id": {
+      "type": "string"
+    },
+    "part_number": {
+      "type": "string"
+    },
+    "part_description": {
+      "type": "string"
+    },
+    "warehouse": {
+      "type": "string"
+    },
+    "zone": {
+      "type": "string"
+    },
+    "aisle": {
+      "type": "string"
+    },
+    "shelf": {
+      "type": "string"
+    },
+    "bay": {
+      "type": "string"
+    },
+    "bin": {
+      "type": "string"
+    },
+    "location_type": {
+      "type": "string",
+      "enum": [
+        "available_stock",
+        "picking",
+        "reserve",
+        "quarantine",
+        "damaged",
+        "returns_staging",
+        "workshop_allocation",
+        "customer_hold",
+        "in_transit"
+      ],
+      "default": "available_stock"
+    },
+    "on_hand": {
+      "type": "number",
+      "default": 0
+    },
+    "available": {
+      "type": "number",
+      "default": 0
+    },
+    "allocated": {
+      "type": "number",
+      "default": 0
+    },
+    "reserved": {
+      "type": "number",
+      "default": 0
+    },
+    "in_transit": {
+      "type": "number",
+      "default": 0
+    },
+    "quarantine": {
+      "type": "number",
+      "default": 0
+    },
+    "damaged": {
+      "type": "number",
+      "default": 0
+    },
+    "on_order": {
+      "type": "number",
+      "default": 0
+    },
+    "backordered": {
+      "type": "number",
+      "default": 0
+    },
+    "unit_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "min_level": {
+      "type": "number",
+      "default": 0
+    },
+    "max_level": {
+      "type": "number",
+      "default": 0
+    },
+    "reorder_point": {
+      "type": "number",
+      "default": 0
+    },
+    "preferred_reorder_qty": {
+      "type": "number",
+      "default": 0
+    },
+    "lead_time_days": {
+      "type": "number",
+      "default": 0
+    },
+    "is_critical": {
+      "type": "boolean",
+      "default": false
+    },
+    "preferred_supplier": {
+      "type": "string"
+    },
+    "last_stocktake_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "last_adjustment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "last_movement_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "stock_condition": {
+      "type": "string",
+      "enum": [
+        "available",
+        "quarantine",
+        "damaged",
+        "obsolete",
+        "awaiting_inspection",
+        "warranty_hold",
+        "return_pending",
+        "supplier_claim_hold"
+      ],
+      "default": "available"
+    }
+  },
+  "required": [
+    "part_number",
+    "warehouse"
+  ]
+}

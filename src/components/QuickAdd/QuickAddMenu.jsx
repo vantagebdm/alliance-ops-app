@@ -1,6 +1,6 @@
 import {
   FileText, ShoppingCart, MessageSquare, Users, Package,
-  Truck, RotateCcw, Zap, MapPin, Receipt,
+  Truck, RotateCcw, Zap, Receipt, BarChart2, ClipboardList,
 } from "lucide-react";
 
 const MENU_SECTIONS = [
@@ -25,7 +25,7 @@ const MENU_SECTIONS = [
     name: "INVENTORY",
     items: [
       { id: "receive", label: "Receive Stock", icon: RotateCcw, action: "receive" },
-      { id: "adjustment", label: "Stock Adjustment", icon: Zap, action: "adjustment" },
+      { id: "adjustment", label: "Stock Adjustment", icon: BarChart2, action: "adjustment" },
     ],
   },
   {

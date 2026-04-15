@@ -12,7 +12,11 @@
         "enquiry",
         "credit_return",
         "warranty",
-        "goods_receipt"
+        "goods_receipt",
+        "stock_adjustment",
+        "stocktake",
+        "stock_transfer",
+        "stock_movement"
       ]
     },
     "subtype": {
@@ -21,7 +25,7 @@
     },
     "prefix": {
       "type": "string",
-      "description": "e.g. PO-PS, Q-, SO-, I-"
+      "description": "e.g. PO-PS, Q-, SO-, I-, SA-, ST-, TR-, SM-"
     },
     "current_sequence": {
       "type": "number",

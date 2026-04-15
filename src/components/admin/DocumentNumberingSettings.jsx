@@ -11,8 +11,12 @@ const DEFAULT_CONFIGS = [
   { document_type: "invoice",        subtype: null,              prefix: "I-",    current_sequence: 1, number_padding: 5, is_active: true, label: "Invoice" },
   { document_type: "quote",          subtype: null,              prefix: "Q-",    current_sequence: 1, number_padding: 5, is_active: true, label: "Quote" },
   { document_type: "enquiry",        subtype: null,              prefix: "E-",    current_sequence: 1, number_padding: 5, is_active: true, label: "Enquiry" },
-  { document_type: "credit_return",  subtype: null,              prefix: "CR-",   current_sequence: 1, number_padding: 5, is_active: true, label: "Credit / Return" },
-  { document_type: "warranty",       subtype: null,              prefix: "W-",    current_sequence: 1, number_padding: 5, is_active: true, label: "Warranty" },
+  { document_type: "credit_return",    subtype: null, prefix: "CR-",  current_sequence: 1, number_padding: 5, is_active: true, label: "Credit / Return" },
+  { document_type: "warranty",         subtype: null, prefix: "W-",   current_sequence: 1, number_padding: 5, is_active: true, label: "Warranty" },
+  { document_type: "stock_adjustment", subtype: null, prefix: "SA-",  current_sequence: 1, number_padding: 5, is_active: true, label: "Stock Adjustment" },
+  { document_type: "stocktake",        subtype: null, prefix: "ST-",  current_sequence: 1, number_padding: 5, is_active: true, label: "Stocktake" },
+  { document_type: "stock_transfer",   subtype: null, prefix: "TR-",  current_sequence: 1, number_padding: 5, is_active: true, label: "Stock Transfer" },
+  { document_type: "stock_movement",   subtype: null, prefix: "SM-",  current_sequence: 1, number_padding: 5, is_active: true, label: "Stock Movement" },
 ];
 
 function formatExample(prefix, seq, padding) {

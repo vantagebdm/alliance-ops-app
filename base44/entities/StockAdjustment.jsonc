@@ -1,0 +1,117 @@
+{
+  "name": "StockAdjustment",
+  "type": "object",
+  "properties": {
+    "adjustment_number": {
+      "type": "string"
+    },
+    "adjustment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "part_id": {
+      "type": "string"
+    },
+    "part_number": {
+      "type": "string"
+    },
+    "part_description": {
+      "type": "string"
+    },
+    "warehouse": {
+      "type": "string"
+    },
+    "bin": {
+      "type": "string"
+    },
+    "adjustment_type": {
+      "type": "string",
+      "enum": [
+        "adjustment_in",
+        "adjustment_out",
+        "stock_correction",
+        "damaged_writedown",
+        "found_stock",
+        "lost_missing",
+        "internal_use",
+        "quarantine_move",
+        "return_to_available",
+        "opening_balance",
+        "other"
+      ]
+    },
+    "reason_code": {
+      "type": "string",
+      "enum": [
+        "count_variance",
+        "damage",
+        "theft_loss",
+        "mispick_correction",
+        "supplier_short_shipment",
+        "initial_load",
+        "workshop_consumption",
+        "warranty_stock_hold",
+        "obsolete_writeoff",
+        "admin_correction",
+        "other"
+      ]
+    },
+    "qty_before": {
+      "type": "number",
+      "default": 0
+    },
+    "adjustment_qty": {
+      "type": "number",
+      "default": 0
+    },
+    "qty_after": {
+      "type": "number",
+      "default": 0
+    },
+    "unit_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "value_impact": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    },
+    "other_reason": {
+      "type": "string"
+    },
+    "performed_by": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "pending_approval",
+        "approved",
+        "posted",
+        "rejected"
+      ],
+      "default": "draft"
+    },
+    "stocktake_id": {
+      "type": "string"
+    },
+    "stocktake_number": {
+      "type": "string"
+    },
+    "attachment_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "part_number",
+    "adjustment_type",
+    "adjustment_qty"
+  ]
+}

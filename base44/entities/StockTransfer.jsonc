@@ -1,0 +1,98 @@
+{
+  "name": "StockTransfer",
+  "type": "object",
+  "properties": {
+    "transfer_number": {
+      "type": "string"
+    },
+    "transfer_type": {
+      "type": "string",
+      "enum": [
+        "warehouse_to_warehouse",
+        "bin_to_bin",
+        "warehouse_to_workshop",
+        "warehouse_to_customer_reserve",
+        "quarantine_to_available",
+        "available_to_damaged",
+        "other"
+      ],
+      "default": "bin_to_bin"
+    },
+    "from_warehouse": {
+      "type": "string"
+    },
+    "from_bin": {
+      "type": "string"
+    },
+    "to_warehouse": {
+      "type": "string"
+    },
+    "to_bin": {
+      "type": "string"
+    },
+    "transfer_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "in_transit",
+        "completed",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "requested_by": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "part_id": {
+            "type": "string"
+          },
+          "part_number": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "available_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "transfer_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "unit_cost": {
+            "type": "number",
+            "default": 0
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "transfer_type",
+    "from_warehouse",
+    "to_warehouse"
+  ]
+}

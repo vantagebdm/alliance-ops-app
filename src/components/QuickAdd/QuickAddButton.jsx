@@ -11,6 +11,7 @@ import QuickPOForm from "./forms/QuickPOForm";
 import QuickSupplierForm from "./forms/QuickSupplierForm";
 import QuickInvoiceForm from "./forms/QuickInvoiceForm";
 import QuickReceiveForm from "./forms/QuickReceiveForm";
+import QuickAdjustmentForm from "./forms/QuickAdjustmentForm";
 
 export default function QuickAddButton({ contextData = {} }) {
   const [open, setOpen] = useState(false);
@@ -37,6 +38,7 @@ export default function QuickAddButton({ contextData = {} }) {
     supplier: QuickSupplierForm,
     invoice: QuickInvoiceForm,
     receive: QuickReceiveForm,
+    adjustment: QuickAdjustmentForm,
   };
 
   const ActiveForm = formComponents[activeForm];

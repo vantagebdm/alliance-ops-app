@@ -1,0 +1,181 @@
+{
+  "name": "Stocktake",
+  "type": "object",
+  "properties": {
+    "stocktake_number": {
+      "type": "string"
+    },
+    "stocktake_name": {
+      "type": "string"
+    },
+    "stocktake_type": {
+      "type": "string",
+      "enum": [
+        "full",
+        "partial",
+        "cycle_count",
+        "bin_count",
+        "category_count",
+        "supplier_count",
+        "equipment_type_count"
+      ],
+      "default": "full"
+    },
+    "warehouse": {
+      "type": "string"
+    },
+    "selected_bins": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "selected_categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "selected_equipment_types": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "selected_suppliers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "count_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "released",
+        "in_progress",
+        "submitted",
+        "variance_review",
+        "approved",
+        "posted",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "count_mode": {
+      "type": "string",
+      "enum": [
+        "blind",
+        "visible"
+      ],
+      "default": "blind"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "assigned_counters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "posted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "total_lines": {
+      "type": "number",
+      "default": 0
+    },
+    "counted_lines": {
+      "type": "number",
+      "default": 0
+    },
+    "variance_lines": {
+      "type": "number",
+      "default": 0
+    },
+    "total_value_variance": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "part_id": {
+            "type": "string"
+          },
+          "part_number": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "warehouse": {
+            "type": "string"
+          },
+          "bin": {
+            "type": "string"
+          },
+          "system_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "counted_qty": {
+            "type": "number"
+          },
+          "variance_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "unit_cost": {
+            "type": "number",
+            "default": 0
+          },
+          "variance_value": {
+            "type": "number",
+            "default": 0
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "counted",
+              "recount",
+              "approved",
+              "adjusted"
+            ],
+            "default": "pending"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "recount_required": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "stocktake_name",
+    "stocktake_type",
+    "warehouse"
+  ]
+}
