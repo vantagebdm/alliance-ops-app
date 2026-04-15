@@ -37,13 +37,13 @@ export default function CreditAppTemplates() {
         title="Credit Application Templates"
         subtitle="Manage your APP Credit Account Application Pack"
         actions={
-          <div className="flex gap-2">
+          <div className="flex gap-2 text-foreground">
             {active && (
               <>
-                <Button variant="outline" onClick={() => setMode("preview")} className="rounded-sm font-heading text-xs uppercase tracking-wider">
+                <Button variant="outline" onClick={() => setMode("preview")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-foreground">
                   <Eye className="w-4 h-4 mr-1" /> Preview
                 </Button>
-                <Button variant="outline" onClick={() => setMode("edit")} className="rounded-sm font-heading text-xs uppercase tracking-wider">
+                <Button variant="outline" onClick={() => setMode("edit")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-foreground">
                   <Edit className="w-4 h-4 mr-1" /> Edit Template
                 </Button>
               </>
