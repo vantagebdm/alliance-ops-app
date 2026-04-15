@@ -28,8 +28,10 @@ export default function FitmentDisplay({ fitments = [] }) {
       </div>
       <div className="space-y-2">
         {fitments.map((f, i) => {
-          const eqLabel = EQUIPMENT_TYPE_OPTIONS.find(e => e.value === f.equipment_type)?.label;
-          const mfr = f.manufacturer === "Other" && f.manufacturer_custom ? f.manufacturer_custom : f.manufacturer;
+          const eqTypes = f.equipment_types || (f.equipment_type ? [f.equipment_type] : []);
+          const eqLabel = eqTypes.map(v => EQUIPMENT_TYPE_OPTIONS.find(e => e.value === v)?.label).filter(Boolean).join(", ");
+          const mfrs = f.manufacturers || (f.manufacturer ? [f.manufacturer] : []);
+          const mfr = mfrs.join(", ");
           const yearRange = formatYearRange(f);
 
           return (

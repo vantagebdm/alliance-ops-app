@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Plus, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Plus, Trash2, ChevronDown, ChevronUp, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -38,11 +38,116 @@ const FITMENT_TYPE_OPTIONS = [
 
 const YEARS = Array.from({ length: 55 }, (_, i) => String(2024 - i));
 
+// Reusable multi-select dropdown with search
+function MultiSelectDropdown({ options, value = [], onChange, placeholder, allowCustom = false }) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [customInput, setCustomInput] = useState("");
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filtered = options.filter(o => {
+    const label = typeof o === "string" ? o : o.label;
+    return label.toLowerCase().includes(search.toLowerCase()) && !value.includes(typeof o === "string" ? o : o.value);
+  });
+
+  const toggle = (val) => {
+    if (value.includes(val)) onChange(value.filter(v => v !== val));
+    else onChange([...value, val]);
+  };
+
+  const addCustom = () => {
+    const trimmed = customInput.trim();
+    if (trimmed && !value.includes(trimmed)) { onChange([...value, trimmed]); }
+    setCustomInput("");
+  };
+
+  const getLabel = (val) => {
+    const found = options.find(o => (typeof o === "string" ? o : o.value) === val);
+    return found ? (typeof found === "string" ? found : found.label) : val;
+  };
+
+  return (
+    <div className="relative" ref={ref}>
+      <div
+        className="border border-input rounded-sm px-2 py-1.5 min-h-[36px] bg-transparent cursor-pointer focus-within:ring-1 focus-within:ring-ring"
+        onClick={() => setOpen(o => !o)}
+      >
+        {value.length === 0 ? (
+          <span className="text-sm text-muted-foreground">{placeholder}</span>
+        ) : (
+          <div className="flex flex-wrap gap-1">
+            {value.map(v => (
+              <span key={v} className="inline-flex items-center gap-1 bg-primary/10 text-primary border border-primary/30 text-[10px] font-heading uppercase tracking-wider px-2 py-0.5 rounded-sm">
+                {getLabel(v)}
+                <button type="button" onClick={e => { e.stopPropagation(); toggle(v); }} className="text-primary/60 hover:text-red-500">×</button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      {open && (
+        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-sm shadow-lg max-h-52 flex flex-col">
+          <div className="p-2 border-b border-border">
+            <input
+              autoFocus
+              className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              placeholder="Search..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              onClick={e => e.stopPropagation()}
+            />
+          </div>
+          <div className="overflow-y-auto flex-1">
+            {filtered.map(o => {
+              const val = typeof o === "string" ? o : o.value;
+              const label = typeof o === "string" ? o : o.label;
+              const selected = value.includes(val);
+              return (
+                <div
+                  key={val}
+                  className={`flex items-center gap-2 px-3 py-1.5 text-sm cursor-pointer hover:bg-accent hover:text-accent-foreground ${selected ? "bg-primary/5 text-primary" : ""}`}
+                  onMouseDown={e => { e.preventDefault(); toggle(val); }}
+                >
+                  <div className={`w-3.5 h-3.5 border rounded-sm flex items-center justify-center flex-shrink-0 ${selected ? "bg-primary border-primary" : "border-input"}`}>
+                    {selected && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
+                  </div>
+                  {label}
+                </div>
+              );
+            })}
+            {filtered.length === 0 && !allowCustom && (
+              <div className="px-3 py-2 text-xs text-muted-foreground">No results</div>
+            )}
+          </div>
+          {allowCustom && (
+            <div className="p-2 border-t border-border flex gap-1">
+              <input
+                className="flex-1 bg-transparent text-xs outline-none placeholder:text-muted-foreground"
+                placeholder="Add custom entry..."
+                value={customInput}
+                onChange={e => setCustomInput(e.target.value)}
+                onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addCustom(); } }}
+                onClick={e => e.stopPropagation()}
+              />
+              {customInput && <button type="button" className="text-primary text-xs font-heading" onMouseDown={e => { e.preventDefault(); addCustom(); }}>Add</button>}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const emptyFitment = () => ({
   _id: Math.random().toString(36).slice(2),
-  equipment_type: "",
-  manufacturer: "",
-  manufacturer_custom: "",
+  equipment_types: [],
+  manufacturers: [],
   model: "",
   series_variant: "",
   fitment_type: "",
@@ -117,10 +222,10 @@ function YearMultiSelect({ value = [], onChange }) {
 function FitmentCard({ fitment, onChange, onRemove }) {
   const [expanded, setExpanded] = useState(true);
   const u = (k, v) => onChange({ ...fitment, [k]: v });
-  const isOtherMfr = fitment.manufacturer === "Other";
-  const displayMfr = isOtherMfr && fitment.manufacturer_custom ? fitment.manufacturer_custom : fitment.manufacturer;
-  const displayEq = EQUIPMENT_TYPE_OPTIONS.find(e => e.value === fitment.equipment_type)?.label;
-  const summary = [displayMfr, fitment.model, fitment.series_variant].filter(Boolean).join(" • ");
+  const eqTypes = fitment.equipment_types || (fitment.equipment_type ? [fitment.equipment_type] : []);
+  const mfrs = fitment.manufacturers || (fitment.manufacturer ? [fitment.manufacturer] : []);
+  const displayEq = eqTypes.map(v => EQUIPMENT_TYPE_OPTIONS.find(e => e.value === v)?.label).filter(Boolean).join(", ");
+  const summary = [mfrs.join(", "), fitment.model, fitment.series_variant].filter(Boolean).join(" • ");
 
   return (
     <div className="border border-border rounded-sm overflow-hidden">
@@ -150,31 +255,24 @@ function FitmentCard({ fitment, onChange, onRemove }) {
           {/* Equipment Type */}
           <div>
             <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Equipment Type *</label>
-            <Select value={fitment.equipment_type} onValueChange={v => u("equipment_type", v)}>
-              <SelectTrigger className="rounded-sm h-8 text-xs"><SelectValue placeholder="Select type..." /></SelectTrigger>
-              <SelectContent>
-                {EQUIPMENT_TYPE_OPTIONS.map(o => <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <MultiSelectDropdown
+              options={EQUIPMENT_TYPE_OPTIONS}
+              value={eqTypes}
+              onChange={v => u("equipment_types", v)}
+              placeholder="Select equipment types..."
+            />
           </div>
 
           {/* Manufacturer */}
           <div>
             <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Manufacturer *</label>
-            <Select value={fitment.manufacturer} onValueChange={v => u("manufacturer", v)}>
-              <SelectTrigger className="rounded-sm h-8 text-xs"><SelectValue placeholder="Select brand..." /></SelectTrigger>
-              <SelectContent>
-                {MANUFACTURER_OPTIONS.map(m => <SelectItem key={m} value={m}>{m}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            {isOtherMfr && (
-              <Input
-                className="rounded-sm h-8 text-xs mt-1"
-                placeholder="Enter manufacturer..."
-                value={fitment.manufacturer_custom}
-                onChange={e => u("manufacturer_custom", e.target.value)}
-              />
-            )}
+            <MultiSelectDropdown
+              options={MANUFACTURER_OPTIONS}
+              value={mfrs}
+              onChange={v => u("manufacturers", v)}
+              placeholder="Select manufacturers..."
+              allowCustom
+            />
           </div>
 
           {/* Model */}
