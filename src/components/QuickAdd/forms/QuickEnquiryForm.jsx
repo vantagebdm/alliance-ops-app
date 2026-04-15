@@ -68,6 +68,7 @@ export default function QuickEnquiryForm({ onClose, onSaved }) {
                 fillCustomer(item);
                 customerAC.handleSelectSuggestion(item);
               }}
+              onShowAll={customerAC.handleShowAll}
               placeholder="Search customer..."
               className="rounded-sm"
             />

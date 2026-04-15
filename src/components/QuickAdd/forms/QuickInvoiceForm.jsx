@@ -363,6 +363,7 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
                       loading={customerAC.loading}
                       onInputChange={(val) => { u("customer_name", val); customerAC.handleInputChange(val); }}
                       onSelect={(item) => { fillCustomer(item); customerAC.handleSelectSuggestion(item); }}
+                      onShowAll={customerAC.handleShowAll}
                       placeholder="Search customer..."
                       className="rounded-sm"
                     />
@@ -376,6 +377,7 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
                       loading={companyAC.loading}
                       onInputChange={(val) => { u("company", val); companyAC.handleInputChange(val); }}
                       onSelect={(item) => { fillCustomer(item); companyAC.handleSelectSuggestion(item); }}
+                      onShowAll={companyAC.handleShowAll}
                       placeholder="Search company..."
                       className="rounded-sm"
                     />

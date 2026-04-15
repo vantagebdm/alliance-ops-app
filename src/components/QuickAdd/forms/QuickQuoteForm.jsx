@@ -85,6 +85,7 @@ export default function QuickQuoteForm({ onClose, onSaved, contextData = {} }) {
                 fillCustomer(item);
                 customerAC.handleSelectSuggestion(item);
               }}
+              onShowAll={customerAC.handleShowAll}
               placeholder="Search customer..."
               className="rounded-sm"
             />

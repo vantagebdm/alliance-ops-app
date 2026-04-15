@@ -92,6 +92,7 @@ export default function QuickOrderForm({ onClose, onSaved }) {
                   fillCustomer(item);
                   customerAC.handleSelectSuggestion(item);
                 }}
+                onShowAll={customerAC.handleShowAll}
                 placeholder="Search customer..."
                 className="rounded-sm"
               />
