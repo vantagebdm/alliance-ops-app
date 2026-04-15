@@ -40,14 +40,23 @@ export default function SupplierOnboardingForm({ onClose, onSaved, initial }) {
 
   const save = async () => {
     setSaving(true);
+    const numFields = ["preferred_ranking", "lead_time_standard", "lead_time_express", "rating", "min_order_value"];
+    const cleaned = { ...form };
+    numFields.forEach(f => {
+      if (cleaned[f] !== undefined && cleaned[f] !== "") {
+        cleaned[f] = Number(cleaned[f]) || undefined;
+      } else if (cleaned[f] === "") {
+        cleaned[f] = undefined;
+      }
+    });
     let saved;
     if (initial?.id) {
-      saved = await base44.entities.Supplier.update(initial.id, form);
+      saved = await base44.entities.Supplier.update(initial.id, cleaned);
     } else {
-      saved = await base44.entities.Supplier.create(form);
+      saved = await base44.entities.Supplier.create(cleaned);
     }
     setSaving(false);
-    onSaved(saved || { ...form });
+    onSaved(saved || { ...cleaned });
   };
 
   const isValid = !!(form.name && (form.phone || form.email) && form.status);
