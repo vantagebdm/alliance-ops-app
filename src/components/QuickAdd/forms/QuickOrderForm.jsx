@@ -19,11 +19,13 @@ export default function QuickOrderForm({ onClose, onSaved }) {
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const fillCustomer = (item) => {
+    const displayName = item.company || item.trading_name || item.name;
     setForm(f => ({
       ...f,
-      customer_name: item.name || f.customer_name,
-      company: item.company || f.company,
+      customer_name: displayName,
+      company: item.company || item.trading_name || "",
     }));
+    customerAC.setQuery(displayName);
   };
 
   const updateLine = (i, k, v) => {
