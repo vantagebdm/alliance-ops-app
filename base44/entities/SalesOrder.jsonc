@@ -8,6 +8,9 @@
     "quote_id": {
       "type": "string"
     },
+    "customer_po_number": {
+      "type": "string"
+    },
     "customer_name": {
       "type": "string"
     },

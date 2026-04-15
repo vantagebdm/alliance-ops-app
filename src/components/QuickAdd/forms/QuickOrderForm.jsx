@@ -44,6 +44,7 @@ export default function QuickOrderForm({ onClose, onSaved }) {
       const subtotal = items.reduce((s, l) => s + l.total, 0);
       const data = {
         customer_name: form.customer_name,
+        customer_po_number: form.customer_po_number || "",
         items,
         subtotal,
         gst: subtotal * 0.1,
@@ -73,24 +74,36 @@ export default function QuickOrderForm({ onClose, onSaved }) {
         </div>
 
         <div className="p-6 space-y-5">
-          <div className="max-w-sm">
-            <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Customer *</label>
-            <Autocomplete
-              value={form.customer_name}
-              suggestions={customerAC.suggestions}
-              open={customerAC.open}
-              loading={customerAC.loading}
-              onInputChange={(val) => {
-                u("customer_name", val);
-                customerAC.handleInputChange(val);
-              }}
-              onSelect={(item) => {
-                fillCustomer(item);
-                customerAC.handleSelectSuggestion(item);
-              }}
-              placeholder="Search customer..."
-              className="rounded-sm"
-            />
+          <div className="flex gap-4 items-end">
+            <div className="flex-1 max-w-sm">
+              <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Customer *</label>
+              <Autocomplete
+                value={form.customer_name}
+                suggestions={customerAC.suggestions}
+                open={customerAC.open}
+                loading={customerAC.loading}
+                onInputChange={(val) => {
+                  u("customer_name", val);
+                  customerAC.handleInputChange(val);
+                }}
+                onSelect={(item) => {
+                  fillCustomer(item);
+                  customerAC.handleSelectSuggestion(item);
+                }}
+                placeholder="Search customer..."
+                className="rounded-sm"
+              />
+            </div>
+            <div className="flex-1 max-w-xs">
+              <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Client PO Number</label>
+              <input
+                type="text"
+                value={form.customer_po_number || ""}
+                onChange={(e) => u("customer_po_number", e.target.value)}
+                placeholder="Enter client PO #"
+                className="flex h-9 w-full rounded-sm border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+              />
+            </div>
           </div>
 
           <div className="border border-border rounded-sm overflow-hidden">
