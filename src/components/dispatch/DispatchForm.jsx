@@ -300,8 +300,8 @@ export default function DispatchForm({ onClose, onSaved }) {
 
           {/* S4 — Dispatch Lines */}
           <SectionHeader number="4" title="Dispatch Line Items" />
-          <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <table className="w-full text-xs">
+          <div className="border border-border rounded-sm overflow-x-auto mb-3">
+            <table className="w-full text-xs min-w-[700px]">
               <thead className="bg-[hsl(0,0%,12%)]">
                 <tr>
                   {["Part #", "Description", "Ord. Qty", "Avail. Qty", "Dispatch Qty", "Remaining", "Location", "Status", ""].map(h => (

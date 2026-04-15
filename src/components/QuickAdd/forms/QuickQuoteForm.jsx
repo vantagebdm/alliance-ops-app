@@ -90,8 +90,8 @@ export default function QuickQuoteForm({ onClose, onSaved, contextData = {} }) {
             />
           </div>
 
-          <div className="border border-border rounded-sm overflow-hidden">
-            <table className="w-full text-xs">
+          <div className="border border-border rounded-sm overflow-x-auto">
+            <table className="w-full text-xs min-w-[500px]">
               <thead className="bg-[hsl(0,0%,96%)]">
                 <tr className="border-b border-border">
                   <th className="text-left px-2 py-1 font-heading tracking-wider text-foreground/50">Part #</th>

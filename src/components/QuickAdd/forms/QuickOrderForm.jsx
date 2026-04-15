@@ -113,8 +113,8 @@ export default function QuickOrderForm({ onClose, onSaved }) {
             </div>
           </div>
 
-          <div className="border border-border rounded-sm overflow-hidden">
-            <table className="w-full text-sm">
+          <div className="border border-border rounded-sm overflow-x-auto">
+            <table className="w-full text-sm min-w-[600px]">
               <thead className="bg-[hsl(0,0%,96%)]">
                 <tr className="border-b border-border">
                   <th className="text-left px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-56">Part #</th>

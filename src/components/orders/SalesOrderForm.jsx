@@ -163,8 +163,8 @@ export default function SalesOrderForm({ onClose, onSaved, initial }) {
               </div>
               <h3 className="font-heading text-sm font-semibold uppercase tracking-wider">Line Items</h3>
             </div>
-            <div className="border border-border rounded-sm overflow-hidden">
-              <table className="w-full text-sm">
+            <div className="border border-border rounded-sm overflow-x-auto">
+              <table className="w-full text-sm min-w-[600px]">
                 <thead className="bg-[hsl(0,0%,96%)] border-b border-border">
                   <tr>
                     <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-44">Part #</th>
