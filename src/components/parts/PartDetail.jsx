@@ -2,6 +2,7 @@ import { base44 } from "@/api/base44Client";
 import { X, Edit3, Package, AlertTriangle, DollarSign, Warehouse, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
+import FitmentDisplay from "./FitmentDisplay";
 
 export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
   const lowStock = part.min_stock_level > 0 && part.stock_quantity <= part.min_stock_level;
@@ -50,7 +51,7 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
               {part.oem_number && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">OEM #</span><span className="font-mono">{part.oem_number}</span></div>}
               {part.aftermarket_number && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Aftermarket #</span><span className="font-mono">{part.aftermarket_number}</span></div>}
               {part.cross_references && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Cross Refs</span><span className="font-mono text-xs">{part.cross_references}</span></div>}
-              {part.compatible_vehicles && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Fits</span><span className="text-xs">{part.compatible_vehicles}</span></div>}
+
               {part.supplier_name && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Supplier</span><span className="font-medium">{part.supplier_name}</span></div>}
             </div>
             {part.description && (
@@ -121,6 +122,13 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
               {part.bin && <div className="flex gap-2"><span className="text-muted-foreground w-20 flex-shrink-0">Bin</span><span className="font-mono">{part.bin}</span></div>}
             </div>
           </div>
+
+          {/* Fitments */}
+          {part.fitments?.length > 0 && (
+            <div className="col-span-2">
+              <FitmentDisplay fitments={part.fitments} />
+            </div>
+          )}
 
           {/* Specs */}
           {(part.weight_kg || part.dimensions || part.barcode || part.hazardous) && (

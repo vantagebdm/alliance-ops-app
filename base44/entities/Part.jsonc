@@ -77,8 +77,64 @@
     "model": {
       "type": "string"
     },
-    "compatible_vehicles": {
-      "type": "string"
+    "fitments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "equipment_type": {
+            "type": "string"
+          },
+          "manufacturer": {
+            "type": "string"
+          },
+          "manufacturer_custom": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "series_variant": {
+            "type": "string"
+          },
+          "fitment_type": {
+            "type": "string"
+          },
+          "year_from": {
+            "type": "string"
+          },
+          "year_to": {
+            "type": "string"
+          },
+          "specific_years": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "engine_spec": {
+            "type": "string"
+          },
+          "serial_from": {
+            "type": "string"
+          },
+          "serial_to": {
+            "type": "string"
+          },
+          "vin_from": {
+            "type": "string"
+          },
+          "vin_to": {
+            "type": "string"
+          },
+          "fitment_notes": {
+            "type": "string"
+          }
+        }
+      }
     },
     "unit_of_measure": {
       "type": "string",

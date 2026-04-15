@@ -8,11 +8,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
+import FitmentBuilder from "./FitmentBuilder";
 
 export default function PartForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
     part_number: "", name: "", description: "", category: "other", brand: "",
-    oem_number: "", compatible_vehicles: "", unit_cost: 0, sell_price: 0,
+    oem_number: "", fitments: [], unit_cost: 0, sell_price: 0,
     stock_quantity: 0, min_stock_level: 0, location: "", supplier_name: "", status: "active",
     equipment_type: "",
   });
@@ -87,13 +88,13 @@ export default function PartForm({ onClose, onSaved, initial }) {
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">OEM Number</label>
                 <Input value={form.oem_number} onChange={e => update("oem_number", e.target.value)} className="rounded-sm" />
               </div>
-              <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Compatible Vehicles</label>
-                <Input value={form.compatible_vehicles} onChange={e => update("compatible_vehicles", e.target.value)} className="rounded-sm" />
-              </div>
               <div className="col-span-2">
                 <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Description</label>
                 <Textarea value={form.description} onChange={e => update("description", e.target.value)} className="rounded-sm" rows={2} />
+              </div>
+              <div className="col-span-2">
+                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-2 block">Compatible Fitments / Applications</label>
+                <FitmentBuilder value={form.fitments || []} onChange={v => update("fitments", v)} />
               </div>
             </div>
           </div>
