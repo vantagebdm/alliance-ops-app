@@ -23,6 +23,7 @@ import GmailTest from './pages/GmailTest';
 import Cashflow from './pages/Cashflow';
 import CreditAppTemplates from './pages/CreditAppTemplates';
 import Notifications from './pages/Notifications';
+import ReceiveStock from './pages/ReceiveStock';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -74,6 +75,7 @@ const AuthenticatedApp = () => {
         <Route path="/gmail-test" element={<GmailTest />} />
         <Route path="/credit-application" element={<CreditAppTemplates />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/receive-stock" element={<ReceiveStock />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

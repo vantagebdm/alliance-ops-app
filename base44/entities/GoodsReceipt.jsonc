@@ -1,0 +1,343 @@
+{
+  "name": "GoodsReceipt",
+  "type": "object",
+  "properties": {
+    "gr_number": {
+      "type": "string"
+    },
+    "receipt_type": {
+      "type": "string",
+      "enum": [
+        "po_receipt",
+        "manual",
+        "supplier_return_replacement",
+        "transfer_in",
+        "warranty_replacement"
+      ],
+      "default": "po_receipt"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_progress",
+        "posted",
+        "partially_received",
+        "fully_received",
+        "variance_review",
+        "quarantined",
+        "cancelled"
+      ],
+      "default": "draft"
+    },
+    "receipt_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "purchase_order_id": {
+      "type": "string"
+    },
+    "po_number": {
+      "type": "string"
+    },
+    "supplier_invoice_number": {
+      "type": "string"
+    },
+    "supplier_invoice_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "supplier_invoice_total": {
+      "type": "number",
+      "default": 0
+    },
+    "packing_slip_number": {
+      "type": "string"
+    },
+    "freight_reference": {
+      "type": "string"
+    },
+    "warehouse": {
+      "type": "string"
+    },
+    "received_by": {
+      "type": "string"
+    },
+    "checked_by": {
+      "type": "string"
+    },
+    "receipt_total": {
+      "type": "number",
+      "default": 0
+    },
+    "freight_cost": {
+      "type": "number",
+      "default": 0
+    },
+    "freight_allocation_method": {
+      "type": "string",
+      "enum": [
+        "value",
+        "quantity",
+        "weight",
+        "manual"
+      ],
+      "default": "value"
+    },
+    "invoice_match_status": {
+      "type": "string",
+      "enum": [
+        "not_matched",
+        "matched",
+        "variance_detected",
+        "pending_review"
+      ],
+      "default": "not_matched"
+    },
+    "invoice_variance": {
+      "type": "number",
+      "default": 0
+    },
+    "manual_receipt_reason": {
+      "type": "string"
+    },
+    "linked_reference_id": {
+      "type": "string"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "part_number": {
+            "type": "string"
+          },
+          "part_id": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "supplier_part_number": {
+            "type": "string"
+          },
+          "po_line_id": {
+            "type": "string"
+          },
+          "ordered_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "previously_received_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "outstanding_qty": {
+            "type": "number",
+            "default": 0
+          },
+          "qty_received_now": {
+            "type": "number",
+            "default": 0
+          },
+          "unit_cost": {
+            "type": "number",
+            "default": 0
+          },
+          "freight_allocated": {
+            "type": "number",
+            "default": 0
+          },
+          "surcharge_allocated": {
+            "type": "number",
+            "default": 0
+          },
+          "landed_cost": {
+            "type": "number",
+            "default": 0
+          },
+          "discount": {
+            "type": "number",
+            "default": 0
+          },
+          "warehouse": {
+            "type": "string"
+          },
+          "bin": {
+            "type": "string"
+          },
+          "destination": {
+            "type": "string",
+            "enum": [
+              "available_stock",
+              "quarantine",
+              "damaged_stock",
+              "customer_reserved",
+              "workshop_allocation"
+            ],
+            "default": "available_stock"
+          },
+          "condition": {
+            "type": "string",
+            "enum": [
+              "good",
+              "damaged",
+              "short_supplied",
+              "incorrect_item",
+              "quarantine",
+              "warranty_return",
+              "replacement_stock"
+            ],
+            "default": "good"
+          },
+          "line_status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "partially_received",
+              "fully_received",
+              "short_supplied",
+              "quarantined",
+              "variance_review",
+              "closed"
+            ],
+            "default": "open"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "selected": {
+            "type": "boolean",
+            "default": true
+          }
+        }
+      }
+    },
+    "variances": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "line_id": {
+            "type": "string"
+          },
+          "part_number": {
+            "type": "string"
+          },
+          "variance_type": {
+            "type": "string",
+            "enum": [
+              "short_supply",
+              "damaged_goods",
+              "wrong_part",
+              "excess_quantity",
+              "missing_paperwork",
+              "cost_variance",
+              "freight_variance"
+            ]
+          },
+          "variance_note": {
+            "type": "string"
+          },
+          "action_taken": {
+            "type": "string",
+            "enum": [
+              "receive_quarantine",
+              "create_supplier_claim",
+              "create_return",
+              "leave_outstanding",
+              "close_short",
+              "accept_over_supply",
+              "pending"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "resolved",
+              "pending"
+            ],
+            "default": "open"
+          }
+        }
+      }
+    },
+    "attachments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "doc_type": {
+            "type": "string",
+            "enum": [
+              "supplier_invoice",
+              "packing_slip",
+              "freight_docket",
+              "delivery_photo",
+              "damage_photo",
+              "other"
+            ]
+          },
+          "filename": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "uploaded_by": {
+            "type": "string"
+          },
+          "upload_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "activity_log": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "user": {
+            "type": "string"
+          },
+          "action": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "notes": {
+      "type": "string"
+    },
+    "internal_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "receipt_type",
+    "supplier_name"
+  ]
+}
