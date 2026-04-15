@@ -94,13 +94,13 @@ export default function PartForm({ onClose, onSaved, initial }) {
             <SectionHeader num={1} title="Part Information" />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <FieldLabel>Part Number *</FieldLabel>
-                <Input value={form.part_number} onChange={e => update("part_number", e.target.value)} className="rounded-sm" />
-              </div>
-              <div>
-                <FieldLabel>Name *</FieldLabel>
-                <Input value={form.name} onChange={e => update("name", e.target.value)} className="rounded-sm" />
-              </div>
+                 <FieldLabel>Part Number *</FieldLabel>
+                 <Input value={form.part_number} onChange={e => update("part_number", e.target.value.toUpperCase())} className="rounded-sm" />
+               </div>
+               <div>
+                 <FieldLabel>Name *</FieldLabel>
+                 <Input value={form.name} onChange={e => update("name", e.target.value.toUpperCase())} className="rounded-sm" />
+               </div>
               <div className="col-span-2">
                 <FieldLabel>Equipment Type</FieldLabel>
                 <Select value={form.equipment_type || ""} onValueChange={v => update("equipment_type", v)}>
@@ -124,7 +124,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
                 <FieldLabel>APP Internal Part Number</FieldLabel>
                 <Input 
                   value={form.app_part_number} 
-                  onChange={e => update("app_part_number", e.target.value)}
+                  onChange={e => update("app_part_number", e.target.value.toUpperCase())}
                   className="rounded-sm font-mono font-semibold text-primary"
                   placeholder="Category prefix will appear above"
                 />
@@ -143,23 +143,23 @@ export default function PartForm({ onClose, onSaved, initial }) {
               )}
               <div>
                 <FieldLabel>Brand</FieldLabel>
-                <Input value={form.brand} onChange={e => update("brand", e.target.value)} className="rounded-sm" />
+                <Input value={form.brand} onChange={e => update("brand", e.target.value.toUpperCase())} className="rounded-sm" />
               </div>
               <div>
                 <FieldLabel>OEM Number</FieldLabel>
-                <Input value={form.oem_number} onChange={e => update("oem_number", e.target.value)} className="rounded-sm" />
+                <Input value={form.oem_number} onChange={e => update("oem_number", e.target.value.toUpperCase())} className="rounded-sm" />
               </div>
               <div>
                 <FieldLabel>Supplier Part Number</FieldLabel>
-                <Input value={form.supplier_sku} onChange={e => update("supplier_sku", e.target.value)} className="rounded-sm" />
+                <Input value={form.supplier_sku} onChange={e => update("supplier_sku", e.target.value.toUpperCase())} className="rounded-sm" />
               </div>
               <div>
                 <FieldLabel>Aftermarket Number</FieldLabel>
-                <Input value={form.aftermarket_number} onChange={e => update("aftermarket_number", e.target.value)} className="rounded-sm" />
+                <Input value={form.aftermarket_number} onChange={e => update("aftermarket_number", e.target.value.toUpperCase())} className="rounded-sm" />
               </div>
               <div className="col-span-2">
                 <FieldLabel>Description</FieldLabel>
-                <Textarea value={form.description} onChange={e => update("description", e.target.value)} className="rounded-sm" rows={2} />
+                <Textarea value={form.description} onChange={e => update("description", e.target.value.toUpperCase())} className="rounded-sm" rows={2} />
               </div>
               <div className="col-span-2">
                 <FieldLabel>Compatible Fitments / Applications</FieldLabel>
