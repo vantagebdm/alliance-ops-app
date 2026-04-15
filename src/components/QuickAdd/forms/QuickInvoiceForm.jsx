@@ -62,19 +62,34 @@ function FieldLabel({ children, required }) {
   );
 }
 
-export default function QuickInvoiceForm({ onClose, onSaved }) {
+export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) {
   const [source, setSource] = useState("");
   const [form, setForm] = useState({
-    customer_name: "", billing_contact: "", billing_email: "", billing_address: "",
-    delivery_address: "", customer_po_number: "", job_number: "", account_status: "",
-    payment_terms: "30_days_eom", pricing_tier: "standard",
+    customer_name: prefillCustomer?.name || "",
+    billing_contact: prefillCustomer?.accounts_contact_name || "",
+    billing_email: prefillCustomer?.email || "",
+    billing_address: prefillCustomer?.billing_address_1 || "",
+    delivery_address: prefillCustomer?.physical_address_1 || "",
+    customer_po_number: "",
+    job_number: "",
+    account_status: prefillCustomer?.account_status || "",
+    payment_terms: prefillCustomer?.payment_terms || "30_days_eom",
+    pricing_tier: prefillCustomer?.pricing_tier || "standard",
     invoice_number: "",
-    invoice_date: today, due_date: "", reference: "",
-    sales_order_reference: "", dispatch_reference: "", internal_notes: "", customer_notes: "",
+    invoice_date: today,
+    due_date: "",
+    reference: "",
+    sales_order_reference: "",
+    dispatch_reference: "",
+    internal_notes: "",
+    customer_notes: "",
     items: [newLine()],
-    payment_type: "account", payment_status: "unpaid",
-    approved_by: "", linked_account: "", status: "draft",
-    company: "",
+    payment_type: "account",
+    payment_status: "unpaid",
+    approved_by: "",
+    linked_account: prefillCustomer?.id || "",
+    status: "draft",
+    company: prefillCustomer?.company || "",
   });
   const [saving, setSaving] = useState(false);
   const [saveAction, setSaveAction] = useState("draft");
@@ -210,18 +225,19 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
     setSaving(true);
     try {
       const status = action === "draft" ? "draft" : action === "paid" ? "paid" : "sent";
-      const invoiceNumber = form.invoice_number || await generateDocNumber("invoice");
-      const data = {
-        ...form,
-        invoice_number: invoiceNumber,
-        status,
-        subtotal,
-        gst: gstAmount,
-        total: totalAmount,
-        items: form.items,
-        invoice_source: source,
-      };
-      await base44.entities.Invoice.create(data);
+       const invoiceNumber = form.invoice_number || await generateDocNumber("invoice");
+       const data = {
+         ...form,
+         invoice_number: invoiceNumber,
+         status,
+         subtotal,
+         gst: gstAmount,
+         total: totalAmount,
+         items: form.items,
+         invoice_source: source,
+       };
+       if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
+       await base44.entities.Invoice.create(data);
       onSaved?.();
     } finally {
       setSaving(false);

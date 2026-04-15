@@ -29,7 +29,7 @@ const quickActions = [
   { icon: FileSearch, label: "Credit App" },
 ];
 
-export default function ProfileHeader({ customer, onEdit, onClose, onUpdated }) {
+export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, onAction }) {
   const acctColor = ACCOUNT_STATUS_COLORS[customer.account_status] || ACCOUNT_STATUS_COLORS.cash_sale;
   const tierColor = TIER_COLORS[customer.pricing_tier] || "text-gray-400";
   const isOnHold = customer.account_status === "on_hold";
@@ -119,12 +119,22 @@ export default function ProfileHeader({ customer, onEdit, onClose, onUpdated }) 
 
       {/* Quick action strip */}
       <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
-        {quickActions.map(({ icon: Icon, label }) => (
-          <button key={label}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-sm transition-colors bg-white/0 hover:bg-white/5">
-            <Icon className="w-3 h-3" /> {label}
-          </button>
-        ))}
+        {quickActions.map(({ icon: Icon, label }) => {
+          const actionMap = {
+            "New Order": "new-order",
+            "New Quote": "new-quote",
+            "New Invoice": "new-invoice",
+            "Upload Doc": "upload-doc",
+            "Credit App": "credit-app"
+          };
+          return (
+            <button key={label}
+              onClick={() => onAction?.(actionMap[label])}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider text-white/50 hover:text-white border border-white/10 hover:border-white/30 rounded-sm transition-colors bg-white/0 hover:bg-white/5">
+              <Icon className="w-3 h-3" /> {label}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

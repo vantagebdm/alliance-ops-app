@@ -10,6 +10,7 @@ import TabTradeRefs from "./profile/TabTradeRefs";
 import TabDocuments from "./profile/TabDocuments";
 import TabActivity from "./profile/TabActivity";
 import TabHistory from "./profile/TabHistory";
+import CustomerActionHandler from "./actions/CustomerActionHandler";
 
 const TABS = [
   { key: "overview",   label: "Overview" },
@@ -26,6 +27,7 @@ const TABS = [
 export default function CustomerDetail({ customer: initialCustomer, onClose, onUpdated }) {
   const [tab, setTab] = useState("overview");
   const [editing, setEditing] = useState(false);
+  const [activeAction, setActiveAction] = useState(null);
   const [customer, setCustomer] = useState(initialCustomer);
 
   if (editing) {
@@ -42,6 +44,20 @@ export default function CustomerDetail({ customer: initialCustomer, onClose, onU
     );
   }
 
+  if (activeAction) {
+    return (
+      <CustomerActionHandler
+        customer={customer}
+        action={activeAction}
+        onClose={() => setActiveAction(null)}
+        onUpdated={() => {
+          setActiveAction(null);
+          onUpdated?.();
+        }}
+      />
+    );
+  }
+
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-6 overflow-y-auto">
       <div className="bg-card w-full max-w-5xl rounded-sm shadow-2xl mx-4 mb-4">
@@ -51,6 +67,7 @@ export default function CustomerDetail({ customer: initialCustomer, onClose, onU
           customer={customer}
           onEdit={() => setEditing(true)}
           onClose={onClose}
+          onAction={(action) => setActiveAction(action)}
           onUpdated={(updated) => { setCustomer(updated); onUpdated?.(); }}
         />
 

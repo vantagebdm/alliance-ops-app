@@ -11,12 +11,18 @@ import { generateDocNumber } from "@/hooks/useDocNumber";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
-export default function QuoteForm({ onClose, onSaved, initial }) {
+export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }) {
   const [form, setForm] = useState(initial || {
-    customer_name: "", customer_email: "", company: "",
-    status: "draft", valid_until: "", notes: "",
+    customer_name: prefillCustomer?.name || "",
+    customer_email: prefillCustomer?.email || "", 
+    company: prefillCustomer?.company || "",
+    status: "draft", 
+    valid_until: "", 
+    notes: "",
     items: [newLine()],
-    subtotal: 0, gst: 0, total: 0,
+    subtotal: 0, 
+    gst: 0, 
+    total: 0,
   });
   const [saving, setSaving] = useState(false);
   const customerAC = useAutocomplete("Customer", "name");
@@ -59,6 +65,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
     setSaving(true);
     const data = { ...form };
     if (!data.quote_number) data.quote_number = await generateDocNumber("quote");
+    if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
     if (initial?.id) {
       await base44.entities.Quote.update(initial.id, data);
     } else {

@@ -11,11 +11,19 @@ import { generateDocNumber } from "@/hooks/useDocNumber";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
-export default function SalesOrderForm({ onClose, onSaved, initial }) {
+export default function SalesOrderForm({ onClose, onSaved, initial, prefillCustomer }) {
   const [form, setForm] = useState(initial || {
-    customer_name: "", company: "", status: "pending", priority: "normal",
-    delivery_method: "pickup", delivery_address: "", notes: "",
-    items: [newLine()], subtotal: 0, gst: 0, total: 0,
+    customer_name: prefillCustomer?.name || "", 
+    company: prefillCustomer?.company || "", 
+    status: "pending", 
+    priority: "normal",
+    delivery_method: prefillCustomer?.delivery_method || "pickup",
+    delivery_address: prefillCustomer?.physical_address_1 || "", 
+    notes: "",
+    items: [newLine()], 
+    subtotal: 0, 
+    gst: 0, 
+    total: 0,
   });
   const [saving, setSaving] = useState(false);
   const customerAC = useAutocomplete("Customer", "name");
@@ -56,6 +64,7 @@ export default function SalesOrderForm({ onClose, onSaved, initial }) {
     setSaving(true);
     const data = { ...form };
     if (!data.order_number) data.order_number = await generateDocNumber("sales_order");
+    if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
     if (initial?.id) {
       await base44.entities.SalesOrder.update(initial.id, data);
     } else {
