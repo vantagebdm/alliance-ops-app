@@ -95,13 +95,17 @@ export default function QuickOrderForm({ onClose, onSaved }) {
               />
             </div>
             <div className="flex-1 max-w-xs">
-              <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Client PO Number</label>
+              <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Client PO Number *</label>
               <input
                 type="text"
                 value={form.customer_po_number || ""}
                 onChange={(e) => u("customer_po_number", e.target.value)}
                 placeholder="Enter client PO #"
-                className="flex h-9 w-full rounded-sm border border-input bg-transparent px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className={`flex h-9 w-full rounded-sm border px-3 py-1 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 bg-transparent ${
+                  form.customer_po_number
+                    ? "border-input focus-visible:ring-ring"
+                    : "border-red-500 ring-1 ring-red-500 bg-red-500/5 focus-visible:ring-red-500"
+                }`}
               />
             </div>
           </div>
@@ -216,7 +220,7 @@ export default function QuickOrderForm({ onClose, onSaved }) {
           </Button>
           <Button
             onClick={save}
-            disabled={saving || !form.customer_name || form.items.some(l => !l.part_number)}
+            disabled={saving || !form.customer_name || !form.customer_po_number || form.items.some(l => !l.part_number)}
             className="bg-primary text-black hover:bg-primary/90 font-heading font-semibold uppercase text-xs tracking-wider rounded-sm"
           >
             {saving ? "Creating..." : "Create Order"}
