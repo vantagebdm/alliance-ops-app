@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { DollarSign, ShoppingCart, TrendingUp, Package, Users, BarChart3, AlertTriangle, Target } from "lucide-react";
+import { CATEGORY_LABEL } from "@/lib/categories";
 import PageHeader from "@/components/ui/PageHeader";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 
@@ -65,11 +66,36 @@ export default function Reports() {
     return Object.entries(srcs).map(([name, count]) => ({ name: name.replace("_", " "), count })).sort((a, b) => b.count - a.count);
   })();
 
-  // Top parts by category
+  // Parts and value by category
   const partsByCategory = (() => {
     const cats = {};
     parts.forEach(p => { cats[p.category || "other"] = (cats[p.category || "other"] || 0) + 1; });
-    return Object.entries(cats).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count).slice(0, 8);
+    return Object.entries(cats)
+      .map(([key, count]) => ({ name: CATEGORY_LABEL[key] || key, count }))
+      .sort((a, b) => b.count - a.count).slice(0, 10);
+  })();
+
+  const stockValueByCategory = (() => {
+    const cats = {};
+    parts.forEach(p => {
+      const cat = p.category || "other";
+      cats[cat] = (cats[cat] || 0) + ((p.stock_quantity || 0) * (p.unit_cost || 0));
+    });
+    return Object.entries(cats)
+      .map(([key, value]) => ({ name: CATEGORY_LABEL[key] || key, value: Math.round(value) }))
+      .filter(x => x.value > 0)
+      .sort((a, b) => b.value - a.value).slice(0, 10);
+  })();
+
+  const lowStockByCategory = (() => {
+    const cats = {};
+    parts.filter(p => p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level).forEach(p => {
+      const cat = p.category || "other";
+      cats[cat] = (cats[cat] || 0) + 1;
+    });
+    return Object.entries(cats)
+      .map(([key, count]) => ({ name: CATEGORY_LABEL[key] || key, count }))
+      .sort((a, b) => b.count - a.count);
   })();
 
   // Order status distribution
@@ -250,13 +276,13 @@ export default function Reports() {
             {/* Parts by Category */}
             <div className="col-span-2 md:col-span-4 bg-white border border-border rounded-sm overflow-hidden">
               <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
-                <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Parts by Category</h3>
+                <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Parts Count by Category</h3>
               </div>
               <div className="p-6">
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={partsByCategory}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "var(--font-heading)" }} />
+                    <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: "var(--font-heading)" }} angle={-30} textAnchor="end" height={50} />
                     <YAxis tick={{ fontSize: 11 }} />
                     <Tooltip />
                     <Bar dataKey="count" fill="hsl(145, 80%, 42%)" radius={[2, 2, 0, 0]} />
@@ -264,6 +290,43 @@ export default function Reports() {
                 </ResponsiveContainer>
               </div>
             </div>
+
+            {/* Stock Value by Category */}
+            {stockValueByCategory.length > 0 && (
+              <div className="col-span-2 md:col-span-4 bg-white border border-border rounded-sm overflow-hidden">
+                <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
+                  <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Stock Cost Value by Category</h3>
+                </div>
+                <div className="p-6">
+                  <ResponsiveContainer width="100%" height={220}>
+                    <BarChart data={stockValueByCategory}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                      <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: "var(--font-heading)" }} angle={-30} textAnchor="end" height={50} />
+                      <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
+                      <Tooltip formatter={v => [`$${v.toLocaleString("en-AU")}`, "Cost Value"]} />
+                      <Bar dataKey="value" fill="hsl(210, 60%, 50%)" radius={[2, 2, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+
+            {/* Low Stock by Category */}
+            {lowStockByCategory.length > 0 && (
+              <div className="col-span-2 md:col-span-2 bg-white border border-border rounded-sm overflow-hidden">
+                <div className="bg-amber-600 px-5 py-3">
+                  <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Low Stock by Category</h3>
+                </div>
+                <div className="p-4 space-y-2">
+                  {lowStockByCategory.map(c => (
+                    <div key={c.name} className="flex items-center justify-between">
+                      <span className="font-heading text-xs uppercase tracking-wider text-foreground/60">{c.name}</span>
+                      <span className="font-heading font-bold text-amber-600">{c.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : null}
       </div>

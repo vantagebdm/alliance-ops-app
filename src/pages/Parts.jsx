@@ -9,6 +9,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import PartForm from "../components/parts/PartForm";
 import PartDetail from "../components/parts/PartDetail";
 import EquipmentTypeSelector, { EQUIPMENT_TYPES } from "../components/parts/EquipmentTypeSelector";
+import { PART_CATEGORIES, CATEGORY_COLORS, CATEGORY_LABEL } from "@/lib/categories";
 
 export default function Parts() {
   const [parts, setParts] = useState([]);
@@ -73,7 +74,12 @@ export default function Parts() {
         {row.brand && <div className="text-xs text-muted-foreground">{row.brand}{row.oem_number ? ` · OEM: ${row.oem_number}` : ""}</div>}
       </div>
     )},
-    { key: "category", label: "Category", render: (v) => <span className="text-xs font-heading uppercase tracking-wider text-muted-foreground">{v || "—"}</span> },
+    { key: "category", label: "Category", render: (v, row) => (
+      <div>
+        <span className={`text-[10px] font-heading uppercase tracking-wider px-1.5 py-0.5 rounded-sm font-bold ${CATEGORY_COLORS[v] || "bg-gray-100 text-gray-500"}`}>{CATEGORY_LABEL[v] || v || "—"}</span>
+        {row.subcategory && <div className="text-[10px] text-muted-foreground mt-0.5">{row.subcategory}</div>}
+      </div>
+    )},
     { key: "stock_quantity", label: "In Stock", render: (v, row) => {
       const low = row.min_stock_level > 0 && v <= row.min_stock_level;
       const out = v === 0;
@@ -91,7 +97,7 @@ export default function Parts() {
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
   ];
 
-  const CATEGORIES = ["all","engine","transmission","brakes","suspension","electrical","body","filters","hydraulic","driveline","cooling","fuel","tyres","other"];
+  const CATEGORIES = [{ value: "all", label: "All" }, ...PART_CATEGORIES];
 
   // Show equipment selector if no type chosen yet
   if (!equipmentType) {
@@ -171,9 +177,9 @@ export default function Parts() {
           <div className="flex items-center gap-2 flex-wrap">
             <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             {CATEGORIES.map(c => (
-              <button key={c} onClick={() => setCatFilter(c)}
-                className={`px-2.5 py-1 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${catFilter === c ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
-                {c}
+              <button key={c.value} onClick={() => setCatFilter(c.value)}
+                className={`px-2.5 py-1 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${catFilter === c.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                {c.label}
               </button>
             ))}
           </div>

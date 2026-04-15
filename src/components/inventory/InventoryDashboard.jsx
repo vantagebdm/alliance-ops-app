@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { Package, AlertTriangle, TrendingDown, ShieldAlert, Wrench, RefreshCw, ArrowRight, ClipboardList, BarChart2, ArrowLeftRight, ArrowDownToLine } from "lucide-react";
 import { Link } from "react-router-dom";
+import { CATEGORY_LABEL, CATEGORY_COLORS } from "@/lib/categories";
 
 export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, onNewTransfer, onReceiveStock }) {
   const [stats, setStats] = useState(null);
@@ -28,7 +29,17 @@ export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, on
       const critical = parts.filter(p => p.is_critical && (p.stock_quantity || 0) <= (p.min_stock_level || 0));
       const reorderNeeded = parts.filter(p => p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level);
 
-      setStats({ parts, totalValue, lowStock, outOfStock, negative, critical, reorderNeeded, total: parts.length });
+      // Category breakdown
+      const byCategory = {};
+      parts.forEach(p => {
+        const cat = p.category || "other";
+        if (!byCategory[cat]) byCategory[cat] = { count: 0, value: 0, low: 0 };
+        byCategory[cat].count++;
+        byCategory[cat].value += (p.stock_quantity || 0) * (p.unit_cost || 0);
+        if (p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level) byCategory[cat].low++;
+      });
+
+      setStats({ parts, totalValue, lowStock, outOfStock, negative, critical, reorderNeeded, total: parts.length, byCategory });
       setAdjustmentsToday(adjToday.length);
       setActiveStocktakes(stocktakes.filter(s => ["released", "in_progress", "submitted", "variance_review"].includes(s.status)).length);
       setLoading(false);
@@ -124,6 +135,26 @@ export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, on
                 +{stats.critical.length - 5} more critical parts
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Category Breakdown */}
+      {stats.byCategory && Object.keys(stats.byCategory).length > 0 && (
+        <div className="border border-border rounded-sm overflow-hidden">
+          <div className="bg-[hsl(0,0%,8%)] px-4 py-2 flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
+            <span className="font-heading text-xs uppercase tracking-wider font-bold text-white">Stock by Category</span>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-px bg-border/40">
+            {Object.entries(stats.byCategory).sort((a, b) => b[1].count - a[1].count).map(([cat, data]) => (
+              <div key={cat} className="bg-white px-3 py-2.5">
+                <div className={`text-[10px] font-heading uppercase tracking-wider font-bold mb-1 px-1 py-0.5 rounded-sm inline-block ${CATEGORY_COLORS[cat] || "bg-gray-100 text-gray-500"}`}>{CATEGORY_LABEL[cat] || cat}</div>
+                <div className="font-heading text-lg font-bold text-foreground">{data.count}</div>
+                <div className="text-[10px] text-muted-foreground">${Math.round(data.value / 1000).toFixed(0)}k value</div>
+                {data.low > 0 && <div className="text-[10px] text-amber-500 font-bold">{data.low} low</div>}
+              </div>
+            ))}
           </div>
         </div>
       )}

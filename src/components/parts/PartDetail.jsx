@@ -1,8 +1,9 @@
 import { base44 } from "@/api/base44Client";
-import { X, Edit3, Package, AlertTriangle, DollarSign, Warehouse, Tag } from "lucide-react";
+import { X, Edit3, Package, AlertTriangle, DollarSign, Warehouse, Tag, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import FitmentDisplay from "./FitmentDisplay";
+import { CATEGORY_LABEL, CATEGORY_COLORS } from "@/lib/categories";
 
 export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
   const lowStock = part.min_stock_level > 0 && part.stock_quantity <= part.min_stock_level;
@@ -47,7 +48,15 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
             </div>
             <div className="space-y-2 text-sm">
               {part.brand && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Brand</span><span className="font-medium">{part.brand}</span></div>}
-              {part.category && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Category</span><span className="font-medium capitalize">{part.category}</span></div>}
+              {part.category && (
+                <div className="flex gap-2 items-start">
+                  <span className="text-muted-foreground w-28 flex-shrink-0">Category</span>
+                  <div>
+                    <span className={`text-[10px] font-heading uppercase tracking-wider px-1.5 py-0.5 rounded-sm font-bold ${CATEGORY_COLORS[part.category] || "bg-gray-100 text-gray-500"}`}>{CATEGORY_LABEL[part.category] || part.category}</span>
+                    {part.subcategory && <span className="ml-2 text-xs text-muted-foreground">{part.subcategory}</span>}
+                  </div>
+                </div>
+              )}
               {part.oem_number && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">OEM #</span><span className="font-mono">{part.oem_number}</span></div>}
               {part.aftermarket_number && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Aftermarket #</span><span className="font-mono">{part.aftermarket_number}</span></div>}
               {part.cross_references && <div className="flex gap-2"><span className="text-muted-foreground w-28 flex-shrink-0">Cross Refs</span><span className="font-mono text-xs">{part.cross_references}</span></div>}
@@ -141,7 +150,13 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
                 {part.weight_kg && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Weight</span><span>{part.weight_kg} kg</span></div>}
                 {part.dimensions && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Dimensions</span><span>{part.dimensions}</span></div>}
                 {part.barcode && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Barcode</span><span className="font-mono">{part.barcode}</span></div>}
-                {part.hazardous && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Hazardous</span><span className="text-amber-500 font-semibold">Yes — DG</span></div>}
+                {part.hazardous && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Hazardous</span><span className="text-amber-500 font-semibold">Yes</span></div>}
+                {part.dangerous_goods && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Dangerous Goods</span><span className="text-red-500 font-semibold">Yes — DG</span></div>}
+                {part.sds_required && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">SDS Required</span><span className="text-amber-600 font-semibold">Yes</span></div>}
+                {part.expiry_date && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Expiry Date</span><span className="font-medium">{part.expiry_date}</span></div>}
+                {part.storage_notes && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Storage</span><span className="text-xs">{part.storage_notes}</span></div>}
+                {part.compliance_type && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Compliance</span><span>{part.compliance_type}</span></div>}
+                {part.compliance_reference && <div className="flex gap-2"><span className="text-muted-foreground w-24 flex-shrink-0">Ref / Cert</span><span className="font-mono text-xs">{part.compliance_reference}</span></div>}
               </div>
             </div>
           )}

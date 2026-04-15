@@ -14,6 +14,7 @@ import StocktakeList from "@/components/inventory/StocktakeList";
 import StockAdjustmentList from "@/components/inventory/StockAdjustmentList";
 import StockMovementsLedger from "@/components/inventory/StockMovementsLedger";
 import { useNavigate } from "react-router-dom";
+import { PART_CATEGORIES, CATEGORY_COLORS, CATEGORY_LABEL } from "@/lib/categories";
 
 const TABS = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -33,7 +34,7 @@ const FILTER_VIEWS = [
 ];
 
 const WAREHOUSES = ["All Warehouses", "Main Warehouse", "Karratha", "Port Hedland", "Newman", "Workshop", "Yard"];
-const CATEGORIES = ["all", "engine", "transmission", "brakes", "suspension", "electrical", "body", "filters", "hydraulic", "driveline", "cooling", "fuel", "exhaust", "steering", "tyres", "other"];
+const CATEGORIES = [{ value: "all", label: "All Categories" }, ...PART_CATEGORIES];
 
 export default function Inventory() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -80,7 +81,7 @@ export default function Inventory() {
     if (view === "critical") list = critical;
     if (view === "reorder") list = reorderNeeded;
     if (warehouse !== "All Warehouses") list = list.filter(p => p.location?.includes(warehouse) || p.warehouse === warehouse);
-    if (category !== "all") list = list.filter(p => p.category === category);
+    if (category !== "all") list = list.filter(p => p.category === category || p.subcategory === category);
     const q = search.toLowerCase();
     if (q) list = list.filter(p =>
       p.part_number?.toLowerCase().includes(q) || p.name?.toLowerCase().includes(q) ||
@@ -99,7 +100,12 @@ export default function Inventory() {
       </div>
     )},
     { key: "equipment_type", label: "Equip. Type", render: (v) => <span className="text-[10px] text-muted-foreground uppercase tracking-wider">{v?.replace(/_/g, " ") || "—"}</span> },
-    { key: "category", label: "Category", render: (v) => <span className="text-xs text-muted-foreground capitalize">{v || "—"}</span> },
+    { key: "category", label: "Category", render: (v, row) => (
+      <div>
+        <span className={`text-[10px] font-heading uppercase tracking-wider px-1.5 py-0.5 rounded-sm font-bold ${CATEGORY_COLORS[v] || "bg-gray-100 text-gray-500"}`}>{CATEGORY_LABEL[v] || v || "—"}</span>
+        {row.subcategory && <div className="text-[10px] text-muted-foreground mt-0.5">{row.subcategory}</div>}
+      </div>
+    )},
     { key: "location", label: "Location", render: (v, row) => (
       <div className="font-mono text-xs">
         <span className="font-bold">{v || "—"}</span>
@@ -219,8 +225,8 @@ export default function Inventory() {
                 <SelectContent>{FILTER_VIEWS.map(v => <SelectItem key={v.value} value={v.value}>{v.label} {v.value === "low" ? `(${lowStock.length})` : v.value === "out" ? `(${outOfStock.length})` : v.value === "negative" ? `(${negative.length})` : v.value === "critical" ? `(${critical.length})` : v.value === "reorder" ? `(${reorderNeeded.length})` : `(${parts.length})`}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="w-36 rounded-sm"><SelectValue placeholder="Category" /></SelectTrigger>
-                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c} value={c} className="capitalize">{c === "all" ? "All Categories" : c}</SelectItem>)}</SelectContent>
+                <SelectTrigger className="w-40 rounded-sm"><SelectValue placeholder="Category" /></SelectTrigger>
+                <SelectContent>{CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}</SelectContent>
               </Select>
               <Select value={warehouse} onValueChange={setWarehouse}>
                 <SelectTrigger className="w-44 rounded-sm"><SelectValue /></SelectTrigger>

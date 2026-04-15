@@ -9,13 +9,17 @@ import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import FitmentBuilder from "./FitmentBuilder";
+import { PART_CATEGORIES, SUBCATEGORIES, EXTENDED_CATEGORIES, HAZMAT_CATEGORIES } from "@/lib/categories";
 
 export default function PartForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState(initial || {
-    part_number: "", name: "", description: "", category: "other", brand: "",
+    part_number: "", name: "", description: "", category: "other", subcategory: "", brand: "",
     oem_number: "", fitments: [], unit_cost: 0, sell_price: 0,
     stock_quantity: 0, min_stock_level: 0, location: "", supplier_name: "", status: "active",
-    equipment_type: "",
+    equipment_type: "", hazardous: false, dangerous_goods: false, sds_required: false,
+    storage_notes: "", expiry_date: "", batch_lot_number: "",
+    compliance_type: "", compliance_reference: "", inspection_interval_days: null, regulated_item: false,
+    workshop_use: false, pack_size: "", volume_size: "", issue_method: "each",
   });
   const [saving, setSaving] = useState(false);
   const supplierAC = useAutocomplete("Supplier", "name");
@@ -32,7 +36,11 @@ export default function PartForm({ onClose, onSaved, initial }) {
     onSaved();
   };
 
-  const CATEGORIES = ["engine","transmission","brakes","suspension","electrical","body","filters","hydraulic","driveline","cooling","fuel","tyres","other"];
+  const isExtended = EXTENDED_CATEGORIES.includes(form.category);
+  const isHazmat = HAZMAT_CATEGORIES.includes(form.category);
+  const isCompliance = form.category === "compliance";
+  const isConsumable = form.category === "consumables";
+  const subcatOptions = SUBCATEGORIES[form.category] || [];
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
@@ -45,24 +53,20 @@ export default function PartForm({ onClose, onSaved, initial }) {
         </div>
 
         <div className="p-6 space-y-6">
+          {/* Section 1: Part Information */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 bg-primary flex items-center justify-center rounded-sm">
-                <span className="font-heading font-bold text-black text-sm">1</span>
-              </div>
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wider">Part Information</h3>
-            </div>
+            <SectionHeader num={1} title="Part Information" />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Part Number *</label>
+                <FieldLabel>Part Number *</FieldLabel>
                 <Input value={form.part_number} onChange={e => update("part_number", e.target.value)} className="rounded-sm" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Name *</label>
+                <FieldLabel>Name *</FieldLabel>
                 <Input value={form.name} onChange={e => update("name", e.target.value)} className="rounded-sm" />
               </div>
               <div className="col-span-2">
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Equipment Type</label>
+                <FieldLabel>Equipment Type</FieldLabel>
                 <Select value={form.equipment_type || ""} onValueChange={v => update("equipment_type", v)}>
                   <SelectTrigger className="rounded-sm"><SelectValue placeholder="Select equipment type..." /></SelectTrigger>
                   <SelectContent>
@@ -72,83 +76,184 @@ export default function PartForm({ onClose, onSaved, initial }) {
                 </Select>
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Category</label>
-                <Select value={form.category} onValueChange={v => update("category", v)}>
+                <FieldLabel>Category</FieldLabel>
+                <Select value={form.category} onValueChange={v => { update("category", v); update("subcategory", ""); }}>
                   <SelectTrigger className="rounded-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {CATEGORIES.map(c => <SelectItem key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</SelectItem>)}
+                    {PART_CATEGORIES.map(c => <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
+              {isExtended && (
+                <div>
+                  <FieldLabel>Subcategory</FieldLabel>
+                  <Select value={form.subcategory || ""} onValueChange={v => update("subcategory", v)}>
+                    <SelectTrigger className="rounded-sm"><SelectValue placeholder="Select subcategory..." /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={null}>— None —</SelectItem>
+                      {subcatOptions.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Brand</label>
+                <FieldLabel>Brand</FieldLabel>
                 <Input value={form.brand} onChange={e => update("brand", e.target.value)} className="rounded-sm" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">OEM Number</label>
+                <FieldLabel>OEM Number</FieldLabel>
                 <Input value={form.oem_number} onChange={e => update("oem_number", e.target.value)} className="rounded-sm" />
               </div>
               <div className="col-span-2">
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Description</label>
+                <FieldLabel>Description</FieldLabel>
                 <Textarea value={form.description} onChange={e => update("description", e.target.value)} className="rounded-sm" rows={2} />
               </div>
               <div className="col-span-2">
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-2 block">Compatible Fitments / Applications</label>
+                <FieldLabel>Compatible Fitments / Applications</FieldLabel>
                 <FitmentBuilder value={form.fitments || []} onChange={v => update("fitments", v)} />
               </div>
             </div>
           </div>
 
+          {/* Section 2: Pricing & Stock */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 bg-primary flex items-center justify-center rounded-sm">
-                <span className="font-heading font-bold text-black text-sm">2</span>
-              </div>
-              <h3 className="font-heading text-sm font-semibold uppercase tracking-wider">Pricing & Stock</h3>
-            </div>
+            <SectionHeader num={2} title="Pricing & Stock" />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Unit Cost</label>
+                <FieldLabel>Unit Cost</FieldLabel>
                 <Input type="number" step="0.01" value={form.unit_cost} onChange={e => update("unit_cost", Number(e.target.value))} className="rounded-sm" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Sell Price</label>
+                <FieldLabel>Sell Price</FieldLabel>
                 <Input type="number" step="0.01" value={form.sell_price} onChange={e => update("sell_price", Number(e.target.value))} className="rounded-sm" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Stock Quantity</label>
+                <FieldLabel>Stock Quantity</FieldLabel>
                 <Input type="number" value={form.stock_quantity} onChange={e => update("stock_quantity", Number(e.target.value))} className="rounded-sm" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Min Stock Level</label>
+                <FieldLabel>Min Stock Level</FieldLabel>
                 <Input type="number" value={form.min_stock_level} onChange={e => update("min_stock_level", Number(e.target.value))} className="rounded-sm" />
               </div>
+              {(isExtended || form.category === "oils" || form.category === "sprays" || form.category === "chemicals") && (
+                <div>
+                  <FieldLabel>Pack / Volume Size</FieldLabel>
+                  <Input value={form.volume_size || form.pack_size || ""} onChange={e => { update("volume_size", e.target.value); update("pack_size", e.target.value); }} placeholder="e.g. 5L, 20L, Box of 50" className="rounded-sm" />
+                </div>
+              )}
+              {(isConsumable) && (
+                <div>
+                  <FieldLabel>Issue Method</FieldLabel>
+                  <Select value={form.issue_method || "each"} onValueChange={v => update("issue_method", v)}>
+                    <SelectTrigger className="rounded-sm"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {["each","pack","carton","weight","volume"].map(m => <SelectItem key={m} value={m} className="capitalize">{m}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Location</label>
+                <FieldLabel>Location</FieldLabel>
                 <Input value={form.location} onChange={e => update("location", e.target.value)} className="rounded-sm" placeholder="e.g. Shelf A3" />
               </div>
               <div>
-                <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Supplier</label>
+                <FieldLabel>Supplier</FieldLabel>
                 <Autocomplete
-                 value={form.supplier_name}
-                 suggestions={supplierAC.suggestions}
-                 open={supplierAC.open}
-                 loading={supplierAC.loading}
-                 onInputChange={(val) => {
-                   update("supplier_name", val);
-                   supplierAC.handleInputChange(val);
-                 }}
-                 onSelect={(item) => {
-                   update("supplier_name", item.name);
-                   supplierAC.handleSelectSuggestion(item);
-                 }}
-                 onShowAll={supplierAC.handleShowAll}
-                 placeholder="Search supplier..."
-                 className="rounded-sm"
-               />
+                  value={form.supplier_name}
+                  suggestions={supplierAC.suggestions}
+                  open={supplierAC.open}
+                  loading={supplierAC.loading}
+                  onInputChange={(val) => { update("supplier_name", val); supplierAC.handleInputChange(val); }}
+                  onSelect={(item) => { update("supplier_name", item.name); supplierAC.handleSelectSuggestion(item); }}
+                  onShowAll={supplierAC.handleShowAll}
+                  placeholder="Search supplier..."
+                  className="rounded-sm"
+                />
               </div>
             </div>
           </div>
+
+          {/* Section 3: Hazmat / Safety (oils, sprays, chemicals) */}
+          {isHazmat && (
+            <div>
+              <SectionHeader num={3} title="Safety & Storage" badge="Hazmat" badgeColor="bg-rose-100 text-rose-700" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2 flex gap-6">
+                  {[
+                    { key: "hazardous", label: "Hazardous" },
+                    { key: "dangerous_goods", label: "Dangerous Goods" },
+                    { key: "sds_required", label: "SDS Required" },
+                  ].map(f => (
+                    <label key={f.key} className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={!!form[f.key]} onChange={e => update(f.key, e.target.checked)}
+                        className="w-4 h-4 rounded border-border accent-primary" />
+                      <span className="text-xs font-heading uppercase tracking-wider">{f.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div>
+                  <FieldLabel>Expiry Date (optional)</FieldLabel>
+                  <Input type="date" value={form.expiry_date || ""} onChange={e => update("expiry_date", e.target.value)} className="rounded-sm" />
+                </div>
+                <div>
+                  <FieldLabel>Batch / Lot Number</FieldLabel>
+                  <Input value={form.batch_lot_number || ""} onChange={e => update("batch_lot_number", e.target.value)} className="rounded-sm" />
+                </div>
+                <div className="col-span-2">
+                  <FieldLabel>Storage Requirement Notes</FieldLabel>
+                  <Textarea value={form.storage_notes || ""} onChange={e => update("storage_notes", e.target.value)} className="rounded-sm" rows={2} placeholder="e.g. Store in cool, dry, ventilated area away from heat sources" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Section 3/4: Compliance fields */}
+          {isCompliance && (
+            <div>
+              <SectionHeader num={3} title="Compliance Details" badge="Compliance" badgeColor="bg-green-100 text-green-700" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2 flex gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={!!form.regulated_item} onChange={e => update("regulated_item", e.target.checked)}
+                      className="w-4 h-4 rounded border-border accent-primary" />
+                    <span className="text-xs font-heading uppercase tracking-wider">Regulated Item</span>
+                  </label>
+                </div>
+                <div>
+                  <FieldLabel>Compliance Type</FieldLabel>
+                  <Input value={form.compliance_type || ""} onChange={e => update("compliance_type", e.target.value)} placeholder="e.g. Fire Safety, Electrical" className="rounded-sm" />
+                </div>
+                <div>
+                  <FieldLabel>Tag / Cert Reference</FieldLabel>
+                  <Input value={form.compliance_reference || ""} onChange={e => update("compliance_reference", e.target.value)} placeholder="e.g. AS/NZS 1841" className="rounded-sm" />
+                </div>
+                <div>
+                  <FieldLabel>Expiry / Renewal Date</FieldLabel>
+                  <Input type="date" value={form.expiry_date || ""} onChange={e => update("expiry_date", e.target.value)} className="rounded-sm" />
+                </div>
+                <div>
+                  <FieldLabel>Inspection Interval (days)</FieldLabel>
+                  <Input type="number" value={form.inspection_interval_days || ""} onChange={e => update("inspection_interval_days", Number(e.target.value) || null)} className="rounded-sm" placeholder="e.g. 365" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Consumables extra */}
+          {isConsumable && (
+            <div>
+              <SectionHeader num={3} title="Consumable Details" badge="Consumables" badgeColor="bg-teal-100 text-teal-700" />
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2 flex gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" checked={!!form.workshop_use} onChange={e => update("workshop_use", e.target.checked)}
+                      className="w-4 h-4 rounded border-border accent-primary" />
+                    <span className="text-xs font-heading uppercase tracking-wider">Workshop Use Item</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
@@ -161,4 +266,20 @@ export default function PartForm({ onClose, onSaved, initial }) {
       </div>
     </div>
   );
+}
+
+function SectionHeader({ num, title, badge, badgeColor }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <div className="w-7 h-7 bg-primary flex items-center justify-center rounded-sm">
+        <span className="font-heading font-bold text-black text-sm">{num}</span>
+      </div>
+      <h3 className="font-heading text-sm font-semibold uppercase tracking-wider">{title}</h3>
+      {badge && <span className={`text-[10px] font-heading uppercase tracking-wider px-2 py-0.5 rounded-sm font-bold ${badgeColor}`}>{badge}</span>}
+    </div>
+  );
+}
+
+function FieldLabel({ children }) {
+  return <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">{children}</label>;
 }

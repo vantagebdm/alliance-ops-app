@@ -59,9 +59,12 @@
         "driveline",
         "cooling",
         "fuel",
-        "exhaust",
-        "steering",
         "tyres",
+        "oils",
+        "sprays",
+        "consumables",
+        "compliance",
+        "chemicals",
         "other"
       ]
     },
@@ -140,6 +143,14 @@
       "type": "string",
       "default": "each"
     },
+    "pack_size": {
+      "type": "string",
+      "description": "e.g. 5L, 20L, Box of 50"
+    },
+    "volume_size": {
+      "type": "string",
+      "description": "Volume or size for oils/chemicals/sprays"
+    },
     "barcode": {
       "type": "string"
     },
@@ -152,6 +163,57 @@
     "hazardous": {
       "type": "boolean",
       "default": false
+    },
+    "dangerous_goods": {
+      "type": "boolean",
+      "default": false
+    },
+    "sds_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "storage_notes": {
+      "type": "string",
+      "description": "Storage requirement notes for hazmat items"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Expiry date for oils, chemicals, compliance items"
+    },
+    "batch_lot_number": {
+      "type": "string"
+    },
+    "compliance_type": {
+      "type": "string",
+      "description": "For compliance category items"
+    },
+    "compliance_reference": {
+      "type": "string",
+      "description": "Tag or certification reference"
+    },
+    "inspection_interval_days": {
+      "type": "number",
+      "description": "Inspection interval in days for compliance items"
+    },
+    "regulated_item": {
+      "type": "boolean",
+      "default": false
+    },
+    "workshop_use": {
+      "type": "boolean",
+      "default": false
+    },
+    "issue_method": {
+      "type": "string",
+      "enum": [
+        "each",
+        "pack",
+        "carton",
+        "weight",
+        "volume"
+      ],
+      "default": "each"
     },
     "freight_class": {
       "type": "string"

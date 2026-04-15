@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { PART_CATEGORIES } from "@/lib/categories";
 import { base44 } from "@/api/base44Client";
 import { X, Plus, CheckCircle, AlertTriangle, Eye, EyeOff, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,6 @@ const STOCKTAKE_TYPES = [
 ];
 
 const WAREHOUSES = ["Main Warehouse", "Karratha", "Port Hedland", "Newman", "Workshop", "Yard"];
-const CATEGORIES = ["engine", "transmission", "brakes", "suspension", "electrical", "body", "filters", "hydraulic", "driveline", "cooling", "fuel", "exhaust", "steering", "tyres", "other"];
 
 export default function StocktakeForm({ onClose, onSaved }) {
   const [step, setStep] = useState(1); // 1=setup, 2=count, 3=variance
@@ -257,13 +257,13 @@ export default function StocktakeForm({ onClose, onSaved }) {
                 <div>
                   <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-2">Select Categories</label>
                   <div className="flex flex-wrap gap-2">
-                    {CATEGORIES.map(c => (
-                      <button key={c} type="button"
-                        onClick={() => set("selected_categories", form.selected_categories.includes(c)
-                          ? form.selected_categories.filter(x => x !== c)
-                          : [...form.selected_categories, c])}
-                        className={`px-2 py-1 text-xs font-heading uppercase tracking-wider rounded-sm transition-colors ${form.selected_categories.includes(c) ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/60"}`}>
-                        {c}
+                    {PART_CATEGORIES.map(c => (
+                      <button key={c.value} type="button"
+                        onClick={() => set("selected_categories", form.selected_categories.includes(c.value)
+                          ? form.selected_categories.filter(x => x !== c.value)
+                          : [...form.selected_categories, c.value])}
+                        className={`px-2 py-1 text-xs font-heading uppercase tracking-wider rounded-sm transition-colors ${form.selected_categories.includes(c.value) ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/60"}`}>
+                        {c.label}
                       </button>
                     ))}
                   </div>

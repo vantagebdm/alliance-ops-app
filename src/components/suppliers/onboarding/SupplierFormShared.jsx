@@ -1,7 +1,7 @@
 export const CATEGORIES = [
-  "Engine","Filters","Brakes","Suspension","Electrical","Hydraulic",
-  "Cooling","Fuel","Driveline","Tyres","Undercarriage","Trailer Parts",
-  "LV Parts","Truck Parts","Plant Parts","Fixed Plant","Generator Parts","Other"
+  "Engine","Transmission","Brakes","Suspension","Electrical","Body","Filters","Hydraulic",
+  "Driveline","Cooling","Fuel","Tyres","Oils","Sprays","Consumables","Compliance","Chemicals",
+  "Undercarriage","Trailer Parts","LV Parts","Truck Parts","Plant Parts","Fixed Plant","Generator Parts","Other"
 ];
 
 export const EQUIPMENT_TYPES = [
