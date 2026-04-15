@@ -44,9 +44,12 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
   const [search, setSearch] = useState("");
   const [customInput, setCustomInput] = useState("");
   const ref = useRef(null);
+  const contentRef = useRef(null);
 
   useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const handler = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+    };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
@@ -102,7 +105,7 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
         )}
       </div>
       {open && (
-        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-sm shadow-lg max-h-52 flex flex-col">
+        <div ref={contentRef} className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-sm shadow-lg max-h-52 flex flex-col" onMouseDown={e => e.preventDefault()}>
           <div className="p-2 border-b border-border space-y-2">
             <input
               autoFocus
@@ -124,6 +127,9 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
                 All
               </button>
             )}
+            <div className="text-[10px] text-muted-foreground px-3 py-1 font-heading uppercase tracking-wider">
+              {value.length > 0 && `${value.length} selected`}
+            </div>
           </div>
           <div className="overflow-y-auto flex-1">
             {filtered.map(o => {
