@@ -138,9 +138,14 @@ export default function QuickOrderForm({ onClose, onSaved }) {
                             partAC.handleInputChange(val);
                           }}
                           onSelect={(item) => {
-                            updateLine(i, "part_number", item.part_number);
-                            updateLine(i, "description", item.name);
-                            updateLine(i, "unit_price", item.sell_price || 0);
+                            setForm(f => ({
+                              ...f,
+                              items: f.items.map((line, idx) =>
+                                idx === i
+                                  ? { ...line, part_number: item.part_number, description: item.name, unit_price: item.sell_price || 0 }
+                                  : line
+                              ),
+                            }));
                             partAC.handleSelectSuggestion(item);
                           }}
                           placeholder="SKU"
