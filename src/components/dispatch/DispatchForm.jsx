@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Plus, Trash2, AlertTriangle, Package, ChevronDown } from "lucide-react";
+import Autocomplete from "@/components/ui/Autocomplete";
+import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,6 +55,7 @@ function FieldLabel({ children, required }) {
 
 export default function DispatchForm({ onClose, onSaved }) {
   const [saving, setSaving] = useState(false);
+  const customerAC = useAutocomplete("Customer", "name", ["company", "trading_name"]);
   const [salesOrders, setSalesOrders] = useState([]);
   const [soSearch, setSoSearch] = useState("");
   const [showSODropdown, setShowSODropdown] = useState(false);
@@ -235,7 +238,22 @@ export default function DispatchForm({ onClose, onSaved }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <FieldLabel required>Customer Name</FieldLabel>
-              <Input value={form.customer_name} onChange={e => up("customer_name", e.target.value)} className="rounded-sm" />
+              <Autocomplete
+                value={form.customer_name}
+                suggestions={customerAC.suggestions}
+                open={customerAC.open}
+                loading={customerAC.loading}
+                onInputChange={(val) => { up("customer_name", val); customerAC.handleInputChange(val); }}
+                onSelect={(item) => {
+                  const name = item.company || item.trading_name || item.name;
+                  up("customer_name", name);
+                  customerAC.setQuery(name);
+                  customerAC.setOpen(false);
+                }}
+                onShowAll={customerAC.handleShowAll}
+                placeholder="Search customer..."
+                className="rounded-sm"
+              />
             </div>
             <div>
               <FieldLabel>Sales Order #</FieldLabel>

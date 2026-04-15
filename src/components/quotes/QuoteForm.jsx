@@ -102,6 +102,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
                    fillCustomer(item);
                    customerAC.handleSelectSuggestion(item);
                  }}
+                 onShowAll={customerAC.handleShowAll}
                  placeholder="Search customer..."
                  className="rounded-sm"
                />
@@ -121,6 +122,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
                    fillCustomer(item);
                    companyAC.handleSelectSuggestion(item);
                  }}
+                 onShowAll={companyAC.handleShowAll}
                  placeholder="Search company..."
                  className="rounded-sm"
                />
