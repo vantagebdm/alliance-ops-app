@@ -6,7 +6,7 @@ import QuickQuoteForm from "./forms/QuickQuoteForm";
 import QuickOrderForm from "./forms/QuickOrderForm";
 import QuickEnquiryForm from "./forms/QuickEnquiryForm";
 import QuickCustomerForm from "./forms/QuickCustomerForm";
-import QuickPartForm from "./forms/QuickPartForm";
+import PartForm from "@/components/parts/PartForm";
 import QuickPOForm from "./forms/QuickPOForm";
 import QuickSupplierForm from "./forms/QuickSupplierForm";
 import QuickInvoiceForm from "./forms/QuickInvoiceForm";
@@ -31,7 +31,7 @@ export default function QuickAddButton({ contextData = {} }) {
     order: QuickOrderForm,
     enquiry: QuickEnquiryForm,
     customer: QuickCustomerForm,
-    part: QuickPartForm,
+    part: PartForm,
     po: QuickPOForm,
     supplier: QuickSupplierForm,
     invoice: QuickInvoiceForm,
