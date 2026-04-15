@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { toast } from "sonner";
 
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,9 +68,23 @@ export default function Customers() {
       {showForm && (
         <CustomerOnboardingForm
           onClose={() => setShowForm(false)}
-          onSaved={(saved, opts) => {
+          onSaved={async (saved, opts) => {
             setShowForm(false);
             load();
+            
+            // Trigger external risk assessment if credit review task was requested
+            if (opts?.createTask && saved?.id) {
+              try {
+                await base44.functions.invoke("assessExternalRisk", { customer_id: saved.id });
+                toast.success("External risk assessment completed");
+                // Reload customer data to show external findings
+                const updated = await base44.entities.Customer.get(saved.id);
+                setSelected(updated);
+              } catch (err) {
+                toast.error("External risk assessment failed: " + err.message);
+              }
+            }
+            
             if (opts?.openAfter && saved) setSelected(saved);
           }}
         />

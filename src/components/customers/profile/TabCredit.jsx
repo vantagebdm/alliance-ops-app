@@ -2,6 +2,9 @@ import { SectionTitle } from "./ProfileField";
 import ProfileField from "./ProfileField";
 import { FileSearch, AlertTriangle } from "lucide-react";
 import moment from "moment";
+import ExternalRiskPanel from "../actions/ExternalRiskPanel";
+import { base44 } from "@/api/base44Client";
+import { useState } from "react";
 
 const ACCOUNT_STATUS_LABELS = {
   cash_sale: "Cash Sale", credit_pending: "Credit Pending", under_review: "Under Review",
@@ -19,6 +22,18 @@ const ACCOUNT_STATUS_COLORS = {
 export default function TabCredit({ customer }) {
   const acctColor = ACCOUNT_STATUS_COLORS[customer.account_status] || ACCOUNT_STATUS_COLORS.cash_sale;
   const isOnHold = customer.account_status === "on_hold";
+  const [isAssessing, setIsAssessing] = useState(false);
+
+  const handleRunAssessment = async () => {
+    setIsAssessing(true);
+    try {
+      await base44.functions.invoke("assessExternalRisk", { customer_id: customer.id });
+    } catch (err) {
+      console.error("Assessment failed:", err);
+    } finally {
+      setIsAssessing(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -71,6 +86,20 @@ export default function TabCredit({ customer }) {
               </a>
             </div>
           </div>
+        </div>
+      )}
+
+      {(customer.external_risk_level || customer.external_findings?.length > 0) && (
+        <div>
+          <SectionTitle>External Risk Intelligence</SectionTitle>
+          <ExternalRiskPanel
+            external_risk_level={customer.external_risk_level}
+            external_findings_summary={customer.external_findings_summary}
+            external_findings={customer.external_findings}
+            external_assessment_date={customer.external_assessment_date}
+            onRunAssessment={handleRunAssessment}
+            isAssessing={isAssessing}
+          />
         </div>
       )}
 

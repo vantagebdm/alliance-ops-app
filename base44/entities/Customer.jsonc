@@ -291,6 +291,70 @@
     },
     "pdf_attachment_url": {
       "type": "string"
+    },
+    "external_risk_flag": {
+      "type": "boolean",
+      "default": false
+    },
+    "external_risk_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "none"
+    },
+    "external_findings_summary": {
+      "type": "string"
+    },
+    "external_confidence_level": {
+      "type": "string",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "external_assessment_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "external_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "finding": {
+            "type": "string"
+          },
+          "source_type": {
+            "type": "string",
+            "enum": [
+              "asic_regulatory",
+              "legal_record",
+              "news_article",
+              "public_listing",
+              "other"
+            ]
+          },
+          "confidence": {
+            "type": "string",
+            "enum": [
+              "high",
+              "medium",
+              "low"
+            ]
+          },
+          "date": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      }
     }
   },
   "required": [
