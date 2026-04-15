@@ -161,8 +161,8 @@ export default function CustomerOnboardingForm({ onClose, onSaved, initial }) {
   const isCreditStatus = CREDIT_STATUSES.includes(form.account_status);
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-6 pb-8 overflow-y-auto">
-      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl mx-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl mx-4">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,5%)] px-6 py-5 flex items-center justify-between rounded-t-sm sticky top-0 z-10">

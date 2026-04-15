@@ -71,8 +71,8 @@ export default function SupplierOnboardingForm({ onClose, onSaved, initial }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-6 pb-6 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl flex flex-col" style={{ minHeight: "min(90vh, 800px)" }}>
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl flex flex-col mx-4" style={{ minHeight: "min(92vh, 900px)" }}>
         {/* Header */}
         <div className="bg-[hsl(0,0%,8%)] px-6 py-4 flex items-center justify-between rounded-t-sm flex-shrink-0">
           <div>

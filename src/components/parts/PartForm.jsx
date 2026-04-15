@@ -35,8 +35,8 @@ export default function PartForm({ onClose, onSaved, initial }) {
   const CATEGORIES = ["engine","transmission","brakes","suspension","electrical","body","filters","hydraulic","driveline","cooling","fuel","tyres","other"];
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-10 overflow-y-auto">
-      <div className="bg-white w-full max-w-2xl rounded-sm shadow-2xl mb-10">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl mx-4">
         <div className="bg-[hsl(0,0%,8%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
           <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">
             {initial ? "Edit Part" : "New Part"}

@@ -179,7 +179,7 @@ export default function DispatchForm({ onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-end">
-      <div className="w-full max-w-4xl h-full bg-card flex flex-col shadow-2xl overflow-hidden">
+      <div className="w-full max-w-5xl h-full bg-card flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className={`flex items-center justify-between px-6 py-4 flex-shrink-0 ${isBreakdown ? "bg-red-900" : "bg-[hsl(0,0%,6%)]"}`}>
           <div className="flex items-center gap-3">

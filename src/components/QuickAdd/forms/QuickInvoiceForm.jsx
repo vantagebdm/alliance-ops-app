@@ -227,7 +227,7 @@ export default function QuickInvoiceForm({ onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl mx-4 flex flex-col">
+      <div className="bg-white w-full max-w-6xl rounded-sm shadow-2xl mx-4 flex flex-col">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm sticky top-0 z-10">

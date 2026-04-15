@@ -66,8 +66,8 @@ export default function QuickOrderForm({ onClose, onSaved }) {
   const total = subtotal + gst;
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl my-6">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-6xl rounded-sm shadow-2xl mx-4">
         <div className="bg-[hsl(0,0%,8%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
           <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">New Sales Order</h2>
           <button onClick={onClose} className="text-white/60 hover:text-white">
