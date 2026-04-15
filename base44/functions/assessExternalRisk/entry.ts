@@ -20,43 +20,85 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Customer not found' }, { status: 404 });
     }
 
-    // Build search query with primary identifiers
-    const searchTerms = [
-      customer.name,
-      customer.trading_name,
-      customer.abn,
-      customer.acn,
-      ...(customer.directors?.map(d => d.full_name) || []),
-      customer.city && customer.state ? `${customer.city} ${customer.state}` : null
-    ].filter(Boolean).join(' ');
+    // Format directors info
+    const directorsInfo = customer.directors?.map(d => {
+      let info = d.full_name;
+      if (d.dob) info += ` (DOB: ${d.dob})`;
+      return info;
+    }).join('; ') || 'N/A';
 
-    // Use LLM to search for external risk indicators
+    // Use LLM to search for external risk indicators with deeper analysis
     const findings = await base44.integrations.Core.InvokeLLM({
-      prompt: `Search for external risk indicators for a company with these details:
-      
+      prompt: `Perform a comprehensive credit risk assessment for a company with these details:
+       
 Company Name: ${customer.name}
 Trading Name: ${customer.trading_name || 'N/A'}
 ABN: ${customer.abn || 'N/A'}
 ACN: ${customer.acn || 'N/A'}
 Location: ${customer.city}, ${customer.state}
-Directors: ${customer.directors?.map(d => d.full_name).join(', ') || 'N/A'}
+Date Established: ${customer.date_established || 'N/A'}
+Nature of Business: ${customer.nature_of_business || 'N/A'}
+Directors: ${directorsInfo}
+Estimated Monthly Purchases: ${customer.estimated_monthly_purchases || 'N/A'}
 
-Search for and identify:
-1. Insolvency records (liquidation, administration, receivership, ASIC deregistration)
-2. Legal actions or court judgments
-3. Negative news articles or media mentions
-4. Regulatory compliance issues
-5. Public complaints or disputes
-6. Payment defaults or financial distress indicators
+SEARCH FOR AND ANALYZE:
 
-For each finding, provide:
-- Brief description of the issue
-- Source type (ASIC/Regulatory, Legal Record, News Article, Public Listing, Other)
-- Confidence level (High/Medium/Low) - based on how closely the match identifies this specific company
+1. INSOLVENCY & DEREGISTRATION (Critical)
+   - Liquidation, administration, receivership, court-ordered wind-ups
+   - ASIC deregistration or strike-off
+   - Voluntary agreements or creditor schemes
+
+2. DIRECTOR HISTORY (Important)
+   - Directors with history of failed companies
+   - Directors disqualified or banned
+   - Frequent director changes (instability indicator)
+   - Directors involved in previous insolvencies
+
+3. LEGAL & REGULATORY (Important)
+   - Court judgments, writs, or liens
+   - Tax office pursuit or unpaid ATO debts
+   - Fair Work breaches or underpayment claims
+   - ASIC enforcement actions
+   - Consumer complaints or business disputes
+
+4. FINANCIAL DISTRESS SIGNALS
+   - Payment defaults or court-ordered recovery actions
+   - Asset seizure or repossession
+   - Breached payment agreements with creditors
+   - Multiple creditor claims
+
+5. REPUTATIONAL & MARKET SIGNALS
+   - Negative media coverage (fraud, disputes, quality issues)
+   - Public complaints or blacklist mentions
+   - Poor online reviews or industry warnings
+   - Warnings from industry bodies
+
+6. STRUCTURAL CHANGES (Caution flag)
+   - Recent sudden changes in ownership or structure
+   - Frequent trading name changes
+   - Recent address changes suggesting relocation
+   - Unusual company restructures
+
+7. BUSINESS VIABILITY
+   - Newly established companies (under 12 months)
+   - Industry sector challenges or downturns
+   - Geographic market issues
+
+For EACH finding identified, provide:
+- Specific issue description
+- Source type: asic_regulatory, legal_record, news_article, public_listing, director_history, financial_distress, or other
+- Confidence: High (verified official record), Medium (credible source), Low (unverified)
 - Date if available
+- Brief context
 
-Return ONLY if you find relevant information. If no adverse records found, return: "NO_ADVERSE_RECORDS"
-Format findings as bullet points.`,
+ONLY return findings if they are RELEVANT and VERIFIABLE. If no adverse records found, return: "NO_ADVERSE_RECORDS"
+
+Rate overall risk considering:
+- None: No adverse indicators found
+- Low: Minor concerns, unlikely to affect creditworthiness
+- Medium: Moderate concerns requiring attention, manageable risk
+- High: Significant concerns, substantial credit risk
+Provide a concise executive summary (2-3 sentences) of the company's credit risk profile.`,
       add_context_from_internet: true,
       response_json_schema: {
         type: "object",
@@ -70,8 +112,9 @@ Format findings as bullet points.`,
               type: "object",
               properties: {
                 finding: { type: "string" },
-                source_type: { type: "string" },
-                confidence: { type: "string" },
+                category: { type: "string", enum: ["insolvency", "director_history", "legal_regulatory", "financial_distress", "reputational", "structural", "viability"] },
+                source_type: { type: "string", enum: ["asic_regulatory", "legal_record", "news_article", "public_listing", "director_history", "financial_distress", "other"] },
+                confidence: { type: "string", enum: ["high", "medium", "low"] },
                 date: { type: "string" },
                 description: { type: "string" }
               }
@@ -95,14 +138,15 @@ Format findings as bullet points.`,
     if (findings.has_findings && findings.findings.length > 0) {
       const highConfidenceCount = findings.findings.filter(f => f.confidence === "high").length;
       const mediumConfidenceCount = findings.findings.filter(f => f.confidence === "medium").length;
+      const criticalFinding = findings.findings.some(f => f.category === "insolvency" && f.confidence === "high");
 
-      if (highConfidenceCount >= 2 || findings.findings.some(f => f.source_type === "asic_regulatory" && f.confidence === "high")) {
+      if (criticalFinding || highConfidenceCount >= 2 || findings.findings.some(f => f.source_type === "asic_regulatory" && f.confidence === "high")) {
         riskLevel = "high";
         riskFlag = true;
       } else if (highConfidenceCount >= 1 || mediumConfidenceCount >= 2) {
         riskLevel = "medium";
         riskFlag = true;
-      } else if (mediumConfidenceCount >= 1) {
+      } else if (mediumConfidenceCount >= 1 || findings.findings.some(f => f.category === "director_history")) {
         riskLevel = "low";
         riskFlag = true;
       }
