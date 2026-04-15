@@ -40,10 +40,10 @@ export default function CreditAppTemplates() {
           <div className="flex gap-2 text-foreground">
             {active && (
               <>
-                <Button variant="outline" onClick={() => setMode("preview")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-foreground">
+                <Button variant="outline" onClick={() => setMode("preview")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-white border-white/30 hover:bg-white/10">
                   <Eye className="w-4 h-4 mr-1" /> Preview
                 </Button>
-                <Button variant="outline" onClick={() => setMode("edit")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-foreground">
+                <Button variant="outline" onClick={() => setMode("edit")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-white border-white/30 hover:bg-white/10">
                   <Edit className="w-4 h-4 mr-1" /> Edit Template
                 </Button>
               </>
