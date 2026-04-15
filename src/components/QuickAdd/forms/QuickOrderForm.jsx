@@ -13,7 +13,7 @@ export default function QuickOrderForm({ onClose, onSaved }) {
     items: [newLine()],
   });
   const [saving, setSaving] = useState(false);
-  const customerAC = useAutocomplete("Customer", "name");
+  const customerAC = useAutocomplete("Customer", "name", ["company", "trading_name"]);
   const partAC = useAutocomplete("Part", "part_number");
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));

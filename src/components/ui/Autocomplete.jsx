@@ -24,16 +24,21 @@ export default function Autocomplete({
           {loading ? (
             <div className="px-3 py-2 text-sm text-muted-foreground">Loading...</div>
           ) : suggestions.length > 0 ? (
-            suggestions.map((item, idx) => (
-              <button
-                key={idx}
-                type="button"
-                onClick={() => onSelect(item)}
-                className="w-full text-left px-3 py-2 hover:bg-accent text-sm transition-colors"
-              >
-                {item.name || item.customer_name || item.supplier_name || item.part_number || "N/A"}
-              </button>
-            ))
+            suggestions.map((item, idx) => {
+              const primary = item.name || item.customer_name || item.supplier_name || item.part_number || "N/A";
+              const secondary = item.company && item.company !== primary ? item.company : (item.trading_name && item.trading_name !== primary ? item.trading_name : null);
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => onSelect(item)}
+                  className="w-full text-left px-3 py-2 hover:bg-accent text-sm transition-colors flex items-baseline gap-2"
+                >
+                  <span>{primary}</span>
+                  {secondary && <span className="text-xs text-muted-foreground">— {secondary}</span>}
+                </button>
+              );
+            })
           ) : (
             <div className="px-3 py-2 text-sm text-muted-foreground">No results</div>
           )}

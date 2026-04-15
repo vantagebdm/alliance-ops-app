@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
 
-export function useAutocomplete(entityName, searchField) {
+export function useAutocomplete(entityName, searchField, extraSearchFields = []) {
   const [suggestions, setSuggestions] = useState([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -17,11 +17,12 @@ export function useAutocomplete(entityName, searchField) {
     setLoading(true);
     try {
       const results = await base44.entities[entityName].list(null, 50);
+      const allFields = [searchField, ...extraSearchFields];
       const filtered = results
-        .filter(item => 
-          String(item[searchField] || "")
-            .toLowerCase()
-            .includes(value.toLowerCase())
+        .filter(item =>
+          allFields.some(field =>
+            String(item[field] || "").toLowerCase().includes(value.toLowerCase())
+          )
         )
         .slice(0, 10);
       setSuggestions(filtered);
