@@ -68,8 +68,8 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/75 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl mx-4">
+    <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-end">
+      <div className="w-full max-w-4xl h-full bg-white flex flex-col shadow-2xl overflow-hidden">
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
           <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">
             {initial ? "Edit Quote" : "New Quote"}
@@ -77,7 +77,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
           <button onClick={onClose} className="text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Customer Section */}
           <div>
             <div className="flex items-center gap-2 mb-4">
@@ -256,7 +256,7 @@ export default function QuoteForm({ onClose, onSaved, initial }) {
           </div>
         </div>
 
-        <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
+        <div className="flex-shrink-0 px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
           <Button variant="outline" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">Cancel</Button>
           <Button onClick={save} disabled={saving || !form.customer_name}
             className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
