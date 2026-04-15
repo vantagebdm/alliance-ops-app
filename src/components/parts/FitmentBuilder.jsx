@@ -61,6 +61,16 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
     else onChange([...value, val]);
   };
 
+  const toggleAll = () => {
+    if (value.length === filtered.length && filtered.length > 0) {
+      onChange(value.filter(v => !filtered.map(o => typeof o === "string" ? o : o.value).includes(v)));
+    } else {
+      const allVals = filtered.map(o => typeof o === "string" ? o : o.value);
+      const newSelection = [...new Set([...value, ...allVals])];
+      onChange(newSelection);
+    }
+  };
+
   const addCustom = () => {
     const trimmed = customInput.trim();
     if (trimmed && !value.includes(trimmed)) { onChange([...value, trimmed]); }
@@ -93,7 +103,7 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
       </div>
       {open && (
         <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-sm shadow-lg max-h-52 flex flex-col">
-          <div className="p-2 border-b border-border">
+          <div className="p-2 border-b border-border space-y-2">
             <input
               autoFocus
               className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
@@ -102,6 +112,18 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
               onChange={e => setSearch(e.target.value)}
               onClick={e => e.stopPropagation()}
             />
+            {filtered.length > 0 && (
+              <button
+                type="button"
+                onMouseDown={e => { e.preventDefault(); toggleAll(); }}
+                className="w-full text-left flex items-center gap-2 px-3 py-1.5 text-xs bg-primary/10 text-primary hover:bg-primary/20 rounded-sm font-heading uppercase tracking-wider"
+              >
+                <div className={`w-3.5 h-3.5 border rounded-sm flex items-center justify-center ${value.length === filtered.length && filtered.length > 0 ? "bg-primary border-primary" : "border-input"}`}>
+                  {value.length === filtered.length && filtered.length > 0 && <Check className="w-2.5 h-2.5 text-primary-foreground" />}
+                </div>
+                All
+              </button>
+            )}
           </div>
           <div className="overflow-y-auto flex-1">
             {filtered.map(o => {
