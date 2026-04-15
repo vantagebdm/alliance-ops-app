@@ -58,18 +58,22 @@ export default function QuickOrderForm({ onClose, onSaved }) {
     }
   };
 
+  const subtotal = form.items.reduce((s, l) => s + (l.quantity * l.unit_price), 0);
+  const gst = subtotal * 0.1;
+  const total = subtotal + gst;
+
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-2xl rounded-sm shadow-2xl">
-        <div className="bg-[hsl(0,0%,8%)] px-6 py-3 flex items-center justify-between rounded-t-sm">
-          <h2 className="font-heading text-base font-bold text-white uppercase tracking-wider">New Sales Order</h2>
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center p-4 overflow-y-auto">
+      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl my-6">
+        <div className="bg-[hsl(0,0%,8%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
+          <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">New Sales Order</h2>
           <button onClick={onClose} className="text-white/60 hover:text-white">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="p-4 space-y-4 max-h-96 overflow-y-auto">
-          <div>
+        <div className="p-6 space-y-5">
+          <div className="max-w-sm">
             <label className="font-heading text-[11px] uppercase tracking-wider text-foreground/60 mb-1 block">Customer *</label>
             <Autocomplete
               value={form.customer_name}
@@ -90,96 +94,117 @@ export default function QuickOrderForm({ onClose, onSaved }) {
           </div>
 
           <div className="border border-border rounded-sm overflow-hidden">
-            <table className="w-full text-xs">
+            <table className="w-full text-sm">
               <thead className="bg-[hsl(0,0%,96%)]">
                 <tr className="border-b border-border">
-                  <th className="text-left px-2 py-1 font-heading tracking-wider text-foreground/50">Part #</th>
-                  <th className="text-left px-2 py-1 font-heading tracking-wider text-foreground/50">Description</th>
-                  <th className="text-right px-2 py-1 font-heading tracking-wider text-foreground/50 w-12">Qty</th>
-                  <th className="text-right px-2 py-1 font-heading tracking-wider text-foreground/50 w-16">Price</th>
-                  <th className="w-6" />
+                  <th className="text-left px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-40">Part #</th>
+                  <th className="text-left px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50">Description</th>
+                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-20">Qty</th>
+                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-28">Unit Price</th>
+                  <th className="text-right px-3 py-2 font-heading text-[11px] uppercase tracking-wider text-foreground/50 w-24">Line Total</th>
+                  <th className="w-8" />
                 </tr>
               </thead>
               <tbody>
-                {form.items.map((line, i) => (
-                  <tr key={i} className="border-b border-border/50 last:border-0">
-                    <td className="px-2 py-1">
-                      <Autocomplete
-                        value={line.part_number}
-                        suggestions={partAC.suggestions}
-                        open={partAC.open}
-                        loading={partAC.loading}
-                        onInputChange={(val) => {
-                          updateLine(i, "part_number", val);
-                          partAC.handleInputChange(val);
-                        }}
-                        onSelect={(item) => {
-                          updateLine(i, "part_number", item.part_number);
-                          updateLine(i, "description", item.name);
-                          partAC.handleSelectSuggestion(item);
-                        }}
-                        placeholder="SKU"
-                        className="rounded-sm h-7 text-xs"
-                      />
-                    </td>
-                    <td className="px-2 py-1">
-                      <input
-                        type="text"
-                        value={line.description}
-                        onChange={(e) => updateLine(i, "description", e.target.value)}
-                        placeholder="Desc"
-                        className="w-full h-7 px-2 text-xs border border-input rounded-sm"
-                      />
-                    </td>
-                    <td className="px-2 py-1">
-                      <input
-                        type="number"
-                        min="1"
-                        value={line.quantity}
-                        onChange={(e) => updateLine(i, "quantity", Number(e.target.value))}
-                        className="w-full h-7 px-2 text-xs border border-input rounded-sm text-right"
-                      />
-                    </td>
-                    <td className="px-2 py-1">
-                      <input
-                        type="number"
-                        step="0.01"
-                        value={line.unit_price}
-                        onChange={(e) => updateLine(i, "unit_price", Number(e.target.value))}
-                        className="w-full h-7 px-2 text-xs border border-input rounded-sm text-right"
-                      />
-                    </td>
-                    <td className="px-1 py-1">
-                      <button
-                        onClick={() => removeLine(i)}
-                        className="text-muted-foreground hover:text-red-500"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {form.items.map((line, i) => {
+                  const lineTotal = line.quantity * line.unit_price;
+                  return (
+                    <tr key={i} className="border-b border-border/50 last:border-0 hover:bg-muted/20">
+                      <td className="px-3 py-2">
+                        <Autocomplete
+                          value={line.part_number}
+                          suggestions={partAC.suggestions}
+                          open={partAC.open}
+                          loading={partAC.loading}
+                          onInputChange={(val) => {
+                            updateLine(i, "part_number", val);
+                            partAC.handleInputChange(val);
+                          }}
+                          onSelect={(item) => {
+                            updateLine(i, "part_number", item.part_number);
+                            updateLine(i, "description", item.name);
+                            updateLine(i, "unit_price", item.sell_price || 0);
+                            partAC.handleSelectSuggestion(item);
+                          }}
+                          placeholder="SKU"
+                          className="rounded-sm"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="text"
+                          value={line.description}
+                          onChange={(e) => updateLine(i, "description", e.target.value)}
+                          placeholder="Description"
+                          className="w-full h-9 px-2 text-sm border border-input rounded-sm"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          min="1"
+                          value={line.quantity}
+                          onChange={(e) => updateLine(i, "quantity", Number(e.target.value))}
+                          className="w-full h-9 px-2 text-sm border border-input rounded-sm text-right"
+                        />
+                      </td>
+                      <td className="px-3 py-2">
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={line.unit_price}
+                          onChange={(e) => updateLine(i, "unit_price", Number(e.target.value))}
+                          className="w-full h-9 px-2 text-sm border border-input rounded-sm text-right"
+                        />
+                      </td>
+                      <td className="px-3 py-2 text-right font-body text-sm text-foreground/80">
+                        ${lineTotal.toFixed(2)}
+                      </td>
+                      <td className="px-2 py-2 text-center">
+                        <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
-          <button
-            onClick={addLine}
-            className="text-xs font-heading uppercase tracking-wider text-primary hover:text-primary/80 flex items-center gap-1"
-          >
-            <Plus className="w-3 h-3" /> Add Line
-          </button>
+          <div className="flex items-start justify-between">
+            <button
+              onClick={addLine}
+              className="text-xs font-heading uppercase tracking-wider text-primary hover:text-primary/80 flex items-center gap-1 mt-1"
+            >
+              <Plus className="w-3 h-3" /> Add Line
+            </button>
+
+            <div className="text-sm space-y-1 text-right">
+              <div className="flex justify-between gap-12 text-foreground/60">
+                <span className="font-heading text-[11px] uppercase tracking-wider">Subtotal</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between gap-12 text-foreground/60">
+                <span className="font-heading text-[11px] uppercase tracking-wider">GST (10%)</span>
+                <span>${gst.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between gap-12 font-semibold text-base border-t border-border pt-1">
+                <span className="font-heading text-[11px] uppercase tracking-wider">Total</span>
+                <span>${total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="px-4 py-3 bg-muted/30 border-t border-border flex justify-end gap-2">
-          <Button variant="outline" onClick={onClose} size="sm" className="rounded-sm text-xs">
+        <div className="px-6 py-4 bg-muted/30 border-t border-border flex justify-end gap-3">
+          <Button variant="outline" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">
             Cancel
           </Button>
           <Button
             onClick={save}
             disabled={saving || !form.customer_name || form.items.some(l => !l.part_number)}
-            className="bg-primary text-black hover:bg-primary/90 text-xs rounded-sm"
-            size="sm"
+            className="bg-primary text-black hover:bg-primary/90 font-heading font-semibold uppercase text-xs tracking-wider rounded-sm"
           >
             {saving ? "Creating..." : "Create Order"}
           </Button>
