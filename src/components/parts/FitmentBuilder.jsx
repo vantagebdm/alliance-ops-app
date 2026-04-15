@@ -48,7 +48,9 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
 
   useEffect(() => {
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target) && contentRef.current && !contentRef.current.contains(e.target)) {
+        setOpen(false);
+      }
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -105,7 +107,7 @@ function MultiSelectDropdown({ options, value = [], onChange, placeholder, allow
         )}
       </div>
       {open && (
-        <div ref={contentRef} className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-sm shadow-lg max-h-52 flex flex-col" onMouseDown={e => e.preventDefault()}>
+        <div ref={contentRef} className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-sm shadow-lg max-h-52 flex flex-col" onMouseDown={e => e.preventDefault()} onClick={e => e.stopPropagation()}>
           <div className="p-2 border-b border-border space-y-2">
             <input
               autoFocus
