@@ -41,7 +41,7 @@ export default function ReceiptAttachments({ attachments, onChange }) {
     <div className="p-6 space-y-5">
       <div>
         <h2 className="font-heading text-base font-bold uppercase tracking-wider mb-1">Attachments & Documents</h2>
-        <p className="text-xs text-muted-foreground">Attach supplier invoices, packing slips, photos and supporting documents.</p>
+        <p className="text-xs text-muted-foreground">Attach supplier invoices, packing slips, photos and supporting documents. <span className="text-primary font-semibold">Attachments are optional</span> — you can post the receipt without uploading any documents.</p>
       </div>
 
       {/* Upload */}

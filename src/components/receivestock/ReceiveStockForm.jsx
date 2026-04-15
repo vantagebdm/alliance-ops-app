@@ -295,16 +295,20 @@ export default function ReceiveStockForm({ onClose, onSaved, initialPO }) {
               <Save className="w-3 h-3 mr-1" /> {saving ? "Saving..." : "Save Draft"}
             </Button>
 
-            {isLastStep ? (
+            {/* Show Post Receipt from lines step onward */}
+            {stepIdx >= steps.findIndex(s => s.id === "lines") && (
               <Button
                 type="button" size="sm"
                 onClick={() => postReceipt("posted")}
                 disabled={saving || !canPost()}
-                className="bg-primary text-black font-heading font-bold uppercase text-[10px] tracking-wider hover:bg-primary/90 rounded-sm"
+                title={!canPost() ? "Enter quantities on the Lines step to post" : "Post this receipt"}
+                className="bg-primary text-black font-heading font-bold uppercase text-[10px] tracking-wider hover:bg-primary/90 rounded-sm disabled:opacity-40"
               >
                 <Check className="w-3 h-3 mr-1" /> {saving ? "Posting..." : "Post Receipt"}
               </Button>
-            ) : (
+            )}
+
+            {!isLastStep && (
               <Button
                 type="button" size="sm"
                 onClick={() => setStepIdx(s => s + 1)}
