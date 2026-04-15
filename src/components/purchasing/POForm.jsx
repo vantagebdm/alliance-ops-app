@@ -88,6 +88,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                     u("supplier_name", item.name);
                     supplierAC.handleSelectSuggestion(item);
                   }}
+                  onShowAll={supplierAC.handleShowAll}
                   placeholder="Search supplier..."
                   className="rounded-sm"
                 />
