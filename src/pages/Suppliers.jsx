@@ -8,6 +8,7 @@ import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SupplierOnboardingForm from "../components/suppliers/SupplierOnboardingForm";
 import SupplierDetail from "../components/suppliers/SupplierDetail";
+import POForm from "../components/purchasing/POForm";
 
 function StarRating({ value }) {
   if (!value) return <span className="text-muted-foreground text-xs">—</span>;
@@ -29,6 +30,8 @@ export default function Suppliers() {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterCategory, setFilterCategory] = useState("all");
+  const [showPOForm, setShowPOForm] = useState(false);
+  const [poInitial, setPoInitial] = useState(null);
 
   const load = async () => {
     setLoading(true);
@@ -66,6 +69,16 @@ export default function Suppliers() {
     setEditTarget(selected);
     setSelected(null);
     setShowForm(true);
+  };
+
+  const handleNewPO = () => {
+    setPoInitial({ supplier_name: selected?.name || "", supplier_id: selected?.id || "" });
+    setShowPOForm(true);
+  };
+
+  const handleViewOpenPOs = () => {
+    // Navigate to purchasing page filtered by this supplier
+    window.location.href = `/purchasing?supplier=${encodeURIComponent(selected?.name || "")}`;
   };
 
   return (
@@ -192,11 +205,24 @@ export default function Suppliers() {
           supplier={selected}
           onClose={() => setSelected(null)}
           onEdit={handleEdit}
+          onNewPO={handleNewPO}
+          onViewOpenPOs={handleViewOpenPOs}
           onStatusChanged={async () => {
             await load();
-            // update selected supplier's status optimistically
-            setSelected(prev => prev ? { ...prev, status: prev.status === "inactive" ? "active" : "inactive" } : prev);
+            setSelected(prev => {
+              if (!prev) return prev;
+              const updated = suppliers.find(s => s.id === prev.id);
+              return updated || prev;
+            });
           }}
+        />
+      )}
+
+      {showPOForm && (
+        <POForm
+          initial={poInitial}
+          onClose={() => { setShowPOForm(false); setPoInitial(null); }}
+          onSaved={() => { setShowPOForm(false); setPoInitial(null); }}
         />
       )}
     </div>

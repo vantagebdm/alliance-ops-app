@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Star, ShoppingCart, Upload, FileText, Edit2, CheckCircle, PauseCircle, PowerOff, RotateCcw } from "lucide-react";
+import { useState, useRef } from "react";
+import { Star, ShoppingCart, Upload, FileText, Edit2, CheckCircle, PauseCircle, PowerOff, RotateCcw, ExternalLink } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const STATUS_COLORS = {
@@ -10,11 +10,15 @@ const STATUS_COLORS = {
   under_review: "bg-blue-500/20 text-blue-300 border-blue-500/30",
 };
 
-export default function SupplierProfileHeader({ supplier, onEdit, onClose, onStatusChanged }) {
+export default function SupplierProfileHeader({ supplier, onEdit, onClose, onStatusChanged, onNewPO, onViewOpenPOs }) {
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const statusColor = STATUS_COLORS[supplier.status] || STATUS_COLORS.active;
   const statusLabel = (supplier.status || "active").replace("_", " ").toUpperCase();
   const isInactive = supplier.status === "inactive";
+  const isOnHold = supplier.status === "on_hold";
+  const isPreferred = supplier.preferred_supplier;
 
   const handleDeactivate = async () => {
     if (!confirm(isInactive ? "Reactivate this supplier?" : "Deactivate this supplier? It will remain in the system for record keeping.")) return;
@@ -24,13 +28,58 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
     onStatusChanged?.();
   };
 
+  const handleMarkPreferred = async () => {
+    setSaving(true);
+    await base44.entities.Supplier.update(supplier.id, { preferred_supplier: !isPreferred, status: !isPreferred ? "preferred" : "active" });
+    setSaving(false);
+    onStatusChanged?.();
+  };
+
+  const handleSetOnHold = async () => {
+    if (!confirm(isOnHold ? "Remove this supplier from hold?" : "Put this supplier on hold?")) return;
+    setSaving(true);
+    await base44.entities.Supplier.update(supplier.id, { status: isOnHold ? "active" : "on_hold" });
+    setSaving(false);
+    onStatusChanged?.();
+  };
+
+  const handleUploadPriceList = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelected = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const existing = supplier.attachments || [];
+      await base44.entities.Supplier.update(supplier.id, {
+        attachments: [...existing, {
+          doc_type: "price_list",
+          filename: file.name,
+          url: file_url,
+          uploaded_by: "user",
+          upload_date: new Date().toISOString().split("T")[0],
+        }],
+        price_file_available: true,
+      });
+      onStatusChanged?.();
+      alert("Price list uploaded successfully.");
+    } catch (err) {
+      alert("Upload failed: " + err.message);
+    }
+    setUploading(false);
+    e.target.value = "";
+  };
+
   const QUICK_ACTIONS = [
     { icon: Edit2, label: "Edit", onClick: onEdit },
-    { icon: ShoppingCart, label: "New PO", onClick: undefined },
-    { icon: Upload, label: "Upload Price List", onClick: undefined },
-    { icon: FileText, label: "View Open POs", onClick: undefined },
-    { icon: CheckCircle, label: "Mark Preferred", onClick: undefined },
-    { icon: PauseCircle, label: "Set On Hold", onClick: undefined },
+    { icon: ShoppingCart, label: "New PO", onClick: onNewPO },
+    { icon: Upload, label: uploading ? "Uploading..." : "Upload Price List", onClick: handleUploadPriceList, disabled: uploading },
+    { icon: FileText, label: "View Open POs", onClick: onViewOpenPOs },
+    { icon: CheckCircle, label: isPreferred ? "Unmark Preferred" : "Mark Preferred", onClick: handleMarkPreferred, active: isPreferred },
+    { icon: PauseCircle, label: isOnHold ? "Remove Hold" : "Set On Hold", onClick: handleSetOnHold, active: isOnHold },
     {
       icon: isInactive ? RotateCcw : PowerOff,
       label: isInactive ? "Reactivate" : "Deactivate",
@@ -91,15 +140,18 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
         <button onClick={onClose} className="text-white/40 hover:text-white flex-shrink-0 mt-1 text-lg leading-none">✕</button>
       </div>
 
+      <input ref={fileInputRef} type="file" accept=".pdf,.xls,.xlsx,.csv" className="hidden" onChange={handleFileSelected} />
       <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
-        {QUICK_ACTIONS.map(({ icon: Icon, label, onClick, danger }) => (
+        {QUICK_ACTIONS.map(({ icon: Icon, label, onClick, danger, active, disabled }) => (
           <button key={label}
             onClick={onClick}
-            disabled={saving && (label === "Deactivate" || label === "Reactivate")}
-            className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider border rounded-sm transition-colors bg-white/0 hover:bg-white/5 disabled:opacity-50 ${
+            disabled={disabled || saving}
+            className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider border rounded-sm transition-colors disabled:opacity-50 ${
               danger
-                ? "text-red-400/70 hover:text-red-400 border-red-500/20 hover:border-red-500/40"
-                : "text-white/50 hover:text-white border-white/10 hover:border-white/30"
+                ? "bg-white/0 text-red-400/70 hover:text-red-400 border-red-500/20 hover:border-red-500/40 hover:bg-white/5"
+                : active
+                ? "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30"
+                : "bg-white/0 text-white/50 hover:text-white border-white/10 hover:border-white/30 hover:bg-white/5"
             }`}>
             <Icon className="w-3 h-3" /> {label}
           </button>

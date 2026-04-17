@@ -5,7 +5,7 @@ import { Star, FileText, ExternalLink, ShoppingCart, Package } from "lucide-reac
 
 const TABS = ["Overview","Contacts","Addresses","Commercial","Procurement","Returns","Documents","Activity"];
 
-export default function SupplierDetail({ supplier, onClose, onEdit, onStatusChanged }) {
+export default function SupplierDetail({ supplier, onClose, onEdit, onStatusChanged, onNewPO, onViewOpenPOs }) {
   const [tab, setTab] = useState("Overview");
   const s = supplier;
 
@@ -247,7 +247,7 @@ export default function SupplierDetail({ supplier, onClose, onEdit, onStatusChan
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-6 pb-6 overflow-y-auto">
       <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl flex flex-col" style={{ minHeight: "min(90vh, 800px)" }}>
-        <SupplierProfileHeader supplier={s} onEdit={onEdit} onClose={onClose} onStatusChanged={onStatusChanged} />
+        <SupplierProfileHeader supplier={s} onEdit={onEdit} onClose={onClose} onStatusChanged={onStatusChanged} onNewPO={onNewPO} onViewOpenPOs={onViewOpenPOs} />
 
         {/* Tab nav */}
         <div className="bg-[hsl(0,0%,96%)] border-b border-border flex gap-0 overflow-x-auto flex-shrink-0">
