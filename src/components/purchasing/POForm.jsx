@@ -12,9 +12,11 @@ import { generateDocNumber } from "@/hooks/useDocNumber";
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_cost: 0, total: 0 });
 
 export default function POForm({ onClose, onSaved, initial }) {
-  const [form, setForm] = useState(initial || {
+  const [form, setForm] = useState({
     supplier_name: "", status: "draft", expected_date: "", reference: "", notes: "",
     items: [newLine()], subtotal: 0, gst: 0, total: 0,
+    ...initial,
+    items: initial?.items?.length ? initial.items : [newLine()],
   });
   const [poType, setPoType] = useState(initial?.po_type || "parts");
   const [saving, setSaving] = useState(false);
