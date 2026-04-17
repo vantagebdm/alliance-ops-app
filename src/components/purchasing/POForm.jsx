@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
-import { generateDocNumber } from "@/hooks/useDocNumber";
+import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 
 const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_cost: 0, total: 0 });
 
@@ -20,6 +20,15 @@ export default function POForm({ onClose, onSaved, initial }) {
   });
   const [poType, setPoType] = useState(initial?.po_type || "parts");
   const [saving, setSaving] = useState(false);
+  const [previewPO, setPreviewPO] = useState("");
+
+  const loadPreview = async (type) => {
+    const subtype = type === "parts" ? "parts" : "company_expense";
+    const num = await previewDocNumber("purchase_order", subtype);
+    setPreviewPO(num || "");
+  };
+
+  useState(() => { loadPreview(poType); }, []);
   const supplierAC = useAutocomplete("Supplier", "name");
   const partAC = useAutocomplete("Part", "part_number");
 
@@ -118,7 +127,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                     <button
                       key={opt.value}
                       type="button"
-                      onClick={() => setPoType(opt.value)}
+                      onClick={() => { setPoType(opt.value); loadPreview(opt.value); }}
                       className={`px-2 py-2 text-[10px] font-heading font-semibold uppercase tracking-wider rounded-sm border transition-colors text-left ${
                         poType === opt.value
                           ? "bg-primary text-black border-primary"
@@ -126,11 +135,21 @@ export default function POForm({ onClose, onSaved, initial }) {
                       }`}
                     >
                       <div>{opt.label}</div>
-                      <div className={`font-mono text-[9px] mt-0.5 ${poType === opt.value ? "text-black/60" : "text-muted-foreground"}`}>{opt.prefix}00001</div>
+                      <div className={`font-mono text-[9px] mt-0.5 ${poType === opt.value ? "text-black/60" : "text-muted-foreground"}`}>
+                        {poType === opt.value && previewPO ? previewPO : `${opt.prefix}00001`}
+                      </div>
                     </button>
                   ))}
                 </div>
               </div>
+              {previewPO && (
+                <div>
+                  <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">PO Number (Auto-assigned)</label>
+                  <div className="h-9 px-3 flex items-center rounded-sm border border-border bg-muted font-mono text-sm font-semibold text-primary">
+                    {previewPO}
+                  </div>
+                </div>
+              )}
               <div>
                 <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Status</label>
                 <Select value={form.status} onValueChange={v => u("status", v)}>
