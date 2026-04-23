@@ -20,13 +20,15 @@ export default function S8Operations({ form, update }) {
         <FToggle label="API / Portal Available" checked={!!form.api_portal_available} onChange={v => update("api_portal_available", v)} />
       </div>
 
-      {form.api_portal_available && (
-        <div className="grid grid-cols-2 gap-3">
-          <FInput label="Portal Login URL" className="col-span-2" value={form.portal_url} onChange={e => update("portal_url", e.target.value)} />
-          <FInput label="Portal Username" value={form.portal_username} onChange={e => update("portal_username", e.target.value)} />
-          <FTextarea label="Internal Portal Notes" className="col-span-2" value={form.portal_notes} onChange={e => update("portal_notes", e.target.value)} />
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-3">
+        <FInput label="Supplier Login URL (paste link here)" className="col-span-2" value={form.portal_url} onChange={e => update("portal_url", e.target.value)} placeholder="https://supplier-portal.com/login" />
+        {form.api_portal_available && (
+          <>
+            <FInput label="Portal Username" value={form.portal_username} onChange={e => update("portal_username", e.target.value)} />
+            <FTextarea label="Internal Portal Notes" className="col-span-2" value={form.portal_notes} onChange={e => update("portal_notes", e.target.value)} />
+          </>
+        )}
+      </div>
     </div>
   );
 }

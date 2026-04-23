@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { Star, ShoppingCart, Upload, FileText, Edit2, CheckCircle, PauseCircle, PowerOff, RotateCcw, ExternalLink } from "lucide-react";
+import { Star, ShoppingCart, Upload, FileText, Edit2, CheckCircle, PauseCircle, PowerOff, RotateCcw, LogIn } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const STATUS_COLORS = {
@@ -73,8 +73,15 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
     e.target.value = "";
   };
 
+  const handleSupplierLogin = () => {
+    if (!supplier.portal_url) return;
+    const url = supplier.portal_url.startsWith("http") ? supplier.portal_url : `https://${supplier.portal_url}`;
+    window.open(url, "_blank");
+  };
+
   const QUICK_ACTIONS = [
     { icon: Edit2, label: "Edit", onClick: onEdit },
+    ...(supplier.portal_url ? [{ icon: LogIn, label: "Supplier Login", onClick: handleSupplierLogin, login: true }] : []),
     { icon: ShoppingCart, label: "New PO", onClick: onNewPO },
     { icon: Upload, label: uploading ? "Uploading..." : "Upload Price List", onClick: handleUploadPriceList, disabled: uploading },
     { icon: FileText, label: "View Open POs", onClick: onViewOpenPOs },
@@ -142,13 +149,15 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
 
       <input ref={fileInputRef} type="file" accept=".pdf,.xls,.xlsx,.csv" className="hidden" onChange={handleFileSelected} />
       <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t border-white/10">
-        {QUICK_ACTIONS.map(({ icon: Icon, label, onClick, danger, active, disabled }) => (
+        {QUICK_ACTIONS.map(({ icon: Icon, label, onClick, danger, active, disabled, login }) => (
           <button key={label}
             onClick={onClick}
             disabled={disabled || saving}
             className={`flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-heading uppercase tracking-wider border rounded-sm transition-colors disabled:opacity-50 ${
               danger
                 ? "bg-white/0 text-red-400/70 hover:text-red-400 border-red-500/20 hover:border-red-500/40 hover:bg-white/5"
+                : login
+                ? "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30 hover:bg-primary/30"
                 : active
                 ? "bg-primary/20 text-primary border-primary/40 hover:bg-primary/30"
                 : "bg-white/0 text-white/50 hover:text-white border-white/10 hover:border-white/30 hover:bg-white/5"
