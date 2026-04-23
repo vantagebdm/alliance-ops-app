@@ -502,8 +502,8 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
             </div>
             {openSections.includes(3) && (
               <div className="p-4">
-                <div className="border border-border rounded-sm overflow-hidden overflow-x-auto">
-                  <table className="w-full text-xs min-w-[700px]">
+                <div className="border border-border rounded-sm overflow-x-auto">
+                  <table className="w-full text-sm min-w-[700px]" style={{ borderCollapse: "separate", borderSpacing: 0 }}>
                     <thead className="bg-[hsl(0,0%,96%)] border-b border-border">
                       <tr>
                         <th className="text-left px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-28">Part #</th>
@@ -517,56 +517,56 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
                       </tr>
                     </thead>
                     <tbody>
-                      {form.items.map((line, i) => (
-                        <tr key={i} className={`border-b border-border/50 ${line._charge ? "bg-blue-50/50" : ""}`}>
-                          <td className="px-2 py-1.5">
-                            {line._charge ? (
-                              <span className="text-[10px] font-heading text-blue-600 uppercase tracking-wider px-1">{line._charge}</span>
-                            ) : (
-                              <Autocomplete
-                                value={line.part_number}
-                                suggestions={partAC.suggestions}
-                                open={partAC.open}
-                                loading={partAC.loading}
-                                onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                                onSelect={(item) => {
-                                  const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: item.part_number, description: item.name, unit_price: item.sell_price || 0, total: (l.quantity || 1) * (item.sell_price || 0) } : l);
-                                  recalc(items);
-                                  partAC.handleSelectSuggestion(item);
-                                }}
-                                placeholder="SKU"
-                                className="rounded-sm h-7"
-                              />
-                            )}
-                          </td>
-                          <td className="px-2 py-1.5">
-                            <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
-                              placeholder="Description" className="w-full h-7 px-2 border border-input rounded-sm text-xs" />
-                          </td>
-                          <td className="px-2 py-1.5">
-                            <input type="number" min="0" step="0.01" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
-                              className="w-full h-7 px-2 border border-input rounded-sm text-xs text-right" />
-                          </td>
-                          <td className="px-2 py-1.5">
-                            <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
-                              className="w-full h-7 px-2 border border-input rounded-sm text-xs text-right" />
-                          </td>
-                          <td className="px-2 py-1.5">
-                            <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
-                              className="w-full h-7 px-2 border border-input rounded-sm text-xs text-right" />
-                          </td>
-                          <td className="px-2 py-1.5 text-center">
-                            <input type="checkbox" checked={line.gst} onChange={e => updateLine(i, "gst", e.target.checked)}
-                              className="h-3.5 w-3.5 accent-primary" />
-                          </td>
-                          <td className="px-2 py-1.5 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
-                          <td className="px-1 py-1.5">
-                            <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
+                     {form.items.map((line, i) => (
+                       <tr key={i} className={`border-b border-border/50 ${line._charge ? "bg-blue-50/50" : ""}`}>
+                         <td className="px-2 py-2" style={{ position: "relative", zIndex: form.items.length - i + 10 }}>
+                           {line._charge ? (
+                             <span className="text-[10px] font-heading text-blue-600 uppercase tracking-wider px-1">{line._charge}</span>
+                           ) : (
+                             <Autocomplete
+                               value={line.part_number}
+                               suggestions={partAC.suggestions}
+                               open={partAC.open}
+                               loading={partAC.loading}
+                               onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
+                               onSelect={(item) => {
+                                 const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: item.part_number, description: item.name, unit_price: item.sell_price || 0, total: (l.quantity || 1) * (item.sell_price || 0) } : l);
+                                 recalc(items);
+                                 partAC.handleSelectSuggestion(item);
+                               }}
+                               placeholder="SKU"
+                               className="rounded-sm"
+                             />
+                           )}
+                         </td>
+                         <td className="px-2 py-2">
+                           <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
+                             placeholder="Description" className="w-full h-9 px-3 border border-input rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                         </td>
+                         <td className="px-2 py-2">
+                           <input type="number" min="0" step="0.01" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
+                             className="w-full h-9 px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                         </td>
+                         <td className="px-2 py-2">
+                           <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
+                             className="w-full h-9 px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                         </td>
+                         <td className="px-2 py-2">
+                           <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
+                             className="w-full h-9 px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                         </td>
+                         <td className="px-2 py-2 text-center">
+                           <input type="checkbox" checked={line.gst} onChange={e => updateLine(i, "gst", e.target.checked)}
+                             className="h-4 w-4 accent-primary" />
+                         </td>
+                         <td className="px-2 py-2 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
+                         <td className="px-1 py-2">
+                           <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
+                             <Trash2 className="w-4 h-4" />
+                           </button>
+                         </td>
+                       </tr>
+                     ))}
                     </tbody>
                   </table>
                 </div>
