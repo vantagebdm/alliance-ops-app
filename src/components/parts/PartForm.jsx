@@ -206,7 +206,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <FieldLabel>Unit Cost</FieldLabel>
-                <Input type="number" step="0.01" value={form.unit_cost} onChange={e => update("unit_cost", Number(e.target.value))} className="rounded-sm" />
+                <Input type="number" step="0.01" value={form.unit_cost || ""} onChange={e => update("unit_cost", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -224,15 +224,15 @@ export default function PartForm({ onClose, onSaved, initial }) {
                     ))}
                   </div>
                 </div>
-                <Input type="number" step="0.01" value={form.sell_price} onChange={e => update("sell_price", Number(e.target.value))} className="rounded-sm" />
+                <Input type="number" step="0.01" value={form.sell_price || ""} onChange={e => update("sell_price", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
               </div>
               <div>
                 <FieldLabel>Stock Quantity</FieldLabel>
-                <Input type="number" value={form.stock_quantity} onChange={e => update("stock_quantity", Number(e.target.value))} className="rounded-sm" />
+                <Input type="number" value={form.stock_quantity || ""} onChange={e => update("stock_quantity", Number(e.target.value))} className="rounded-sm" placeholder="0" />
               </div>
               <div>
                 <FieldLabel>Min Stock Level</FieldLabel>
-                <Input type="number" value={form.min_stock_level} onChange={e => update("min_stock_level", Number(e.target.value))} className="rounded-sm" />
+                <Input type="number" value={form.min_stock_level || ""} onChange={e => update("min_stock_level", Number(e.target.value))} className="rounded-sm" placeholder="0" />
               </div>
               {(isExtended || form.category === "oils" || form.category === "sprays" || form.category === "chemicals") && (
                 <div>
