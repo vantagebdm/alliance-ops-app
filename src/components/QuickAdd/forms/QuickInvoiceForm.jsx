@@ -502,74 +502,70 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
             </div>
             {openSections.includes(3) && (
               <div className="p-4">
-                <div className="border border-border rounded-sm overflow-x-auto">
-                  <table className="w-full text-sm min-w-[700px]" style={{ borderCollapse: "separate", borderSpacing: 0 }}>
-                    <thead className="bg-[hsl(0,0%,96%)] border-b border-border">
-                      <tr>
-                        <th className="text-left px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-28">Part #</th>
-                        <th className="text-left px-2 py-2 font-heading uppercase tracking-wider text-foreground/50">Description</th>
-                        <th className="text-right px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-14">Qty</th>
-                        <th className="text-right px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-24">Unit Price</th>
-                        <th className="text-right px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-16">Disc%</th>
-                        <th className="text-center px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-12">GST</th>
-                        <th className="text-right px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-24">Total</th>
-                        <th className="w-8" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                     {form.items.map((line, i) => (
-                       <tr key={i} className={`border-b border-border/50 ${line._charge ? "bg-blue-50/50" : ""}`}>
-                         <td className="px-2 py-2" style={{ position: "relative", zIndex: form.items.length - i + 10 }}>
-                           {line._charge ? (
-                             <span className="text-[10px] font-heading text-blue-600 uppercase tracking-wider px-1">{line._charge}</span>
-                           ) : (
-                             <Autocomplete
-                               value={line.part_number}
-                               suggestions={partAC.suggestions}
-                               open={partAC.open}
-                               loading={partAC.loading}
-                               onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                               onSelect={(item) => {
-                                 const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: item.part_number, description: item.name, unit_price: item.sell_price || 0, total: (l.quantity || 1) * (item.sell_price || 0) } : l);
-                                 recalc(items);
-                                 partAC.handleSelectSuggestion(item);
-                               }}
-                               placeholder="SKU"
-                               className="rounded-sm"
-                             />
-                           )}
-                         </td>
-                         <td className="px-2 py-2">
-                           <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
-                             placeholder="Description" className="w-full h-9 px-3 border border-input rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                         </td>
-                         <td className="px-2 py-2">
-                           <input type="number" min="0" step="0.01" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
-                             className="w-full h-9 px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
-                         </td>
-                         <td className="px-2 py-2">
-                           <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
-                             className="w-full h-9 px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
-                         </td>
-                         <td className="px-2 py-2">
-                           <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
-                             className="w-full h-9 px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
-                         </td>
-                         <td className="px-2 py-2 text-center">
-                           <input type="checkbox" checked={line.gst} onChange={e => updateLine(i, "gst", e.target.checked)}
-                             className="h-4 w-4 accent-primary" />
-                         </td>
-                         <td className="px-2 py-2 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
-                         <td className="px-1 py-2">
-                           <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
-                             <Trash2 className="w-4 h-4" />
-                           </button>
-                         </td>
-                       </tr>
-                     ))}
-                    </tbody>
-                  </table>
-                </div>
+                <div className="space-y-2">
+                    {/* Header row */}
+                    <div className="grid gap-2 px-1 text-[10px] font-heading uppercase tracking-wider text-foreground/40" style={{ gridTemplateColumns: "1fr 2fr 60px 90px 60px 40px 80px 32px" }}>
+                      <span>Part #</span>
+                      <span>Description</span>
+                      <span className="text-right">Qty</span>
+                      <span className="text-right">Unit Price</span>
+                      <span className="text-right">Disc%</span>
+                      <span className="text-center">GST</span>
+                      <span className="text-right">Total</span>
+                      <span />
+                    </div>
+
+                    {form.items.map((line, i) => (
+                      <div key={i} className={`grid gap-2 items-center p-2 rounded-sm border ${line._charge ? "bg-blue-50/50 border-blue-200" : "bg-white border-border"}`} style={{ gridTemplateColumns: "1fr 2fr 60px 90px 60px 40px 80px 32px" }}>
+                        {/* Part # */}
+                        <div>
+                          {line._charge ? (
+                            <span className="text-[10px] font-heading text-blue-600 uppercase tracking-wider">{line._charge}</span>
+                          ) : (
+                            <Autocomplete
+                              value={line.part_number}
+                              suggestions={partAC.suggestions}
+                              open={partAC.open}
+                              loading={partAC.loading}
+                              onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
+                              onSelect={(item) => {
+                                const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: item.part_number, description: item.name, unit_price: item.sell_price || 0, total: (l.quantity || 1) * (item.sell_price || 0) } : l);
+                                recalc(items);
+                                partAC.handleSelectSuggestion(item);
+                              }}
+                              placeholder="SKU"
+                              className="rounded-sm text-sm"
+                            />
+                          )}
+                        </div>
+                        {/* Description */}
+                        <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
+                          placeholder="Description" className="h-9 w-full px-3 border border-input rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                        {/* Qty */}
+                        <input type="number" min="0" step="0.01" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
+                          className="h-9 w-full px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                        {/* Unit Price */}
+                        <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
+                          className="h-9 w-full px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                        {/* Disc% */}
+                        <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
+                          className="h-9 w-full px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                        {/* GST */}
+                        <div className="flex justify-center">
+                          <input type="checkbox" checked={line.gst} onChange={e => updateLine(i, "gst", e.target.checked)}
+                            className="h-4 w-4 accent-primary" />
+                        </div>
+                        {/* Total */}
+                        <div className="text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</div>
+                        {/* Delete */}
+                        <div className="flex justify-center">
+                          <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
                 <div className="flex flex-wrap gap-2 mt-3">
                   <Button variant="outline" size="sm" onClick={addLine} className="rounded-sm font-heading text-xs uppercase tracking-wider">
