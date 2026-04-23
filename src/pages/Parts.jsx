@@ -73,7 +73,13 @@ export default function Parts() {
     { key: "name", label: "Description", render: (v, row) => (
       <div>
         <div className="font-medium text-sm">{v}</div>
-        {row.brand && <div className="text-xs text-muted-foreground">{row.brand}{row.oem_number ? ` · OEM: ${row.oem_number}` : ""}</div>}
+        {(row.brand || row.part_number || row.oem_number) && (
+          <div className="text-xs text-muted-foreground">
+            {row.brand && <span>{row.brand}</span>}
+            {row.part_number && <span>{row.brand ? " · " : ""}{row.part_number}</span>}
+            {row.oem_number && <span> · OEM: {row.oem_number}</span>}
+          </div>
+        )}
       </div>
     )},
     { key: "category", label: "Category", render: (v, row) => (
