@@ -104,7 +104,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
   const customerAC = useAutocomplete("Customer", "name");
   const companyAC = useAutocomplete("Customer", "company");
-  const partAC = useAutocomplete("Part", "part_number");
+  const partAC = useAutocomplete("Part", "part_number", ["app_part_number", "name", "supplier_sku", "oem_number"]);
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
