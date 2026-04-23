@@ -69,7 +69,7 @@ export default function Parts() {
     : EQUIPMENT_TYPES.find(t => t.value === equipmentType)?.label || "";
 
   const columns = [
-    { key: "part_number", label: "Part #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v}</span> },
+    { key: "part_number", label: "Part #", render: (v, row) => <span className="font-mono font-bold text-primary text-xs">{row.app_part_number || v}</span> },
     { key: "name", label: "Description", render: (v, row) => (
       <div>
         <div className="font-medium text-sm">{v}</div>
