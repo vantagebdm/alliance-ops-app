@@ -16,17 +16,16 @@ export function useAutocomplete(entityName, searchField, extraSearchFields = [])
 
     setLoading(true);
     try {
-      const results = await base44.entities[entityName].list(null, 100);
+      const results = await base44.entities[entityName].list(null, 500);
       const allFields = [searchField, ...extraSearchFields];
       const filtered = showAll && !value
-        ? results.slice(0, 20)
+        ? results
         : results
             .filter(item =>
               allFields.some(field =>
                 String(item[field] || "").toLowerCase().includes(value.toLowerCase())
               )
-            )
-            .slice(0, 10);
+            );
       setSuggestions(filtered);
       setOpen(filtered.length > 0);
     } catch (e) {
