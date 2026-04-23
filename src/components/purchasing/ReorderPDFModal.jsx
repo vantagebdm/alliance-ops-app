@@ -2,7 +2,6 @@ import { useEffect, useRef } from "react";
 import { X, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
-import "jspdf-autotable";
 
 export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
   const previewRef = useRef(null);
@@ -14,92 +13,103 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
 
   const generatePDF = () => {
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const pageW = 210;
+    const margin = 14;
+    const colWidths = [22, 25, 78, 14, 24, 24]; // APP#, Part#, Desc, Qty, Cost, Total
+    const colX = [margin];
+    colWidths.forEach((w, i) => { if (i > 0) colX.push(colX[i - 1] + colWidths[i - 1]); });
 
-    // Header block
+    // Header bar
     doc.setFillColor(20, 20, 20);
-    doc.rect(0, 0, 210, 28, "F");
+    doc.rect(0, 0, pageW, 28, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("PURCHASE ORDER", 14, 12);
-    doc.setFontSize(8);
+    doc.setFontSize(15);
+    doc.text("PURCHASE ORDER — DRAFT", margin, 12);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(180, 180, 180);
-    doc.text("ALLIANCE PRIORITY PARTS", 14, 19);
-    doc.text(`Date: ${today}`, 14, 24);
+    doc.setFontSize(8);
+    doc.setTextColor(170, 170, 170);
+    doc.text("ALLIANCE PRIORITY PARTS", margin, 19);
+    doc.text(`Date: ${today}`, margin, 24);
 
-    // Supplier block
+    // Supplier
     doc.setTextColor(30, 30, 30);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text("SUPPLIER", 14, 38);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.text(supplier_name, 14, 44);
-
-    // Status tag
-    doc.setFillColor(230, 255, 230);
-    doc.roundedRect(150, 33, 46, 14, 2, 2, "F");
-    doc.setTextColor(30, 120, 30);
-    doc.setFont("helvetica", "bold");
     doc.setFontSize(8);
-    doc.text("DRAFT", 173, 39, { align: "center" });
+    doc.text("TO SUPPLIER:", margin, 37);
     doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.text(supplier_name, margin, 44);
     doc.setFontSize(7);
-    doc.setTextColor(80, 80, 80);
-    doc.text("Auto-generated · Low Stock", 173, 44, { align: "center" });
+    doc.setTextColor(120, 120, 120);
+    doc.text("Auto-generated from low stock replenishment", margin, 49);
 
-    // Line items table
-    const tableData = lines.map(l => [
-      l.app_part_number || "—",
-      l.part_number,
-      l.description,
-      l.quantity,
-      `$${(l.unit_cost || 0).toFixed(2)}`,
-      `$${(l.total || l.quantity * l.unit_cost || 0).toFixed(2)}`,
-    ]);
-
-    doc.autoTable({
-      startY: 54,
-      head: [["APP #", "Part #", "Description", "Qty", "Unit Cost", "Total"]],
-      body: tableData,
-      styles: { fontSize: 8, cellPadding: 3 },
-      headStyles: { fillColor: [30, 30, 30], textColor: [255, 255, 255], fontStyle: "bold", fontSize: 7 },
-      columnStyles: {
-        0: { cellWidth: 22, font: "courier" },
-        1: { cellWidth: 25, font: "courier" },
-        2: { cellWidth: 80 },
-        3: { cellWidth: 12, halign: "center" },
-        4: { cellWidth: 22, halign: "right" },
-        5: { cellWidth: 22, halign: "right", fontStyle: "bold" },
-      },
-      alternateRowStyles: { fillColor: [248, 248, 248] },
-    });
-
-    const finalY = doc.lastAutoTable.finalY + 6;
-
-    // Totals
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(9);
-    doc.setTextColor(80, 80, 80);
-    doc.text("Subtotal (ex GST)", 140, finalY);
-    doc.text(`$${subtotal.toFixed(2)}`, 196, finalY, { align: "right" });
-    doc.text("GST (10%)", 140, finalY + 6);
-    doc.text(`$${gst.toFixed(2)}`, 196, finalY + 6, { align: "right" });
-
+    // Table header
+    let y = 56;
     doc.setFillColor(30, 30, 30);
-    doc.rect(133, finalY + 9, 67, 10, "F");
+    doc.rect(margin, y, pageW - margin * 2, 7, "F");
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(10);
-    doc.text("TOTAL (inc GST)", 136, finalY + 16);
-    doc.text(`$${total.toFixed(2)}`, 196, finalY + 16, { align: "right" });
-
-    // Footer note
-    doc.setTextColor(140, 140, 140);
-    doc.setFont("helvetica", "italic");
     doc.setFontSize(7);
-    doc.text("This purchase order was auto-generated from Alliance Priority Parts ERP · Low Stock Replenishment", 14, 285);
+    const headers = ["APP #", "PART #", "DESCRIPTION", "QTY", "UNIT COST", "TOTAL"];
+    const aligns = ["left", "left", "left", "center", "right", "right"];
+    headers.forEach((h, i) => {
+      const x = aligns[i] === "right" ? colX[i] + colWidths[i] - 1 : aligns[i] === "center" ? colX[i] + colWidths[i] / 2 : colX[i] + 1;
+      doc.text(h, x, y + 5, { align: aligns[i] });
+    });
+    y += 7;
+
+    // Table rows
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    lines.forEach((l, idx) => {
+      const rowH = 7;
+      if (idx % 2 === 0) {
+        doc.setFillColor(248, 248, 248);
+        doc.rect(margin, y, pageW - margin * 2, rowH, "F");
+      }
+      doc.setTextColor(80, 80, 80);
+      doc.text(l.app_part_number || "—", colX[0] + 1, y + 5);
+      doc.setTextColor(30, 30, 30);
+      doc.text(l.part_number || "—", colX[1] + 1, y + 5);
+      // Truncate description
+      const desc = (l.description || "").substring(0, 42);
+      doc.text(desc, colX[2] + 1, y + 5);
+      doc.text(String(l.quantity), colX[3] + colWidths[3] / 2, y + 5, { align: "center" });
+      doc.text(`$${(l.unit_cost || 0).toFixed(2)}`, colX[4] + colWidths[4] - 1, y + 5, { align: "right" });
+      doc.setFont("helvetica", "bold");
+      doc.text(`$${(l.total || l.quantity * l.unit_cost || 0).toFixed(2)}`, colX[5] + colWidths[5] - 1, y + 5, { align: "right" });
+      doc.setFont("helvetica", "normal");
+      // bottom border
+      doc.setDrawColor(220, 220, 220);
+      doc.line(margin, y + rowH, pageW - margin, y + rowH);
+      y += rowH;
+    });
+
+    // Totals
+    y += 6;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+    doc.setTextColor(80, 80, 80);
+    doc.text("Subtotal (ex GST)", 135, y);
+    doc.text(`$${subtotal.toFixed(2)}`, pageW - margin, y, { align: "right" });
+    y += 6;
+    doc.text("GST (10%)", 135, y);
+    doc.text(`$${gst.toFixed(2)}`, pageW - margin, y, { align: "right" });
+    y += 3;
+    doc.setFillColor(20, 20, 20);
+    doc.rect(130, y, pageW - margin - 130, 10, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text("TOTAL (inc GST)", 133, y + 7);
+    doc.text(`$${total.toFixed(2)}`, pageW - margin, y + 7, { align: "right" });
+
+    // Footer
+    doc.setTextColor(160, 160, 160);
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(6.5);
+    doc.text("Generated by Alliance Priority Parts ERP · Low Stock Auto-Reorder", margin, 288);
 
     doc.save(`PO-DRAFT_${supplier_name.replace(/\s+/g, "_")}_${today.replace(/\//g, "-")}.pdf`);
   };
