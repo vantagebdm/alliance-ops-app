@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { generateDocNumber } from "@/hooks/useDocNumber";
 import { AlertTriangle, Package, Plus, FileDown, RefreshCw, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
@@ -83,8 +84,10 @@ export default function SmartReorder() {
     const lines = getSupplierLines(supplierName);
     if (!lines.length) return;
     setSaving(supplierName);
+    const po_number = await generateDocNumber("purchase_order", "parts");
     const subtotal = lines.reduce((s, l) => s + l.total, 0);
     const po = await base44.entities.PurchaseOrder.create({
+      po_number,
       supplier_name: supplierName,
       status: "draft",
       po_type: "parts",
