@@ -19,6 +19,11 @@ export const PART_CATEGORIES = [
   { value: "consumables",  label: "Consumables" },
   { value: "compliance",   label: "Compliance" },
   { value: "chemicals",    label: "Chemicals" },
+  { value: "get",          label: "G.E.T" },
+  { value: "seals",        label: "Seals" },
+  { value: "fasteners",    label: "Fasteners" },
+  { value: "air_system",   label: "Air System" },
+  { value: "final_drive",  label: "Final Drive" },
   { value: "other",        label: "Other" },
 ];
 
@@ -48,10 +53,25 @@ export const SUBCATEGORIES = {
     "Degreasers", "Solvents", "Coolants", "Cleaning Chemicals", "Battery Chemicals",
     "Adhesives", "Sealants", "Treatment Fluids", "Other",
   ],
+  seals: [
+    "O-Rings", "Oil Seals", "Dust Seals", "Hydraulic Seals", "Gaskets", "Other",
+  ],
+  fasteners: [
+    "Bolts", "Nuts", "Washers", "Studs", "Pins", "Clips", "Other",
+  ],
+  air_system: [
+    "Air Dryers", "Valves", "Compressors", "Air Lines", "Fittings", "Filters", "Other",
+  ],
+  final_drive: [
+    "Drive Shafts", "Hubs", "Wheel Motors", "Gearboxes", "Other",
+  ],
+  get: [
+    "Teeth", "Adapters", "Shrouds", "Side Cutters", "Pins & Retainers", "Other",
+  ],
 };
 
 // Categories that have subcategories
-export const EXTENDED_CATEGORIES = ["oils", "sprays", "consumables", "compliance", "chemicals"];
+export const EXTENDED_CATEGORIES = ["oils", "sprays", "consumables", "compliance", "chemicals", "seals", "fasteners", "air_system", "final_drive", "get"];
 
 // Categories requiring dangerous goods / hazmat fields
 export const HAZMAT_CATEGORIES = ["oils", "sprays", "chemicals"];
@@ -75,5 +95,10 @@ export const CATEGORY_COLORS = {
   consumables:  "bg-teal-100 text-teal-700",
   compliance:   "bg-green-100 text-green-700",
   chemicals:    "bg-rose-100 text-rose-700",
+  get:          "bg-yellow-100 text-yellow-800",
+  seals:        "bg-indigo-100 text-indigo-700",
+  fasteners:    "bg-zinc-100 text-zinc-700",
+  air_system:   "bg-sky-100 text-sky-700",
+  final_drive:  "bg-violet-100 text-violet-700",
   other:        "bg-gray-100 text-gray-500",
 };

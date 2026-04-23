@@ -22,6 +22,11 @@
         "consumables",
         "compliance",
         "chemicals",
+        "get",
+        "seals",
+        "fasteners",
+        "air_system",
+        "final_drive",
         "other"
       ]
     },

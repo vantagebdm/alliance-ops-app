@@ -12,7 +12,8 @@ const CATEGORY_PREFIX_MAP = {
   electrical: "APP-ELE", body: "APP-BOD", filters: "APP-FLT", hydraulic: "APP-HYD",
   driveline: "APP-DRV", cooling: "APP-COL", fuel: "APP-FUL", tyres: "APP-TYR",
   oils: "APP-OIL", sprays: "APP-SPR", consumables: "APP-CON", compliance: "APP-COM",
-  chemicals: "APP-CHM", other: "APP-OTH"
+  chemicals: "APP-CHM", get: "APP-GET", seals: "APP-SEL", fasteners: "APP-FST",
+  air_system: "APP-AIR", final_drive: "APP-FDR", other: "APP-OTH"
 };
 
 async function generateAppPartNumber(category, existingParts) {
