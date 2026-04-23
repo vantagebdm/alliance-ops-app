@@ -1,4 +1,5 @@
-import { X } from "lucide-react";
+import { useRef, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 
 export default function Autocomplete({
   value,
@@ -11,9 +12,26 @@ export default function Autocomplete({
   placeholder = "Type to search...",
   className = "",
 }) {
+  const inputRef = useRef(null);
+  const [dropdownStyle, setDropdownStyle] = useState({});
+
+  useEffect(() => {
+    if (open && inputRef.current) {
+      const rect = inputRef.current.getBoundingClientRect();
+      setDropdownStyle({
+        position: "fixed",
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+        zIndex: 9999,
+      });
+    }
+  }, [open]);
+
   return (
     <div className="relative">
       <input
+        ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => onInputChange(e.target.value)}
@@ -22,8 +40,8 @@ export default function Autocomplete({
         placeholder={placeholder}
         className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       />
-      {open && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-input rounded-md shadow-lg z-50 max-h-48 overflow-y-auto">
+      {open && createPortal(
+        <div style={dropdownStyle} className="bg-white border border-input rounded-md shadow-xl max-h-56 overflow-y-auto">
           {loading ? (
             <div className="px-3 py-2 text-sm text-muted-foreground">Loading...</div>
           ) : suggestions.length > 0 ? (
@@ -34,7 +52,7 @@ export default function Autocomplete({
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => onSelect(item)}
+                  onMouseDown={(e) => { e.preventDefault(); onSelect(item); }}
                   className="w-full text-left px-3 py-2 hover:bg-accent text-sm transition-colors flex items-baseline gap-2"
                 >
                   <span>{primary}</span>
@@ -45,7 +63,8 @@ export default function Autocomplete({
           ) : (
             <div className="px-3 py-2 text-sm text-muted-foreground">No results</div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
