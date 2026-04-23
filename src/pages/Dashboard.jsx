@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import UrgentPanel from "../components/dashboard/UrgentPanel";
 import QuickActions from "../components/dashboard/QuickActions";
+import SalesTrends from "../components/dashboard/SalesTrends";
 import moment from "moment";
 
 const KPI = ({ label, value, sub, color = "text-foreground", border = "" }) => (
@@ -23,22 +24,25 @@ export default function Dashboard() {
   const [orders, setOrders] = useState([]);
   const [parts, setParts] = useState([]);
   const [pos, setPOs] = useState([]);
+  const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
-      const [enq, qt, ord, pt, po] = await Promise.allSettled([
+      const [enq, qt, ord, pt, po, inv] = await Promise.allSettled([
         base44.entities.Enquiry.list("-created_date", 100),
         base44.entities.Quote.list("-created_date", 100),
         base44.entities.SalesOrder.list("-created_date", 100),
         base44.entities.Part.list("-created_date", 200),
         base44.entities.PurchaseOrder.list("-created_date", 50),
+        base44.entities.Invoice.list("-created_date", 200),
       ]);
       if (enq.status === "fulfilled") setEnquiries(enq.value);
       if (qt.status === "fulfilled") setQuotes(qt.value);
       if (ord.status === "fulfilled") setOrders(ord.value);
       if (pt.status === "fulfilled") setParts(pt.value);
       if (po.status === "fulfilled") setPOs(po.value);
+      if (inv.status === "fulfilled") setInvoices(inv.value);
       setLoading(false);
     };
     load();
@@ -135,6 +139,9 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <QuickActions />
+
+        {/* Sales Trends & Pending Invoices */}
+        <SalesTrends invoices={invoices} />
 
         {/* Panels Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4">
