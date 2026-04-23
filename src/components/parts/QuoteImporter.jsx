@@ -134,8 +134,16 @@ export default function QuoteImporter({ onClose, onSaved }) {
       const updated = { ...l, [key]: value };
       // Regenerate app part number if category changes
       if (key === "category") {
-        generateAppPartNumber(value, existingParts).then(num => {
-          setLines(prev2 => prev2.map(l2 => l2._id === id ? { ...l2, app_part_number: num } : l2));
+        setLines(prev2 => {
+          // Combine existing DB parts + app_part_numbers already assigned to other lines
+          const otherLineNumbers = prev2
+            .filter(l2 => l2._id !== id && l2.app_part_number)
+            .map(l2 => ({ app_part_number: l2.app_part_number }));
+          const combined = [...existingParts, ...otherLineNumbers];
+          generateAppPartNumber(value, combined).then(num => {
+            setLines(prev3 => prev3.map(l3 => l3._id === id ? { ...l3, app_part_number: num } : l3));
+          });
+          return prev2;
         });
       }
       // Re-check ERP match if part number changes
