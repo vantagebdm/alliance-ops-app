@@ -209,7 +209,21 @@ export default function PartForm({ onClose, onSaved, initial }) {
                 <Input type="number" step="0.01" value={form.unit_cost} onChange={e => update("unit_cost", Number(e.target.value))} className="rounded-sm" />
               </div>
               <div>
-                <FieldLabel>Sell Price</FieldLabel>
+                <div className="flex items-center justify-between mb-1">
+                  <FieldLabel>Sell Price</FieldLabel>
+                  <div className="flex gap-1">
+                    {[30, 45, 65].map(pct => (
+                      <button
+                        key={pct}
+                        type="button"
+                        onClick={() => update("sell_price", parseFloat((form.unit_cost * (1 + pct / 100)).toFixed(2)))}
+                        className="px-2 py-0.5 text-[10px] font-heading font-bold uppercase tracking-wider rounded-sm bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-black transition-colors"
+                      >
+                        +{pct}%
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <Input type="number" step="0.01" value={form.sell_price} onChange={e => update("sell_price", Number(e.target.value))} className="rounded-sm" />
               </div>
               <div>
