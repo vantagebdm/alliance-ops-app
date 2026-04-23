@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { X, Upload, FileText, Loader2, Check, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { X, Upload, FileText, Loader2, Check, Trash2, ChevronDown, ChevronUp, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -89,6 +89,18 @@ export default function QuoteImporter({ onClose, onSaved }) {
         const appNum = await generateAppPartNumber(category, existing);
         // Shift sequence so each line gets a different number
         existing.push({ app_part_number: appNum }); // fake push to increment for next
+
+        // Check if part number already exists in ERP
+        const extractedPN = (l.part_number || "").trim().toUpperCase();
+        const matchedPart = extractedPN
+          ? existing.find(p =>
+              p.part_number?.toUpperCase() === extractedPN ||
+              p.supplier_sku?.toUpperCase() === extractedPN ||
+              p.oem_number?.toUpperCase() === extractedPN ||
+              p.aftermarket_number?.toUpperCase() === extractedPN
+            )
+          : null;
+
         return {
           _id: i,
           include: true,
@@ -101,7 +113,8 @@ export default function QuoteImporter({ onClose, onSaved }) {
           sell_price: 0,
           quantity: l.quantity || 1,
           app_part_number: appNum,
-          status: "active"
+          status: "active",
+          existing_match: matchedPart || null
         };
       }));
 
@@ -124,6 +137,19 @@ export default function QuoteImporter({ onClose, onSaved }) {
         generateAppPartNumber(value, existingParts).then(num => {
           setLines(prev2 => prev2.map(l2 => l2._id === id ? { ...l2, app_part_number: num } : l2));
         });
+      }
+      // Re-check ERP match if part number changes
+      if (key === "part_number") {
+        const pn = value.trim().toUpperCase();
+        const match = pn
+          ? existingParts.find(p =>
+              p.part_number?.toUpperCase() === pn ||
+              p.supplier_sku?.toUpperCase() === pn ||
+              p.oem_number?.toUpperCase() === pn ||
+              p.aftermarket_number?.toUpperCase() === pn
+            )
+          : null;
+        updated.existing_match = match || null;
       }
       return updated;
     }));
@@ -228,9 +254,19 @@ export default function QuoteImporter({ onClose, onSaved }) {
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-mono font-bold text-xs text-primary">{line.part_number}</span>
                         <span className="text-sm font-medium truncate">{line.name}</span>
+                        {line.existing_match && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-amber-500/10 border border-amber-500/30 text-amber-600 text-[10px] font-heading font-bold uppercase tracking-wider flex-shrink-0">
+                            <AlertCircle className="w-3 h-3" /> Already in ERP
+                          </span>
+                        )}
                       </div>
                       <div className="text-xs text-muted-foreground mt-0.5">
                         Qty: {line.quantity} · Cost: ${line.unit_cost.toFixed(2)} · Sell: {line.sell_price > 0 ? `$${line.sell_price.toFixed(2)}` : "Not set"}
+                        {line.existing_match && (
+                          <span className="ml-2 text-amber-600 font-medium">
+                            · Matched: {line.existing_match.name || line.existing_match.part_number} {line.existing_match.app_part_number ? `(${line.existing_match.app_part_number})` : ""}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <button
@@ -246,7 +282,22 @@ export default function QuoteImporter({ onClose, onSaved }) {
 
                   {/* Expanded edit panel */}
                   {expanded[line._id] && line.include && (
-                    <div className="px-4 pb-4 border-t border-border/50 pt-3 grid grid-cols-2 gap-3">
+                    <div className="px-4 pb-4 border-t border-border/50 pt-3 space-y-3">
+                      {line.existing_match && (
+                        <div className="flex items-start gap-2 p-3 rounded-sm bg-amber-500/10 border border-amber-500/30 text-amber-700">
+                          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                          <div className="text-xs">
+                            <p className="font-bold font-heading uppercase tracking-wider">Part already exists in ERP</p>
+                            <p className="mt-0.5">
+                              <span className="font-mono font-bold">{line.existing_match.part_number}</span>
+                              {line.existing_match.app_part_number && <> · <span className="text-primary font-semibold">{line.existing_match.app_part_number}</span></>}
+                              {line.existing_match.name && <> · {line.existing_match.name}</>}
+                            </p>
+                            <p className="mt-0.5 text-amber-600/80">Importing will create a duplicate. Consider unchecking this line.</p>
+                          </div>
+                        </div>
+                      )}
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Part Number</label>
                         <Input value={line.part_number} onChange={e => updateLine(line._id, "part_number", e.target.value.toUpperCase())} className="rounded-sm font-mono text-xs" />
@@ -299,6 +350,7 @@ export default function QuoteImporter({ onClose, onSaved }) {
                         </div>
                         <Input type="number" step="0.01" value={line.sell_price || ""} onChange={e => updateLine(line._id, "sell_price", Number(e.target.value))} className="rounded-sm text-xs" placeholder="0.00" />
                       </div>
+                    </div>
                     </div>
                   )}
                 </div>
