@@ -143,7 +143,7 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
           )}
         </div>
 
-        <div className="flex items-start gap-6 flex-shrink-0">
+        <div className="flex items-start gap-10 flex-shrink-0">
           {supplier.portal_url && (
             <button
               onClick={handleSupplierLogin}
