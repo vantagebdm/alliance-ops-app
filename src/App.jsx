@@ -26,6 +26,8 @@ import Notifications from './pages/Notifications';
 import ReceiveStock from './pages/ReceiveStock';
 import SmartReorder from './pages/SmartReorder';
 import Accounting from './pages/Accounting';
+import UserManagement from './pages/UserManagement';
+import { PermissionProvider } from '@/lib/PermissionContext';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -80,6 +82,7 @@ const AuthenticatedApp = () => {
         <Route path="/receive-stock" element={<ReceiveStock />} />
         <Route path="/smart-reorder" element={<SmartReorder />} />
         <Route path="/accounting" element={<Accounting />} />
+        <Route path="/admin/user-management" element={<UserManagement />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
@@ -91,12 +94,14 @@ function App() {
 
   return (
     <AuthProvider>
-      <QueryClientProvider client={queryClientInstance}>
-        <Router>
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
+      <PermissionProvider>
+        <QueryClientProvider client={queryClientInstance}>
+          <Router>
+            <AuthenticatedApp />
+          </Router>
+          <Toaster />
+        </QueryClientProvider>
+      </PermissionProvider>
     </AuthProvider>
   )
 }

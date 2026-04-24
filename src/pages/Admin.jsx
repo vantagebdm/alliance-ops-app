@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Users, Shield, Settings, Database, Hash, Package } from "lucide-react";
+import { Users, Shield, Settings, Database, Hash, Package, ChevronRight } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
 import DocumentNumberingSettings from "@/components/admin/DocumentNumberingSettings";
 import PartNumberingSettings from "@/components/admin/PartNumberingSettings";
+import { Link } from "react-router-dom";
 
 export default function Admin() {
   const [users, setUsers] = useState([]);
@@ -27,7 +28,7 @@ export default function Admin() {
   ];
 
   const ADMIN_SECTIONS = [
-    { icon: Users, label: "User Management", desc: "Manage team members and permissions" },
+    { icon: Users, label: "User Management", desc: "Manage team members, roles, permissions and access control", link: "/admin/user-management", highlight: true },
     { icon: Shield, label: "Security", desc: "Authentication and access control" },
     { icon: Database, label: "Data Management", desc: "Import, export, and backup data" },
     { icon: Settings, label: "System Settings", desc: "Configure ERP preferences" },
@@ -40,16 +41,26 @@ export default function Admin() {
       <PageHeader title="Admin" subtitle="System administration and settings" />
       <div className="p-6 space-y-6">
         {/* Quick access cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {ADMIN_SECTIONS.map((section, i) => {
             const Icon = section.icon;
-            return (
-              <div key={i} className="bg-white border border-border rounded-sm p-5 hover:border-primary/30 transition-colors cursor-pointer">
-                <Icon className="w-6 h-6 text-primary mb-3" />
-                <h3 className="font-heading text-sm font-semibold uppercase tracking-wider">{section.label}</h3>
-                <p className="text-xs text-muted-foreground mt-1">{section.desc}</p>
+            const card = (
+              <div className={`border rounded-sm p-5 hover:border-primary/40 transition-all cursor-pointer group flex items-start justify-between
+                ${section.highlight ? "bg-[hsl(0,0%,10%)] border-primary/25 hover:bg-[hsl(0,0%,12%)]" : "bg-[hsl(0,0%,10%)] border-[hsl(0,0%,18%)]"}`}>
+                <div>
+                  <Icon className="w-6 h-6 text-primary mb-3" />
+                  <h3 className="font-heading text-sm font-semibold uppercase tracking-wider text-white">{section.label}</h3>
+                  <p className="text-xs text-white/40 mt-1">{section.desc}</p>
+                  {section.highlight && (
+                    <span className="inline-block mt-2 text-[9px] font-heading uppercase tracking-wider text-primary border border-primary/30 px-1.5 py-0.5 rounded-sm">
+                      Full Module Active
+                    </span>
+                  )}
+                </div>
+                {section.link && <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-primary transition-colors mt-1" />}
               </div>
             );
+            return section.link ? <Link key={i} to={section.link}>{card}</Link> : <div key={i}>{card}</div>;
           })}
         </div>
 
