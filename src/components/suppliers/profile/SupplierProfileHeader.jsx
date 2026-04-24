@@ -100,7 +100,7 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-1">
             <h2 className="font-heading text-xl font-bold text-white uppercase tracking-wide truncate">
-              {supplier.name}
+              {supplier.trading_name || supplier.name}
             </h2>
             <span className={`inline-flex px-2 py-0.5 text-[9px] font-heading font-bold uppercase tracking-wider border rounded-sm flex-shrink-0 ${statusColor}`}>
               {statusLabel}
@@ -111,8 +111,8 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
               </span>
             )}
           </div>
-          {supplier.trading_name && (
-            <p className="text-white/40 text-xs font-heading uppercase tracking-wider">Trading: {supplier.trading_name}</p>
+          {supplier.trading_name && supplier.trading_name !== supplier.name && (
+            <p className="text-white/40 text-xs font-heading uppercase tracking-wider">{supplier.name}</p>
           )}
 
           <div className="flex flex-wrap gap-4 mt-3 text-[11px]">
