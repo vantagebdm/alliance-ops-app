@@ -81,7 +81,6 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
 
   const QUICK_ACTIONS = [
     { icon: Edit2, label: "Edit", onClick: onEdit },
-    ...(supplier.portal_url ? [{ icon: LogIn, label: "Supplier Login", onClick: handleSupplierLogin, login: true }] : []),
     { icon: ShoppingCart, label: "New PO", onClick: onNewPO },
     { icon: Upload, label: uploading ? "Uploading..." : "Upload Price List", onClick: handleUploadPriceList, disabled: uploading },
     { icon: FileText, label: "View Open POs", onClick: onViewOpenPOs },
@@ -144,7 +143,17 @@ export default function SupplierProfileHeader({ supplier, onEdit, onClose, onSta
           )}
         </div>
 
-        <button onClick={onClose} className="text-white/40 hover:text-white flex-shrink-0 mt-1 text-lg leading-none">✕</button>
+        <div className="flex items-start gap-3 flex-shrink-0">
+          {supplier.portal_url && (
+            <button
+              onClick={handleSupplierLogin}
+              className="flex items-center gap-2 px-4 py-2 text-[11px] font-heading uppercase tracking-wider border-2 border-primary rounded-sm text-primary font-bold animate-pulse hover:animate-none hover:bg-primary hover:text-black transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5" /> Supplier Login
+            </button>
+          )}
+          <button onClick={onClose} className="text-white/40 hover:text-white mt-1 text-lg leading-none">✕</button>
+        </div>
       </div>
 
       <input ref={fileInputRef} type="file" accept=".pdf,.xls,.xlsx,.csv" className="hidden" onChange={handleFileSelected} />
