@@ -6,7 +6,7 @@ export const COMPANY = {
   state: "WA",
   postcode: "6714",
   phone: "0402 910 119",
-  email: "info@alliancepartsgroup.com.au",
+  email: "accounts@alliancepartsgroup.com.au",
   website: "www.alliancepartsgroup.com.au",
   hours: "Mon–Sat: 6:00am – 6:00pm (24/7 urgent availability)",
   abn: "", // Add ABN here when available
