@@ -1,0 +1,94 @@
+{
+  "name": "Payment",
+  "type": "object",
+  "properties": {
+    "payment_number": {
+      "type": "string"
+    },
+    "payment_type": {
+      "type": "string",
+      "enum": [
+        "customer_payment",
+        "supplier_payment",
+        "payroll_payment",
+        "bas_payment",
+        "other"
+      ],
+      "default": "customer_payment"
+    },
+    "payment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "amount": {
+      "type": "number",
+      "default": 0
+    },
+    "payment_method": {
+      "type": "string",
+      "enum": [
+        "eft",
+        "card",
+        "cash",
+        "cheque",
+        "direct_debit",
+        "bpay"
+      ],
+      "default": "eft"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "bank_account_id": {
+      "type": "string"
+    },
+    "bank_account_name": {
+      "type": "string"
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "invoice_id": {
+      "type": "string"
+    },
+    "invoice_number": {
+      "type": "string"
+    },
+    "bill_id": {
+      "type": "string"
+    },
+    "bill_number": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "attachment_url": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "processed",
+        "cancelled"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "payment_type",
+    "payment_date",
+    "amount"
+  ]
+}

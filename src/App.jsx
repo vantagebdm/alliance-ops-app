@@ -25,6 +25,7 @@ import CreditAppTemplates from './pages/CreditAppTemplates';
 import Notifications from './pages/Notifications';
 import ReceiveStock from './pages/ReceiveStock';
 import SmartReorder from './pages/SmartReorder';
+import Accounting from './pages/Accounting';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/receive-stock" element={<ReceiveStock />} />
         <Route path="/smart-reorder" element={<SmartReorder />} />
+        <Route path="/accounting" element={<Accounting />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

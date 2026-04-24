@@ -1,0 +1,60 @@
+{
+  "name": "ChartOfAccount",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "asset",
+        "liability",
+        "income",
+        "cogs",
+        "expense",
+        "equity"
+      ]
+    },
+    "category": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "is_system": {
+      "type": "boolean",
+      "default": false
+    },
+    "gst_treatment": {
+      "type": "string",
+      "enum": [
+        "taxable",
+        "gst_free",
+        "out_of_scope",
+        "input_taxed"
+      ],
+      "default": "taxable"
+    },
+    "opening_balance": {
+      "type": "number",
+      "default": 0
+    },
+    "current_balance": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "code",
+    "name",
+    "type"
+  ]
+}

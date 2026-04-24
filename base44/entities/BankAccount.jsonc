@@ -1,0 +1,59 @@
+{
+  "name": "BankAccount",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "bank_name": {
+      "type": "string"
+    },
+    "bsb": {
+      "type": "string"
+    },
+    "account_number": {
+      "type": "string"
+    },
+    "account_type": {
+      "type": "string",
+      "enum": [
+        "cheque",
+        "savings",
+        "credit_card",
+        "loan"
+      ],
+      "default": "cheque"
+    },
+    "currency": {
+      "type": "string",
+      "default": "AUD"
+    },
+    "opening_balance": {
+      "type": "number",
+      "default": 0
+    },
+    "current_balance": {
+      "type": "number",
+      "default": 0
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "gl_account_code": {
+      "type": "string"
+    },
+    "last_reconciled_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "last_reconciled_balance": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "bank_name"
+  ]
+}

@@ -1,0 +1,96 @@
+{
+  "name": "Journal",
+  "type": "object",
+  "properties": {
+    "journal_number": {
+      "type": "string"
+    },
+    "journal_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "posted"
+      ],
+      "default": "draft"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "manual",
+        "system",
+        "payroll",
+        "bas",
+        "bank"
+      ],
+      "default": "manual"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "gl_account_code": {
+            "type": "string"
+          },
+          "gl_account_name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "debit": {
+            "type": "number",
+            "default": 0
+          },
+          "credit": {
+            "type": "number",
+            "default": 0
+          },
+          "gst_treatment": {
+            "type": "string",
+            "default": "no_gst"
+          },
+          "gst_amount": {
+            "type": "number",
+            "default": 0
+          }
+        }
+      }
+    },
+    "total_debits": {
+      "type": "number",
+      "default": 0
+    },
+    "total_credits": {
+      "type": "number",
+      "default": 0
+    },
+    "attachment_url": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "journal_date",
+    "description"
+  ]
+}

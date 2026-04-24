@@ -1,0 +1,115 @@
+{
+  "name": "Employee",
+  "type": "object",
+  "properties": {
+    "employee_number": {
+      "type": "string"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "postcode": {
+      "type": "string"
+    },
+    "employment_type": {
+      "type": "string",
+      "enum": [
+        "full_time",
+        "part_time",
+        "casual",
+        "contractor"
+      ],
+      "default": "full_time"
+    },
+    "pay_basis": {
+      "type": "string",
+      "enum": [
+        "salary",
+        "hourly"
+      ],
+      "default": "hourly"
+    },
+    "pay_rate": {
+      "type": "number",
+      "default": 0
+    },
+    "super_rate": {
+      "type": "number",
+      "default": 11.5
+    },
+    "super_fund": {
+      "type": "string"
+    },
+    "super_member_number": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive",
+        "terminated"
+      ],
+      "default": "active"
+    },
+    "annual_leave_balance": {
+      "type": "number",
+      "default": 0
+    },
+    "personal_leave_balance": {
+      "type": "number",
+      "default": 0
+    },
+    "tfn_placeholder": {
+      "type": "string"
+    },
+    "bank_bsb": {
+      "type": "string"
+    },
+    "bank_account": {
+      "type": "string"
+    },
+    "emergency_contact_name": {
+      "type": "string"
+    },
+    "emergency_contact_phone": {
+      "type": "string"
+    },
+    "gl_wages_account": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "first_name",
+    "last_name"
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "name": "BASReturn",
+  "type": "object",
+  "properties": {
+    "bas_number": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string",
+      "enum": [
+        "monthly",
+        "quarterly",
+        "annually"
+      ],
+      "default": "quarterly"
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "period_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "prepared",
+        "lodged",
+        "paid"
+      ],
+      "default": "draft"
+    },
+    "g1_total_sales": {
+      "type": "number",
+      "default": 0
+    },
+    "g1a_gst_on_sales": {
+      "type": "number",
+      "default": 0
+    },
+    "g1b_gst_on_purchases": {
+      "type": "number",
+      "default": 0
+    },
+    "net_gst": {
+      "type": "number",
+      "default": 0
+    },
+    "payg_withheld": {
+      "type": "number",
+      "default": 0
+    },
+    "bas_payable": {
+      "type": "number",
+      "default": 0
+    },
+    "lodgement_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "payment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "payment_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "notes": {
+      "type": "string"
+    },
+    "prepared_by": {
+      "type": "string"
+    },
+    "lodged_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "period",
+    "period_start",
+    "period_end"
+  ]
+}

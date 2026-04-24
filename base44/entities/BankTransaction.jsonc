@@ -1,0 +1,99 @@
+{
+  "name": "BankTransaction",
+  "type": "object",
+  "properties": {
+    "bank_account_id": {
+      "type": "string"
+    },
+    "bank_account_name": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "description": {
+      "type": "string"
+    },
+    "reference": {
+      "type": "string"
+    },
+    "debit": {
+      "type": "number",
+      "default": 0
+    },
+    "credit": {
+      "type": "number",
+      "default": 0
+    },
+    "gst_treatment": {
+      "type": "string",
+      "enum": [
+        "taxable",
+        "gst_free",
+        "out_of_scope",
+        "input_taxed",
+        "no_gst"
+      ],
+      "default": "no_gst"
+    },
+    "gst_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "gl_account_code": {
+      "type": "string"
+    },
+    "gl_account_name": {
+      "type": "string"
+    },
+    "supplier_id": {
+      "type": "string"
+    },
+    "supplier_name": {
+      "type": "string"
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "reconciliation_status": {
+      "type": "string",
+      "enum": [
+        "unmatched",
+        "suggested",
+        "matched",
+        "reconciled"
+      ],
+      "default": "unmatched"
+    },
+    "matched_to_id": {
+      "type": "string"
+    },
+    "matched_to_type": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "attachment_url": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "enum": [
+        "import",
+        "manual",
+        "system"
+      ],
+      "default": "manual"
+    }
+  },
+  "required": [
+    "bank_account_id",
+    "date",
+    "description"
+  ]
+}

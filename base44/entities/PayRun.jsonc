@@ -1,0 +1,114 @@
+{
+  "name": "PayRun",
+  "type": "object",
+  "properties": {
+    "pay_run_number": {
+      "type": "string"
+    },
+    "pay_period_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "pay_period_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "pay_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "posted",
+        "paid"
+      ],
+      "default": "draft"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "employee_id": {
+            "type": "string"
+          },
+          "employee_name": {
+            "type": "string"
+          },
+          "ordinary_hours": {
+            "type": "number",
+            "default": 0
+          },
+          "overtime_hours": {
+            "type": "number",
+            "default": 0
+          },
+          "pay_rate": {
+            "type": "number",
+            "default": 0
+          },
+          "gross_pay": {
+            "type": "number",
+            "default": 0
+          },
+          "allowances": {
+            "type": "number",
+            "default": 0
+          },
+          "deductions": {
+            "type": "number",
+            "default": 0
+          },
+          "payg_withheld": {
+            "type": "number",
+            "default": 0
+          },
+          "super_amount": {
+            "type": "number",
+            "default": 0
+          },
+          "net_pay": {
+            "type": "number",
+            "default": 0
+          }
+        }
+      }
+    },
+    "total_gross": {
+      "type": "number",
+      "default": 0
+    },
+    "total_payg": {
+      "type": "number",
+      "default": 0
+    },
+    "total_super": {
+      "type": "number",
+      "default": 0
+    },
+    "total_net": {
+      "type": "number",
+      "default": 0
+    },
+    "bank_account_id": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "pay_period_start",
+    "pay_period_end",
+    "pay_date"
+  ]
+}

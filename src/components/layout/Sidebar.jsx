@@ -2,7 +2,8 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, MessageSquare, FileText, ShoppingCart,
   Package, Warehouse, ShoppingBag, Truck, Users,
-  Receipt, BarChart3, Settings, X, Send, TrendingUp, ClipboardList, ArrowDownToLine, BarChart2, RefreshCw
+  Receipt, BarChart3, Settings, X, Send, TrendingUp, ClipboardList, ArrowDownToLine, BarChart2, RefreshCw,
+  BookOpen, Building2, Calculator, BookMarked, CreditCard, DollarSign
 } from "lucide-react";
 
 const NAV_SECTIONS = [
@@ -34,6 +35,20 @@ const NAV_SECTIONS = [
       { label: "Invoices", icon: Receipt, path: "/invoices" },
       { label: "Cashflow", icon: TrendingUp, path: "/cashflow" },
       { label: "Credit Application", icon: ClipboardList, path: "/credit-application" },
+    ]
+  },
+  {
+    label: "Accounting",
+    items: [
+      { label: "Dashboard", icon: LayoutDashboard, path: "/accounting?tab=dashboard" },
+      { label: "Chart of Accounts", icon: BookOpen, path: "/accounting?tab=chart_of_accounts" },
+      { label: "Bank & Recon", icon: Building2, path: "/accounting?tab=bank" },
+      { label: "Accounts Receivable", icon: DollarSign, path: "/accounting?tab=ar" },
+      { label: "Accounts Payable", icon: CreditCard, path: "/accounting?tab=ap" },
+      { label: "Payroll", icon: Users, path: "/accounting?tab=payroll" },
+      { label: "BAS Preparation", icon: Calculator, path: "/accounting?tab=bas" },
+      { label: "Journals", icon: BookMarked, path: "/accounting?tab=journals" },
+      { label: "Reports", icon: BarChart2, path: "/accounting?tab=reports" },
     ]
   },
   {
@@ -77,8 +92,9 @@ export default function Sidebar({ open, onClose }) {
               <div className="space-y-0.5">
                 {section.items.map(item => {
                   const Icon = item.icon;
-                  const isActive = location.pathname === item.path ||
-                    (item.path !== "/" && location.pathname.startsWith(item.path));
+                  const itemPath = item.path.split("?")[0];
+                  const isActive = (location.pathname === itemPath && (!item.path.includes("?") || location.search === `?${item.path.split("?")[1]}`)) ||
+                    (itemPath !== "/" && location.pathname.startsWith(itemPath) && !item.path.includes("?") && itemPath !== "/accounting");
                   return (
                     <Link
                       key={item.path}
