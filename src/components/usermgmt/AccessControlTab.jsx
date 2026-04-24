@@ -3,7 +3,6 @@ import { base44 } from "@/api/base44Client";
 import { Search, Save, Eye, EyeOff, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DEFAULT_ROLES } from "@/lib/permissions";
 
 const FIELD_RESTRICTIONS = [
   { key: "hide_cost_price", label: "Cost Price", desc: "Hide unit cost and landed cost from this user" },
