@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Search, Star, Filter, X } from "lucide-react";
+import { Plus, Search, Star, Filter, X, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -9,6 +9,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import SupplierOnboardingForm from "../components/suppliers/SupplierOnboardingForm";
 import SupplierDetail from "../components/suppliers/SupplierDetail";
 import POForm from "../components/purchasing/POForm";
+import SupplierAppPreview from "../components/supplierapp/SupplierAppPreview";
 
 function StarRating({ value }) {
   if (!value) return <span className="text-muted-foreground text-xs">—</span>;
@@ -32,6 +33,7 @@ export default function Suppliers() {
   const [filterCategory, setFilterCategory] = useState("all");
   const [showPOForm, setShowPOForm] = useState(false);
   const [poInitial, setPoInitial] = useState(null);
+  const [showSupplierApp, setShowSupplierApp] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -87,10 +89,16 @@ export default function Suppliers() {
         title="Suppliers"
         subtitle={`${suppliers.length} suppliers registered`}
         actions={
-          <Button onClick={() => { setEditTarget(null); setShowForm(true); }}
-            className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
-            <Plus className="w-4 h-4 mr-1" /> Add Supplier
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setShowSupplierApp(true)}
+              className="font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
+              <FileText className="w-4 h-4 mr-1" /> Supplier Application Form
+            </Button>
+            <Button onClick={() => { setEditTarget(null); setShowForm(true); }}
+              className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+              <Plus className="w-4 h-4 mr-1" /> Add Supplier
+            </Button>
+          </div>
         }
       />
 
@@ -216,6 +224,10 @@ export default function Suppliers() {
             });
           }}
         />
+      )}
+
+      {showSupplierApp && (
+        <SupplierAppPreview onClose={() => setShowSupplierApp(false)} />
       )}
 
       {showPOForm && (
