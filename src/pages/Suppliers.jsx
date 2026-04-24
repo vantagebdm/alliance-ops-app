@@ -158,8 +158,8 @@ export default function Suppliers() {
                     onClick={() => setSelected(s)}
                     className="hover:bg-muted/30 cursor-pointer transition-colors">
                     <td className="px-4 py-2.5">
-                      <div className="font-semibold text-foreground">{s.name}</div>
-                      {s.trading_name && <div className="text-[10px] text-muted-foreground">{s.trading_name}</div>}
+                     <div className="font-semibold text-foreground">{s.trading_name || s.name}</div>
+                     {s.trading_name && s.trading_name !== s.name && <div className="text-[10px] text-muted-foreground">{s.name}</div>}
                     </td>
                     <td className="px-4 py-2.5 text-xs text-muted-foreground font-mono">{s.supplier_code || "—"}</td>
                     <td className="px-4 py-2.5">
