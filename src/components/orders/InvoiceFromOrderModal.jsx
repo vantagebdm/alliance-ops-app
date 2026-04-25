@@ -23,7 +23,9 @@ function calcDueDate(terms) {
   if (!terms) return today;
   if (terms === "7_days") d.setDate(d.getDate() + 7);
   else if (terms === "14_days") d.setDate(d.getDate() + 14);
-  else if (terms === "30_days_eom") { d.setMonth(d.getMonth() + 1); d.setDate(0); }
+  else if (terms === "21_days") d.setDate(d.getDate() + 21);
+  else if (terms === "30_days") d.setDate(d.getDate() + 30);
+  else if (terms === "30_days_eom") { d.setMonth(d.getMonth() + 1); d.setDate(0); d.setDate(d.getDate() + 30); }
   return format(d, "yyyy-MM-dd");
 }
 

@@ -210,11 +210,16 @@
       "type": "string",
       "enum": [
         "COD",
-        "Net_7",
-        "Net_14",
-        "Net_30"
+        "due_on_receipt",
+        "7_days",
+        "14_days",
+        "21_days",
+        "30_days",
+        "Net_30",
+        "30_days_eom",
+        "custom"
       ],
-      "default": "Net_30"
+      "default": "30_days_eom"
     },
     "pricing_tier": {
       "type": "string",

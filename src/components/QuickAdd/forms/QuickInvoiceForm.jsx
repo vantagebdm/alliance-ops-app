@@ -22,11 +22,13 @@ const INVOICE_SOURCES = [
   { value: "account_charge", label: "Account Charge Invoice" },
 ];
 
-const PAYMENT_TERMS = ["due_on_receipt", "7_days", "14_days", "30_days_eom", "custom"];
+const PAYMENT_TERMS = ["due_on_receipt", "7_days", "14_days", "21_days", "30_days", "30_days_eom", "custom"];
 const PAYMENT_TERMS_LABELS = {
   due_on_receipt: "Due on Receipt",
   "7_days": "7 Days",
   "14_days": "14 Days",
+  "21_days": "21 Days",
+  "30_days": "30 Days",
   "30_days_eom": "30 Days EOM",
   custom: "Custom",
 };
@@ -118,6 +120,8 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
     const date = new Date(invoiceDate);
     if (paymentTerms === "7_days") { date.setDate(date.getDate() + 7); return format(date, "yyyy-MM-dd"); }
     if (paymentTerms === "14_days") { date.setDate(date.getDate() + 14); return format(date, "yyyy-MM-dd"); }
+    if (paymentTerms === "21_days") { date.setDate(date.getDate() + 21); return format(date, "yyyy-MM-dd"); }
+    if (paymentTerms === "30_days") { date.setDate(date.getDate() + 30); return format(date, "yyyy-MM-dd"); }
     if (paymentTerms === "30_days_eom") { date.setMonth(date.getMonth() + 1); date.setDate(0); date.setDate(date.getDate() + 30); return format(date, "yyyy-MM-dd"); }
     if (paymentTerms === "due_on_receipt") return invoiceDate;
     return "";
