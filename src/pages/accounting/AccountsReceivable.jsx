@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { postInvoicePaymentToLedger } from "@/lib/accountingLedger";
 import { Search, AlertTriangle, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,7 @@ export default function AccountsReceivable() {
     const balance = inv.total - totalPaid;
     const newStatus = balance <= 0 ? "paid" : "part_paid";
     await base44.entities.Invoice.update(inv.id, { amount_paid: totalPaid, status: newStatus });
+    await postInvoicePaymentToLedger(inv, paid);
     setPaymentModal(null); setPaymentAmount("");
     await load(); setSaving(false);
   };

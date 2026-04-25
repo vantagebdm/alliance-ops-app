@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { postInvoiceToLedger } from "@/lib/accountingLedger";
 import { X, AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -190,6 +191,9 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
       };
 
       const invoice = await base44.entities.Invoice.create(invoiceData);
+
+      // Post to accounting ledger
+      await postInvoiceToLedger(invoice);
 
       // Update order: compute newly invoiced state
       const updatedItems = (order.items || []).map(item => {

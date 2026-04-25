@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
+import { postBillToLedger, postBillPaymentToLedger } from "@/lib/accountingLedger";
 import { Plus, Search, X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +51,8 @@ export default function AccountsPayable() {
   const save = async () => {
     setSaving(true);
     const t = totals();
-    await base44.entities.SupplierBill.create({ ...form, lines: lines.map(calcLine), ...t });
+    const bill = await base44.entities.SupplierBill.create({ ...form, lines: lines.map(calcLine), ...t });
+    await postBillToLedger(bill);
     setShowForm(false); setForm(BLANK); setLines([{ description: "", quantity: 1, unit_price: 0, gst_treatment: "taxable", gst_amount: 0, total: 0 }]);
     await load(); setSaving(false);
   };
@@ -62,6 +64,7 @@ export default function AccountsPayable() {
 
   const markPaid = async (bill) => {
     await base44.entities.SupplierBill.update(bill.id, { status: "paid", amount_paid: bill.total, balance_due: 0 });
+    await postBillPaymentToLedger({ ...bill, amount_paid: bill.total });
     await load();
   };
 
