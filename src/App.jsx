@@ -28,6 +28,7 @@ import SmartReorder from './pages/SmartReorder';
 import Accounting from './pages/Accounting';
 import UserManagement from './pages/UserManagement';
 import Security from './pages/Security';
+import DataManagement from './pages/DataManagement';
 import { PermissionProvider } from '@/lib/PermissionContext';
 
 const AuthenticatedApp = () => {
@@ -85,6 +86,7 @@ const AuthenticatedApp = () => {
         <Route path="/accounting" element={<Accounting />} />
         <Route path="/admin/user-management" element={<UserManagement />} />
         <Route path="/admin/security" element={<Security />} />
+        <Route path="/admin/data-management" element={<DataManagement />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
