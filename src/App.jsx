@@ -30,6 +30,8 @@ import UserManagement from './pages/UserManagement';
 import Security from './pages/Security';
 import DataManagement from './pages/DataManagement';
 import SystemSettings from './pages/SystemSettings';
+import DocumentNumbering from './pages/DocumentNumbering';
+import PartNumbering from './pages/PartNumbering';
 import { PermissionProvider } from '@/lib/PermissionContext';
 
 const AuthenticatedApp = () => {
@@ -89,6 +91,8 @@ const AuthenticatedApp = () => {
         <Route path="/admin/security" element={<Security />} />
         <Route path="/admin/data-management" element={<DataManagement />} />
         <Route path="/admin/system-settings" element={<SystemSettings />} />
+        <Route path="/admin/document-numbering" element={<DocumentNumbering />} />
+        <Route path="/admin/part-numbering" element={<PartNumbering />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>

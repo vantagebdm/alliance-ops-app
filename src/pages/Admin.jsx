@@ -32,8 +32,8 @@ export default function Admin() {
     { icon: Shield, label: "Security", desc: "Authentication and access control", link: "/admin/security", highlight: true },
     { icon: Database, label: "Data Management", desc: "Import, export, and backup data", link: "/admin/data-management", highlight: true },
     { icon: Settings, label: "System Settings", desc: "Configure ERP preferences", link: "/admin/system-settings", highlight: true },
-    { icon: Hash, label: "Document Numbering", desc: "Configure auto-sequencing for all document types" },
-    { icon: Package, label: "Part Numbering", desc: "Configure APP internal part number generation" },
+    { icon: Hash, label: "Document Numbering", desc: "Configure auto-sequencing for all document types", link: "/admin/document-numbering", highlight: true },
+    { icon: Package, label: "Part Numbering", desc: "Configure APP internal part number generation", link: "/admin/part-numbering", highlight: true },
   ];
 
   return (
