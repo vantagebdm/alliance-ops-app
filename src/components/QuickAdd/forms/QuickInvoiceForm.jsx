@@ -246,7 +246,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-6xl rounded-sm shadow-2xl mx-4 flex flex-col">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-6xl rounded-sm shadow-2xl mx-4 flex flex-col">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm sticky top-0 z-10">
@@ -264,7 +264,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 1 — SOURCE */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={1} label="Invoice Source" open={openSections.includes(0)} onToggle={() => toggleSection(0)} />
             </div>
             {openSections.includes(0) && (
@@ -280,7 +280,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
                         className={`px-3 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm border transition-colors ${
                           source === s.value
                             ? "bg-primary text-black border-primary"
-                            : "bg-white text-foreground border-border hover:border-primary/50"
+                            : "bg-[hsl(0,0%,14%)] text-white/70 border-[hsl(0,0%,22%)] hover:border-primary/50"
                         }`}
                       >
                         {s.label}
@@ -361,7 +361,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 2 — CUSTOMER */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={2} label="Customer & Billing Details" open={openSections.includes(1)} onToggle={() => toggleSection(1)} />
             </div>
             {openSections.includes(1) && (
@@ -454,7 +454,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 3 — INVOICE DETAILS */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={3} label="Invoice Details" open={openSections.includes(2)} onToggle={() => toggleSection(2)} />
             </div>
             {openSections.includes(2) && (
@@ -497,7 +497,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 4 — LINE ITEMS */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={4} label="Line Items" open={openSections.includes(3)} onToggle={() => toggleSection(3)} />
             </div>
             {openSections.includes(3) && (
@@ -516,11 +516,11 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
                     </div>
 
                     {form.items.map((line, i) => (
-                      <div key={i} className={`grid gap-2 items-center p-2 rounded-sm border ${line._charge ? "bg-blue-50/50 border-blue-200" : "bg-white border-border"}`} style={{ gridTemplateColumns: "1fr 2fr 60px 90px 60px 40px 80px 32px" }}>
+                      <div key={i} className={`grid gap-2 items-center p-2 rounded-sm border ${line._charge ? "bg-blue-500/10 border-blue-500/30" : "bg-[hsl(0,0%,13%)] border-[hsl(0,0%,20%)]"}`} style={{ gridTemplateColumns: "1fr 2fr 60px 90px 60px 40px 80px 32px" }}>
                         {/* Part # */}
                         <div>
                           {line._charge ? (
-                            <span className="text-[10px] font-heading text-blue-600 uppercase tracking-wider">{line._charge}</span>
+                            <span className="text-[10px] font-heading text-blue-400 uppercase tracking-wider">{line._charge}</span>
                           ) : (
                             <Autocomplete
                               value={line.part_number}
@@ -540,16 +540,16 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
                         </div>
                         {/* Description */}
                         <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
-                          placeholder="Description" className="h-9 w-full px-3 border border-input rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
-                        {/* Qty */}
-                        <input type="number" min="0" step="0.01" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
-                          className="h-9 w-full px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
-                        {/* Unit Price */}
-                        <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
-                          className="h-9 w-full px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
-                        {/* Disc% */}
-                        <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
-                          className="h-9 w-full px-2 border border-input rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                          placeholder="Description" className="h-9 w-full px-3 border border-[hsl(0,0%,22%)] bg-[hsl(0,0%,10%)] text-white rounded-sm text-sm focus:outline-none focus:ring-1 focus:ring-ring" />
+                          {/* Qty */}
+                          <input type="number" min="0" step="0.01" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
+                           className="h-9 w-full px-2 border border-[hsl(0,0%,22%)] bg-[hsl(0,0%,10%)] text-white rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                          {/* Unit Price */}
+                          <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
+                           className="h-9 w-full px-2 border border-[hsl(0,0%,22%)] bg-[hsl(0,0%,10%)] text-white rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
+                          {/* Disc% */}
+                          <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
+                           className="h-9 w-full px-2 border border-[hsl(0,0%,22%)] bg-[hsl(0,0%,10%)] text-white rounded-sm text-sm text-right focus:outline-none focus:ring-1 focus:ring-ring" />
                         {/* GST */}
                         <div className="flex justify-center">
                           <input type="checkbox" checked={line.gst} onChange={e => updateLine(i, "gst", e.target.checked)}
@@ -571,19 +571,19 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
                   <Button variant="outline" size="sm" onClick={addLine} className="rounded-sm font-heading text-xs uppercase tracking-wider">
                     <Plus className="w-3 h-3 mr-1" /> Add Line
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => addCharge("Freight")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-600 border-blue-300 hover:bg-blue-50">
+                  <Button variant="outline" size="sm" onClick={() => addCharge("Freight")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-400 border-blue-500/30 hover:bg-blue-500/10">
                     + Freight
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => addCharge("Handling")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-600 border-blue-300 hover:bg-blue-50">
+                  <Button variant="outline" size="sm" onClick={() => addCharge("Handling")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-400 border-blue-500/30 hover:bg-blue-500/10">
                     + Handling
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => addCharge("Remote Delivery Surcharge")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-600 border-blue-300 hover:bg-blue-50">
+                  <Button variant="outline" size="sm" onClick={() => addCharge("Remote Delivery Surcharge")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-400 border-blue-500/30 hover:bg-blue-500/10">
                     + Remote Surcharge
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => addCharge("After-hours Surcharge")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-600 border-blue-300 hover:bg-blue-50">
+                  <Button variant="outline" size="sm" onClick={() => addCharge("After-hours Surcharge")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-400 border-blue-500/30 hover:bg-blue-500/10">
                     + After-hours
                   </Button>
-                  <Button variant="outline" size="sm" onClick={() => addCharge("Miscellaneous")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-600 border-blue-300 hover:bg-blue-50">
+                  <Button variant="outline" size="sm" onClick={() => addCharge("Miscellaneous")} className="rounded-sm font-heading text-xs uppercase tracking-wider text-blue-400 border-blue-500/30 hover:bg-blue-500/10">
                     + Misc Charge
                   </Button>
                 </div>
@@ -593,7 +593,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 5 — TOTALS */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={5} label="Charges & Totals" open={openSections.includes(4)} onToggle={() => toggleSection(4)} />
             </div>
             {openSections.includes(4) && (
@@ -618,7 +618,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 6 — PAYMENT */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={6} label="Payment Setup" open={openSections.includes(5)} onToggle={() => toggleSection(5)} />
             </div>
             {openSections.includes(5) && (
@@ -659,7 +659,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
 
           {/* SECTION 7 — INTERNAL CONTROLS */}
           <div className="border border-border rounded-sm overflow-hidden mb-3">
-            <div className="bg-[hsl(0,0%,97%)] px-4 py-2">
+            <div className="bg-[hsl(0,0%,8%)] px-4 py-2">
               <SectionHeader num={7} label="Internal Controls" open={openSections.includes(6)} onToggle={() => toggleSection(6)} />
             </div>
             {openSections.includes(6) && (
