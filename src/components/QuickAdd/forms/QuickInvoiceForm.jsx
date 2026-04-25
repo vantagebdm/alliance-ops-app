@@ -77,7 +77,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
     pricing_tier: prefillCustomer?.pricing_tier || "standard",
     invoice_number: "",
     invoice_date: today,
-    due_date: "",
+    due_date: (() => { const d = new Date(today); d.setMonth(d.getMonth() + 1); d.setDate(0); return format(d, "yyyy-MM-dd"); })(),
     reference: "",
     sales_order_reference: "",
     dispatch_reference: "",
@@ -113,7 +113,27 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
   const companyAC = useAutocomplete("Customer", "company");
   const partAC = useAutocomplete("Part", "part_number", ["app_part_number", "name", "supplier_sku", "oem_number"]);
 
-  const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
+  const calcDueDate = (invoiceDate, paymentTerms) => {
+    if (!invoiceDate || !paymentTerms) return "";
+    const date = new Date(invoiceDate);
+    if (paymentTerms === "7_days") { date.setDate(date.getDate() + 7); return format(date, "yyyy-MM-dd"); }
+    if (paymentTerms === "14_days") { date.setDate(date.getDate() + 14); return format(date, "yyyy-MM-dd"); }
+    if (paymentTerms === "30_days_eom") { date.setMonth(date.getMonth() + 1); date.setDate(0); return format(date, "yyyy-MM-dd"); }
+    if (paymentTerms === "due_on_receipt") return invoiceDate;
+    return "";
+  };
+
+  const u = (k, v) => setForm(f => {
+    const updated = { ...f, [k]: v };
+    if (k === "invoice_date" || k === "payment_terms") {
+      const due = calcDueDate(
+        k === "invoice_date" ? v : f.invoice_date,
+        k === "payment_terms" ? v : f.payment_terms
+      );
+      if (due) updated.due_date = due;
+    }
+    return updated;
+  });
 
   const fillCustomer = (item) => {
     setForm(f => ({
