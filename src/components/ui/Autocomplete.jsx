@@ -38,10 +38,10 @@ export default function Autocomplete({
         onFocus={() => { if (!value && onShowAll) onShowAll(); }}
         onKeyDown={(e) => { if (e.key === "ArrowDown" && onShowAll) onShowAll(); }}
         placeholder={placeholder}
-        className={`flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+        className={`flex h-9 w-full rounded-md border border-input bg-[hsl(0,0%,10%)] text-foreground px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
       />
       {open && createPortal(
-        <div style={dropdownStyle} className="bg-white border border-input rounded-md shadow-xl max-h-56 overflow-y-auto">
+        <div style={dropdownStyle} className="bg-[hsl(0,0%,12%)] border border-[hsl(0,0%,22%)] rounded-md shadow-xl max-h-56 overflow-y-auto">
           {loading ? (
             <div className="px-3 py-2 text-sm text-muted-foreground">Loading...</div>
           ) : suggestions.length > 0 ? (
