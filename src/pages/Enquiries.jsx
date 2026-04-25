@@ -73,8 +73,8 @@ export default function Enquiries() {
     { key: "enquiry_number", label: "Ref #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v || "—"}</span> },
     { key: "customer_name", label: "Customer", render: (v, row) => (
       <div>
-        <div className="font-medium">{v}</div>
-        {row.company && <div className="text-xs text-muted-foreground">{row.company}</div>}
+        <div className="font-medium text-white">{v}</div>
+        {row.company && <div className="text-xs text-white/40">{row.company}</div>}
       </div>
     )},
     { key: "part_description", label: "Part Required", render: (v) => (
@@ -82,15 +82,15 @@ export default function Enquiries() {
     )},
     { key: "vehicle_make", label: "Vehicle", render: (v, row) => {
       const txt = [v, row.vehicle_model, row.vehicle_year].filter(Boolean).join(" ");
-      return txt ? <span className="text-sm">{txt}</span> : <span className="text-muted-foreground">—</span>;
+      return txt ? <span className="text-sm text-white/80">{txt}</span> : <span className="text-white/30">—</span>;
     }},
     { key: "urgency", label: "Urgency", render: (v) => <StatusBadge status={v} /> },
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
-    { key: "source", label: "Source", render: (v) => <span className="text-xs text-muted-foreground uppercase">{(v || "").replace("_", " ")}</span> },
+    { key: "source", label: "Source", render: (v) => <span className="text-xs text-white/40 uppercase">{(v || "").replace("_", " ")}</span> },
     { key: "created_date", label: "Received", render: (v) => (
       <div>
-        <div className="text-xs">{moment(v).format("DD/MM/YY")}</div>
-        <div className="text-[10px] text-muted-foreground">{moment(v).fromNow()}</div>
+        <div className="text-xs text-white/80">{moment(v).format("DD/MM/YY")}</div>
+        <div className="text-[10px] text-white/30">{moment(v).fromNow()}</div>
       </div>
     )},
   ];
@@ -126,7 +126,7 @@ export default function Enquiries() {
           {FILTERS.map(f => (
             <button key={f.value} onClick={() => setFilter(f.value)}
               className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
-                filter === f.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"
+                filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
               }`}>
               {f.label}
             </button>

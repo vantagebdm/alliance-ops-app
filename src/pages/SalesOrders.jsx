@@ -11,9 +11,9 @@ import InvoiceFromOrderModal from "../components/orders/InvoiceFromOrderModal";
 import moment from "moment";
 
 const INVOICE_STATUS_STYLES = {
-  fully_invoiced: "bg-green-500/10 text-green-600 border-green-500/30",
-  partially_invoiced: "bg-blue-500/10 text-blue-600 border-blue-500/30",
-  not_invoiced: "bg-gray-500/10 text-gray-500 border-gray-500/30",
+  fully_invoiced: "bg-green-500/10 text-green-400 border-green-500/30",
+  partially_invoiced: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+  not_invoiced: "bg-gray-500/10 text-gray-400 border-gray-500/30",
 };
 const INVOICE_STATUS_LABELS = {
   fully_invoiced: "Fully Invoiced",
@@ -51,12 +51,12 @@ export default function SalesOrders() {
     { key: "order_number", label: "Order #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v || "—"}</span> },
     { key: "customer_name", label: "Customer", render: (v, row) => (
       <div>
-        <div className="font-medium">{v}</div>
-        {row.company && <div className="text-xs text-muted-foreground">{row.company}</div>}
+        <div className="font-medium text-white">{v}</div>
+        {row.company && <div className="text-xs text-white/40">{row.company}</div>}
       </div>
     )},
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
-    { key: "priority", label: "Priority", render: (v) => v && v !== "normal" ? <StatusBadge status={v} /> : <span className="text-muted-foreground text-xs">Normal</span> },
+    { key: "priority", label: "Priority", render: (v) => v && v !== "normal" ? <StatusBadge status={v} /> : <span className="text-white/40 text-xs">Normal</span> },
     { key: "total", label: "Total", render: (v) => <span className="font-semibold">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
     { key: "delivery_method", label: "Delivery", render: (v) => <span className="text-xs capitalize">{(v || "").replace(/_/g, " ")}</span> },
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
@@ -111,7 +111,7 @@ export default function SalesOrders() {
           <Filter className="w-4 h-4 text-muted-foreground" />
           {FILTERS.map(f => (
             <button key={f.value} onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {f.label}
             </button>
           ))}

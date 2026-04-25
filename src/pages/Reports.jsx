@@ -5,13 +5,13 @@ import { CATEGORY_LABEL } from "@/lib/categories";
 import PageHeader from "@/components/ui/PageHeader";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from "recharts";
 
-const KPICard = ({ label, value, sub, icon: Icon, color = "text-foreground" }) => (
-  <div className="bg-white border border-border rounded-sm p-4">
+const KPICard = ({ label, value, sub, icon: Icon, color = "text-white" }) => (
+  <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm p-4">
     <div className="flex items-start justify-between">
       <div>
-        <div className="font-heading text-[10px] uppercase tracking-widest text-foreground/40 mb-1">{label}</div>
+        <div className="font-heading text-[10px] uppercase tracking-widest text-white/30 mb-1">{label}</div>
         <div className={`font-heading text-2xl font-bold ${color}`}>{value}</div>
-        {sub && <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>}
+        {sub && <div className="text-[11px] text-white/40 mt-0.5">{sub}</div>}
       </div>
       <Icon className={`w-5 h-5 ${color} opacity-40`} />
     </div>
@@ -136,7 +136,7 @@ export default function Reports() {
         <div className="flex gap-2">
           {REPORTS.map(r => (
             <button key={r.value} onClick={() => setActiveReport(r.value)}
-              className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${activeReport === r.value ? "bg-[hsl(0,0%,8%)] text-white" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+              className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${activeReport === r.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {r.label}
             </button>
           ))}
@@ -145,15 +145,15 @@ export default function Reports() {
         {/* Overview KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <KPICard label="Total Revenue" value={`$${Math.round(totalRevenue).toLocaleString("en-AU")}`} sub={`${orders.length} total orders`} icon={DollarSign} color="text-primary" />
-          <KPICard label="Avg Order Value" value={`$${avgOrderValue.toFixed(0)}`} sub="Across all orders" icon={TrendingUp} color="text-blue-500" />
-          <KPICard label="Quote Conversion" value={`${quoteConversion}%`} sub={`${acceptedQuotes} of ${quotes.length} accepted`} icon={Target} color="text-amber-500" />
-          <KPICard label="Enquiry to Order" value={`${conversionRate}%`} sub={`${enquiries.length} enquiries → ${orders.length} orders`} icon={BarChart3} color="text-purple-500" />
+          <KPICard label="Avg Order Value" value={`$${avgOrderValue.toFixed(0)}`} sub="Across all orders" icon={TrendingUp} color="text-blue-400" />
+          <KPICard label="Quote Conversion" value={`${quoteConversion}%`} sub={`${acceptedQuotes} of ${quotes.length} accepted`} icon={Target} color="text-amber-400" />
+          <KPICard label="Enquiry to Order" value={`${conversionRate}%`} sub={`${enquiries.length} enquiries → ${orders.length} orders`} icon={BarChart3} color="text-purple-400" />
         </div>
 
         {activeReport === "overview" || activeReport === "sales" ? (
           <>
             {/* Revenue by Month */}
-            <div className="bg-white border border-border rounded-sm overflow-hidden">
+            <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
               <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
                 <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Revenue by Month</h3>
               </div>
@@ -161,7 +161,7 @@ export default function Reports() {
                 {monthlyRevenue.length > 0 ? (
                   <ResponsiveContainer width="100%" height={280}>
                     <BarChart data={monthlyRevenue}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                       <XAxis dataKey="name" tick={{ fontSize: 11, fontFamily: "var(--font-heading)" }} />
                       <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
                       <Tooltip formatter={v => [`$${v.toLocaleString("en-AU", { minimumFractionDigits: 2 })}`, "Revenue"]} />
@@ -169,52 +169,52 @@ export default function Reports() {
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
-                  <div className="text-center text-muted-foreground py-12 text-sm">No revenue data yet — create sales orders to see data</div>
+                  <div className="text-center text-white/30 py-12 text-sm">No revenue data yet — create sales orders to see data</div>
                 )}
               </div>
             </div>
 
             {/* Order Status Distribution */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <div className="bg-white border border-border rounded-sm overflow-hidden">
-                <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
-                  <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Orders by Status</h3>
-                </div>
-                <div className="p-4 space-y-2">
-                  {orderStatuses.length > 0 ? orderStatuses.map(s => {
-                    const pct = orders.length ? (s.count / orders.length * 100) : 0;
-                    return (
-                      <div key={s.name} className="flex items-center gap-3">
-                        <span className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20 flex-shrink-0">{s.name}</span>
-                        <div className="flex-1 bg-muted rounded-sm h-5 overflow-hidden">
-                          <div className="h-full bg-primary rounded-sm" style={{ width: `${pct}%` }} />
-                        </div>
-                        <span className="font-heading text-sm font-bold w-6 text-right">{s.count}</span>
-                      </div>
-                    );
-                  }) : <div className="text-muted-foreground text-sm py-4 text-center">No order data</div>}
-                </div>
+            <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
+              <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
+                <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Orders by Status</h3>
               </div>
+              <div className="p-4 space-y-2">
+                {orderStatuses.length > 0 ? orderStatuses.map(s => {
+                  const pct = orders.length ? (s.count / orders.length * 100) : 0;
+                  return (
+                    <div key={s.name} className="flex items-center gap-3">
+                      <span className="font-heading text-[10px] uppercase tracking-wider text-white/40 w-20 flex-shrink-0">{s.name}</span>
+                      <div className="flex-1 bg-[hsl(0,0%,18%)] rounded-sm h-5 overflow-hidden">
+                        <div className="h-full bg-primary rounded-sm" style={{ width: `${pct}%` }} />
+                      </div>
+                      <span className="font-heading text-sm font-bold w-6 text-right text-white">{s.count}</span>
+                    </div>
+                  );
+                }) : <div className="text-white/30 text-sm py-4 text-center">No order data</div>}
+              </div>
+            </div>
 
-              <div className="bg-white border border-border rounded-sm overflow-hidden">
-                <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
-                  <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Enquiry Urgency</h3>
-                </div>
-                <div className="p-4 space-y-2">
-                  {urgencyBreakdown.map(u => {
-                    const pct = enquiries.length ? (u.count / enquiries.length * 100) : 0;
-                    return (
-                      <div key={u.name} className="flex items-center gap-3">
-                        <span className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20 flex-shrink-0">{u.name}</span>
-                        <div className="flex-1 bg-muted rounded-sm h-5 overflow-hidden">
-                          <div className="h-full rounded-sm" style={{ width: `${pct}%`, background: u.color }} />
-                        </div>
-                        <span className="font-heading text-sm font-bold w-6 text-right">{u.count}</span>
-                      </div>
-                    );
-                  })}
-                </div>
+            <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
+              <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
+                <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Enquiry Urgency</h3>
               </div>
+              <div className="p-4 space-y-2">
+                {urgencyBreakdown.map(u => {
+                  const pct = enquiries.length ? (u.count / enquiries.length * 100) : 0;
+                  return (
+                    <div key={u.name} className="flex items-center gap-3">
+                      <span className="font-heading text-[10px] uppercase tracking-wider text-white/40 w-20 flex-shrink-0">{u.name}</span>
+                      <div className="flex-1 bg-[hsl(0,0%,18%)] rounded-sm h-5 overflow-hidden">
+                        <div className="h-full rounded-sm" style={{ width: `${pct}%`, background: u.color }} />
+                      </div>
+                      <span className="font-heading text-sm font-bold w-6 text-right text-white">{u.count}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
             </div>
           </>
         ) : null}
@@ -222,7 +222,7 @@ export default function Reports() {
         {activeReport === "enquiries" || activeReport === "overview" ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Enquiry Sources */}
-            <div className="bg-white border border-border rounded-sm overflow-hidden">
+            <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
               <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
                 <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Enquiries by Source</h3>
               </div>
@@ -231,19 +231,19 @@ export default function Reports() {
                   const pct = enquiries.length ? (s.count / enquiries.length * 100) : 0;
                   return (
                     <div key={s.name} className="flex items-center gap-3">
-                      <span className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20 flex-shrink-0 capitalize">{s.name}</span>
-                      <div className="flex-1 bg-muted rounded-sm h-5 overflow-hidden">
+                      <span className="font-heading text-[10px] uppercase tracking-wider text-white/40 w-20 flex-shrink-0 capitalize">{s.name}</span>
+                      <div className="flex-1 bg-[hsl(0,0%,18%)] rounded-sm h-5 overflow-hidden">
                         <div className="h-full bg-blue-500 rounded-sm" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="font-heading text-sm font-bold w-6 text-right">{s.count}</span>
+                      <span className="font-heading text-sm font-bold w-6 text-right text-white">{s.count}</span>
                     </div>
                   );
-                }) : <div className="text-muted-foreground text-sm py-4 text-center">No enquiry data</div>}
+                }) : <div className="text-white/30 text-sm py-4 text-center">No enquiry data</div>}
               </div>
             </div>
 
             {/* Enquiry Status */}
-            <div className="bg-white border border-border rounded-sm overflow-hidden">
+            <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
               <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
                 <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Enquiry Pipeline</h3>
               </div>
@@ -253,11 +253,11 @@ export default function Reports() {
                   const pct = enquiries.length ? (count / enquiries.length * 100) : 0;
                   return (
                     <div key={status} className="flex items-center gap-3">
-                      <span className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28 flex-shrink-0">{status.replace(/_/g, " ")}</span>
-                      <div className="flex-1 bg-muted rounded-sm h-5 overflow-hidden">
+                      <span className="font-heading text-[10px] uppercase tracking-wider text-white/40 w-28 flex-shrink-0">{status.replace(/_/g, " ")}</span>
+                      <div className="flex-1 bg-[hsl(0,0%,18%)] rounded-sm h-5 overflow-hidden">
                         <div className="h-full bg-primary rounded-sm" style={{ width: `${pct}%` }} />
                       </div>
-                      <span className="font-heading text-sm font-bold w-6 text-right">{count}</span>
+                      <span className="font-heading text-sm font-bold w-6 text-right text-white">{count}</span>
                     </div>
                   );
                 })}
@@ -268,20 +268,20 @@ export default function Reports() {
 
         {activeReport === "inventory" || activeReport === "overview" ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <KPICard label="Total SKUs" value={parts.length} sub="Active parts in catalogue" icon={Package} color="text-foreground" />
-            <KPICard label="Low / Out of Stock" value={lowStockCount} sub="Items below min level" icon={AlertTriangle} color={lowStockCount > 0 ? "text-red-500" : "text-foreground"} />
+            <KPICard label="Total SKUs" value={parts.length} sub="Active parts in catalogue" icon={Package} color="text-white" />
+            <KPICard label="Low / Out of Stock" value={lowStockCount} sub="Items below min level" icon={AlertTriangle} color={lowStockCount > 0 ? "text-red-400" : "text-white"} />
             <KPICard label="Stock Cost Value" value={`$${Math.round(stockValue).toLocaleString("en-AU")}`} sub="Total cost of inventory" icon={DollarSign} color="text-blue-500" />
             <KPICard label="Parts by Category" value={partsByCategory.length} sub="Categories stocked" icon={BarChart3} color="text-purple-500" />
 
             {/* Parts by Category */}
-            <div className="col-span-2 md:col-span-4 bg-white border border-border rounded-sm overflow-hidden">
+            <div className="col-span-2 md:col-span-4 bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
               <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
                 <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Parts Count by Category</h3>
               </div>
               <div className="p-6">
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={partsByCategory}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                     <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: "var(--font-heading)" }} angle={-30} textAnchor="end" height={50} />
                     <YAxis tick={{ fontSize: 11 }} />
                     <Tooltip />
@@ -293,14 +293,14 @@ export default function Reports() {
 
             {/* Stock Value by Category */}
             {stockValueByCategory.length > 0 && (
-              <div className="col-span-2 md:col-span-4 bg-white border border-border rounded-sm overflow-hidden">
+              <div className="col-span-2 md:col-span-4 bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
                 <div className="bg-[hsl(0,0%,8%)] px-5 py-3">
                   <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Stock Cost Value by Category</h3>
                 </div>
                 <div className="p-6">
                   <ResponsiveContainer width="100%" height={220}>
                     <BarChart data={stockValueByCategory}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                       <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: "var(--font-heading)" }} angle={-30} textAnchor="end" height={50} />
                       <YAxis tick={{ fontSize: 11 }} tickFormatter={v => `$${(v / 1000).toFixed(0)}k`} />
                       <Tooltip formatter={v => [`$${v.toLocaleString("en-AU")}`, "Cost Value"]} />
@@ -313,15 +313,15 @@ export default function Reports() {
 
             {/* Low Stock by Category */}
             {lowStockByCategory.length > 0 && (
-              <div className="col-span-2 md:col-span-2 bg-white border border-border rounded-sm overflow-hidden">
+              <div className="col-span-2 md:col-span-2 bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
                 <div className="bg-amber-600 px-5 py-3">
                   <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">Low Stock by Category</h3>
                 </div>
                 <div className="p-4 space-y-2">
                   {lowStockByCategory.map(c => (
                     <div key={c.name} className="flex items-center justify-between">
-                      <span className="font-heading text-xs uppercase tracking-wider text-foreground/60">{c.name}</span>
-                      <span className="font-heading font-bold text-amber-600">{c.count}</span>
+                      <span className="font-heading text-xs uppercase tracking-wider text-white/50">{c.name}</span>
+                      <span className="font-heading font-bold text-amber-400">{c.count}</span>
                     </div>
                   ))}
                 </div>

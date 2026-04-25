@@ -52,27 +52,27 @@ export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, on
   }
 
   const STAT_CARDS = [
-    { label: "Total SKUs", value: stats.total, color: "text-foreground", icon: Package, bg: "bg-white" },
-    { label: "Low Stock", value: stats.lowStock.length, color: stats.lowStock.length > 0 ? "text-amber-500" : "text-foreground", icon: TrendingDown, bg: stats.lowStock.length > 0 ? "bg-amber-50" : "bg-white" },
-    { label: "Out of Stock", value: stats.outOfStock.length, color: stats.outOfStock.length > 0 ? "text-red-500" : "text-foreground", icon: AlertTriangle, bg: stats.outOfStock.length > 0 ? "bg-red-50" : "bg-white" },
-    { label: "Negative Stock", value: stats.negative.length, color: stats.negative.length > 0 ? "text-red-600" : "text-foreground", icon: AlertTriangle, bg: stats.negative.length > 0 ? "bg-red-50" : "bg-white" },
-    { label: "Critical Parts ↓ Min", value: stats.critical.length, color: stats.critical.length > 0 ? "text-red-600" : "text-foreground", icon: ShieldAlert, bg: stats.critical.length > 0 ? "bg-red-50" : "bg-white" },
-    { label: "Reorder Needed", value: stats.reorderNeeded.length, color: stats.reorderNeeded.length > 0 ? "text-amber-500" : "text-foreground", icon: RefreshCw, bg: stats.reorderNeeded.length > 0 ? "bg-amber-50" : "bg-white" },
-    { label: "Stocktakes Active", value: activeStocktakes, color: activeStocktakes > 0 ? "text-blue-600" : "text-foreground", icon: ClipboardList, bg: activeStocktakes > 0 ? "bg-blue-50" : "bg-white" },
-    { label: "Adjustments Today", value: adjustmentsToday, color: "text-foreground", icon: BarChart2, bg: "bg-white" },
+    { label: "Total SKUs", value: stats.total, color: "text-white", icon: Package, bg: "bg-[hsl(0,0%,11%)]" },
+    { label: "Low Stock", value: stats.lowStock.length, color: stats.lowStock.length > 0 ? "text-amber-400" : "text-white", icon: TrendingDown, bg: stats.lowStock.length > 0 ? "bg-amber-500/10" : "bg-[hsl(0,0%,11%)]" },
+    { label: "Out of Stock", value: stats.outOfStock.length, color: stats.outOfStock.length > 0 ? "text-red-400" : "text-white", icon: AlertTriangle, bg: stats.outOfStock.length > 0 ? "bg-red-500/10" : "bg-[hsl(0,0%,11%)]" },
+    { label: "Negative Stock", value: stats.negative.length, color: stats.negative.length > 0 ? "text-red-400" : "text-white", icon: AlertTriangle, bg: stats.negative.length > 0 ? "bg-red-500/10" : "bg-[hsl(0,0%,11%)]" },
+    { label: "Critical Parts ↓ Min", value: stats.critical.length, color: stats.critical.length > 0 ? "text-red-400" : "text-white", icon: ShieldAlert, bg: stats.critical.length > 0 ? "bg-red-500/10" : "bg-[hsl(0,0%,11%)]" },
+    { label: "Reorder Needed", value: stats.reorderNeeded.length, color: stats.reorderNeeded.length > 0 ? "text-amber-400" : "text-white", icon: RefreshCw, bg: stats.reorderNeeded.length > 0 ? "bg-amber-500/10" : "bg-[hsl(0,0%,11%)]" },
+    { label: "Stocktakes Active", value: activeStocktakes, color: activeStocktakes > 0 ? "text-blue-400" : "text-white", icon: ClipboardList, bg: activeStocktakes > 0 ? "bg-blue-500/10" : "bg-[hsl(0,0%,11%)]" },
+    { label: "Adjustments Today", value: adjustmentsToday, color: "text-white", icon: BarChart2, bg: "bg-[hsl(0,0%,11%)]" },
   ];
 
   return (
     <div className="space-y-5">
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-border/60">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[hsl(0,0%,14%)]">
         {STAT_CARDS.map(card => {
           const Icon = card.icon;
           return (
             <div key={card.label} className={`${card.bg} p-4`}>
               <div className="flex items-center justify-between mb-1">
-                <div className="font-heading text-[10px] uppercase tracking-widest text-foreground/40">{card.label}</div>
-                <Icon className="w-3.5 h-3.5 text-muted-foreground/50" />
+                <div className="font-heading text-[10px] uppercase tracking-widest text-white/30">{card.label}</div>
+                <Icon className="w-3.5 h-3.5 text-white/20" />
               </div>
               <div className={`font-heading text-2xl font-bold ${card.color}`}>{card.value}</div>
             </div>
@@ -91,7 +91,7 @@ export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, on
 
       {/* Quick Actions */}
       <div>
-        <div className="font-heading text-xs uppercase tracking-widest text-foreground/40 mb-2">Quick Actions</div>
+        <div className="font-heading text-xs uppercase tracking-widest text-white/30 mb-2">Quick Actions</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             { label: "New Adjustment", icon: BarChart2, action: onNewAdjustment, color: "bg-primary text-black hover:bg-primary/90" },
@@ -112,47 +112,47 @@ export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, on
 
       {/* Alert Panels */}
       {stats.critical.length > 0 && (
-        <div className="border border-red-200 rounded-sm overflow-hidden">
-          <div className="bg-red-600 text-white px-4 py-2 flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4" />
-            <span className="font-heading text-xs uppercase tracking-wider font-bold">Critical Parts Below Minimum ({stats.critical.length})</span>
-          </div>
-          <div className="divide-y divide-border/50">
-            {stats.critical.slice(0, 5).map(p => (
-              <div key={p.id} className="px-4 py-2 flex items-center justify-between bg-red-50/30">
-                <div>
-                  <span className="font-mono font-bold text-xs text-primary">{p.part_number}</span>
-                  <span className="ml-2 text-xs text-muted-foreground">{p.name}</span>
-                </div>
-                <div className="flex items-center gap-4 text-xs">
-                  <span className="text-red-600 font-bold">Stock: {p.stock_quantity || 0}</span>
-                  <span className="text-muted-foreground">Min: {p.min_stock_level}</span>
-                </div>
+        <div className="border border-red-500/30 rounded-sm overflow-hidden">
+        <div className="bg-red-600 text-white px-4 py-2 flex items-center gap-2">
+          <ShieldAlert className="w-4 h-4" />
+          <span className="font-heading text-xs uppercase tracking-wider font-bold">Critical Parts Below Minimum ({stats.critical.length})</span>
+        </div>
+        <div className="divide-y divide-[hsl(0,0%,16%)]">
+          {stats.critical.slice(0, 5).map(p => (
+            <div key={p.id} className="px-4 py-2 flex items-center justify-between bg-red-500/5">
+              <div>
+                <span className="font-mono font-bold text-xs text-primary">{p.part_number}</span>
+                <span className="ml-2 text-xs text-white/40">{p.name}</span>
               </div>
-            ))}
-            {stats.critical.length > 5 && (
-              <div className="px-4 py-2 text-xs text-muted-foreground text-center">
-                +{stats.critical.length - 5} more critical parts
+              <div className="flex items-center gap-4 text-xs">
+                <span className="text-red-400 font-bold">Stock: {p.stock_quantity || 0}</span>
+                <span className="text-white/40">Min: {p.min_stock_level}</span>
               </div>
-            )}
-          </div>
+            </div>
+          ))}
+          {stats.critical.length > 5 && (
+            <div className="px-4 py-2 text-xs text-white/30 text-center">
+              +{stats.critical.length - 5} more critical parts
+            </div>
+          )}
+        </div>
         </div>
       )}
 
       {/* Category Breakdown */}
       {stats.byCategory && Object.keys(stats.byCategory).length > 0 && (
-        <div className="border border-border rounded-sm overflow-hidden">
+        <div className="border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
           <div className="bg-[hsl(0,0%,8%)] px-4 py-2 flex items-center gap-2">
             <Package className="w-4 h-4 text-primary" />
             <span className="font-heading text-xs uppercase tracking-wider font-bold text-white">Stock by Category</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-px bg-border/40">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-px bg-[hsl(0,0%,14%)]">
             {Object.entries(stats.byCategory).sort((a, b) => b[1].count - a[1].count).map(([cat, data]) => (
-              <div key={cat} className="bg-white px-3 py-2.5">
-                <div className={`text-[10px] font-heading uppercase tracking-wider font-bold mb-1 px-1 py-0.5 rounded-sm inline-block ${CATEGORY_COLORS[cat] || "bg-gray-100 text-gray-500"}`}>{CATEGORY_LABEL[cat] || cat}</div>
-                <div className="font-heading text-lg font-bold text-foreground">{data.count}</div>
-                <div className="text-[10px] text-muted-foreground">${Math.round(data.value / 1000).toFixed(0)}k value</div>
-                {data.low > 0 && <div className="text-[10px] text-amber-500 font-bold">{data.low} low</div>}
+              <div key={cat} className="bg-[hsl(0,0%,11%)] px-3 py-2.5">
+                <div className={`text-[10px] font-heading uppercase tracking-wider font-bold mb-1 px-1 py-0.5 rounded-sm inline-block ${CATEGORY_COLORS[cat] || "bg-gray-500/15 text-gray-400"}`}>{CATEGORY_LABEL[cat] || cat}</div>
+                <div className="font-heading text-lg font-bold text-white">{data.count}</div>
+                <div className="text-[10px] text-white/30">${Math.round(data.value / 1000).toFixed(0)}k value</div>
+                {data.low > 0 && <div className="text-[10px] text-amber-400 font-bold">{data.low} low</div>}
               </div>
             ))}
           </div>
@@ -160,32 +160,32 @@ export default function InventoryDashboard({ onNewAdjustment, onNewStocktake, on
       )}
 
       {stats.reorderNeeded.length > 0 && (
-        <div className="border border-amber-200 rounded-sm overflow-hidden">
-          <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <TrendingDown className="w-4 h-4" />
-              <span className="font-heading text-xs uppercase tracking-wider font-bold">Reorder Recommendations ({stats.reorderNeeded.length})</span>
-            </div>
-            <Link to="/purchasing" className="flex items-center gap-1 text-xs font-heading uppercase tracking-wider hover:opacity-70">
-              Create POs <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+        <div className="border border-amber-500/30 rounded-sm overflow-hidden">
+        <div className="bg-amber-500 text-black px-4 py-2 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <TrendingDown className="w-4 h-4" />
+            <span className="font-heading text-xs uppercase tracking-wider font-bold">Reorder Recommendations ({stats.reorderNeeded.length})</span>
           </div>
-          <div className="divide-y divide-border/50">
-            {stats.reorderNeeded.slice(0, 5).map(p => (
-              <div key={p.id} className="px-4 py-2 flex items-center justify-between bg-amber-50/20">
-                <div>
-                  <span className="font-mono font-bold text-xs text-primary">{p.part_number}</span>
-                  <span className="ml-2 text-xs text-muted-foreground">{p.name}</span>
-                  {p.supplier_name && <span className="ml-2 text-xs text-muted-foreground/60">— {p.supplier_name}</span>}
-                </div>
-                <div className="flex items-center gap-4 text-xs">
-                  <span className="text-amber-600 font-bold">Stock: {p.stock_quantity || 0}</span>
-                  <span className="text-muted-foreground">Min: {p.min_stock_level}</span>
-                  {p.reorder_qty > 0 && <span className="text-muted-foreground">Reorder: {p.reorder_qty}</span>}
-                </div>
+          <Link to="/purchasing" className="flex items-center gap-1 text-xs font-heading uppercase tracking-wider hover:opacity-70">
+            Create POs <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+        <div className="divide-y divide-[hsl(0,0%,16%)]">
+          {stats.reorderNeeded.slice(0, 5).map(p => (
+            <div key={p.id} className="px-4 py-2 flex items-center justify-between bg-amber-500/5">
+              <div>
+                <span className="font-mono font-bold text-xs text-primary">{p.part_number}</span>
+                <span className="ml-2 text-xs text-white/40">{p.name}</span>
+                {p.supplier_name && <span className="ml-2 text-xs text-white/20">— {p.supplier_name}</span>}
               </div>
-            ))}
-          </div>
+              <div className="flex items-center gap-4 text-xs">
+                <span className="text-amber-400 font-bold">Stock: {p.stock_quantity || 0}</span>
+                <span className="text-white/40">Min: {p.min_stock_level}</span>
+                {p.reorder_qty > 0 && <span className="text-white/30">Reorder: {p.reorder_qty}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
         </div>
       )}
     </div>

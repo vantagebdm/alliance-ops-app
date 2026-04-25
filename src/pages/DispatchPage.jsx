@@ -55,14 +55,14 @@ export default function DispatchPage() {
     { key: "dispatch_number", label: "Dispatch #", render: (v) => <span className="font-mono font-semibold text-primary">{v || "—"}</span> },
     { key: "order_number", label: "Order #", render: v => <span className="font-mono">{v || "—"}</span> },
     { key: "customer_name", label: "Customer" },
-    { key: "method", label: "Method", render: (v) => <span className="text-xs uppercase text-muted-foreground">{METHOD_LABELS[v] || v || "—"}</span> },
+    { key: "method", label: "Method", render: (v) => <span className="text-xs uppercase text-white/40">{METHOD_LABELS[v] || v || "—"}</span> },
     { key: "priority", label: "Priority", render: (v) => {
-      const styles = { breakdown_critical: "text-red-400 font-bold animate-pulse", urgent: "text-amber-400 font-bold", same_day: "text-yellow-400", standard: "text-muted-foreground" };
+      const styles = { breakdown_critical: "text-red-400 font-bold animate-pulse", urgent: "text-amber-400 font-bold", same_day: "text-yellow-400", standard: "text-white/30" };
       return <span className={`text-xs font-heading uppercase tracking-wider ${styles[v] || ""}`}>{(v || "").replace("_", " ")}</span>;
     }},
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
     { key: "dispatch_date", label: "Date", render: (v) => v ? moment(v).format("DD/MM/YY") : "—" },
-    { key: "items", label: "Lines", render: (v) => <span className="text-xs text-muted-foreground">{(v || []).length}</span> },
+    { key: "items", label: "Lines", render: (v) => <span className="text-xs text-white/40">{(v || []).length}</span> },
   ];
 
   return (
@@ -83,7 +83,7 @@ export default function DispatchPage() {
           {FILTERS.map(f => (
             <button key={f.value} onClick={() => setFilter(f.value)}
               className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors whitespace-nowrap
-                ${filter === f.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                ${filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {f.label}
             </button>
           ))}

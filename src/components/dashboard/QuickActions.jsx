@@ -13,7 +13,7 @@ export default function QuickActions() {
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white border border-border rounded-sm overflow-hidden">
+    <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
       <div className="bg-[hsl(0,0%,8%)] px-4 py-3">
         <h3 className="font-heading text-sm font-semibold text-white uppercase tracking-wider">
           Quick Actions
@@ -26,12 +26,12 @@ export default function QuickActions() {
             <button
               key={action.label}
               onClick={() => navigate(action.path)}
-              className="flex flex-col items-center gap-2 p-4 border border-border rounded-sm hover:bg-muted/50 transition-colors group"
+              className="flex flex-col items-center gap-2 p-4 border border-[hsl(0,0%,20%)] rounded-sm hover:bg-[hsl(0,0%,16%)] transition-colors group"
             >
               <div className={`w-10 h-10 ${action.color} rounded-sm flex items-center justify-center group-hover:scale-105 transition-transform`}>
                 <Icon className="w-5 h-5 text-white" />
               </div>
-              <span className="font-heading text-[10px] uppercase tracking-wider text-foreground/70 font-semibold">
+              <span className="font-heading text-[10px] uppercase tracking-wider text-white/60 font-semibold">
                 {action.label}
               </span>
             </button>

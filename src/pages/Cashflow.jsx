@@ -104,13 +104,13 @@ export default function Cashflow() {
       />
 
       {/* Tab Bar */}
-      <div className="flex border-b border-border bg-card/50 px-6 overflow-x-auto">
+      <div className="flex border-b border-[hsl(0,0%,14%)] bg-[hsl(0,0%,8%)] px-6 overflow-x-auto">
         {TABS.map(t => {
           const Icon = t.icon;
           return (
             <button key={t.id} onClick={() => setTab(t.id)}
               className={`flex items-center gap-2 px-4 py-3 font-heading text-xs uppercase tracking-wider font-semibold whitespace-nowrap transition-colors border-b-2 -mb-px
-                ${tab === t.id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+                ${tab === t.id ? "border-primary text-primary" : "border-transparent text-white/40 hover:text-white"}`}>
               <Icon className="w-3.5 h-3.5" />
               {t.label}
             </button>
@@ -131,15 +131,15 @@ export default function Cashflow() {
               <>
                 {/* View toggle */}
                 <div className="flex justify-end mb-4">
-                  <div className="flex border border-border rounded-sm overflow-hidden">
+                  <div className="flex border border-[hsl(0,0%,20%)] rounded-sm overflow-hidden">
                     <button onClick={() => setListView("list")}
                       className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-heading uppercase tracking-wider transition-colors
-                        ${listView === "list" ? "bg-primary text-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
+                        ${listView === "list" ? "bg-primary text-black" : "text-white/40 hover:text-white hover:bg-[hsl(0,0%,16%)]"}`}>
                       <LayoutList className="w-3.5 h-3.5" /> List
                     </button>
                     <button onClick={() => setListView("calendar")}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-heading uppercase tracking-wider transition-colors border-l border-border
-                        ${listView === "calendar" ? "bg-primary text-black" : "text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
+                      className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-heading uppercase tracking-wider transition-colors border-l border-[hsl(0,0%,20%)]
+                        ${listView === "calendar" ? "bg-primary text-black" : "text-white/40 hover:text-white hover:bg-[hsl(0,0%,16%)]"}`}>
                       <CalendarDays className="w-3.5 h-3.5" /> Calendar
                     </button>
                   </div>
@@ -211,41 +211,41 @@ function EntriesList({ entries, type, filterStatus, filterCategory, onFilterStat
 
       {/* Table */}
       {entries.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
+        <div className="text-center py-16 text-white/30">
           <List className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <p className="text-sm">No {type} entries found.</p>
         </div>
       ) : (
-        <div className="border border-border rounded-sm overflow-hidden">
+        <div className="border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-[hsl(0,0%,12%)]">
+            <thead className="bg-[hsl(0,0%,10%)]">
               <tr>
                 {["Title", "Category", "Amount", "Due Date", "Recurrence", "Status", ""].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-left font-heading text-[10px] uppercase tracking-widest text-muted-foreground">{h}</th>
+                  <th key={h} className="px-4 py-2.5 text-left font-heading text-[10px] uppercase tracking-widest text-white/30">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {entries.map((e, i) => (
-                <tr key={e.id} className={`border-t border-border hover:bg-muted/20 cursor-pointer ${i % 2 === 0 ? "" : "bg-muted/5"}`}
+                <tr key={e.id} className={`border-t border-[hsl(0,0%,16%)] hover:bg-[hsl(0,0%,14%)] cursor-pointer ${i % 2 === 0 ? "" : "bg-[hsl(0,0%,10%)]"}`}
                   onClick={() => onEdit(e)}>
-                  <td className="px-4 py-2.5 font-medium">
+                  <td className="px-4 py-2.5 font-medium text-white">
                     <div>{e.title}</div>
-                    {e.supplier_name && <div className="text-[11px] text-muted-foreground">{e.supplier_name}</div>}
+                    {e.supplier_name && <div className="text-[11px] text-white/40">{e.supplier_name}</div>}
                   </td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{CATEGORY_LABELS[e.category] || e.category}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{CATEGORY_LABELS[e.category] || e.category}</td>
                   <td className={`px-4 py-2.5 font-heading font-bold ${isOut ? "text-red-400" : "text-green-400"}`}>
                     {isOut ? "-" : "+"}${(e.amount || 0).toLocaleString()}
                   </td>
                   <td className="px-4 py-2.5 text-xs">
-                    <div>{moment(e.due_date).format("DD/MM/YY")}</div>
-                    <div className="text-muted-foreground text-[10px]">{moment(e.due_date).fromNow()}</div>
+                    <div className="text-white/80">{moment(e.due_date).format("DD/MM/YY")}</div>
+                    <div className="text-white/30 text-[10px]">{moment(e.due_date).fromNow()}</div>
                   </td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground capitalize">{e.recurrence}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40 capitalize">{e.recurrence}</td>
                   <td className="px-4 py-2.5"><StatusBadge status={e.status} /></td>
                   <td className="px-4 py-2.5" onClick={ev => ev.stopPropagation()}>
                     <button onClick={() => { if (confirm("Delete this entry?")) onDelete(e.id); }}
-                      className="text-muted-foreground hover:text-red-400 text-xs">✕</button>
+                      className="text-white/20 hover:text-red-400 text-xs">✕</button>
                   </td>
                 </tr>
               ))}

@@ -32,19 +32,19 @@ export default function Quotes() {
     { key: "quote_number", label: "Quote #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v || "—"}</span> },
     { key: "customer_name", label: "Customer", render: (v, row) => (
       <div>
-        <div className="font-medium">{v}</div>
-        {row.company && <div className="text-xs text-muted-foreground">{row.company}</div>}
+        <div className="font-medium text-white">{v}</div>
+        {row.company && <div className="text-xs text-white/40">{row.company}</div>}
       </div>
     )},
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
-    { key: "total", label: "Total", render: (v) => <span className="font-semibold">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
+    { key: "total", label: "Total", render: (v) => <span className="font-semibold text-white">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
     { key: "valid_until", label: "Expires", render: (v) => {
-      if (!v) return <span className="text-muted-foreground">—</span>;
+      if (!v) return <span className="text-white/30">—</span>;
       const expired = moment(v).isBefore(moment());
-      return <span className={expired ? "text-red-500 font-semibold" : ""}>{moment(v).format("DD/MM/YY")}</span>;
+      return <span className={expired ? "text-red-400 font-semibold" : "text-white/80"}>{moment(v).format("DD/MM/YY")}</span>;
     }},
-    { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
-    { key: "items", label: "Lines", render: (v) => <span className="text-muted-foreground text-xs">{(v || []).length} items</span> },
+    { key: "created_date", label: "Created", render: (v) => <span className="text-white/80">{moment(v).format("DD/MM/YY")}</span> },
+    { key: "items", label: "Lines", render: (v) => <span className="text-white/40 text-xs">{(v || []).length} items</span> },
   ];
 
   const FILTERS = [
@@ -72,7 +72,7 @@ export default function Quotes() {
           <Filter className="w-4 h-4 text-muted-foreground" />
           {FILTERS.map(f => (
             <button key={f.value} onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {f.label}
             </button>
           ))}

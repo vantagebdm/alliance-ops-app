@@ -10,11 +10,11 @@ import QuickActions from "../components/dashboard/QuickActions";
 import SalesTrends from "../components/dashboard/SalesTrends";
 import moment from "moment";
 
-const KPI = ({ label, value, sub, color = "text-foreground", border = "" }) => (
-  <div className={`bg-white p-4 border-l-4 ${border || "border-transparent"} relative overflow-hidden`}>
-    <div className="font-heading text-[10px] uppercase tracking-widest text-foreground/40 mb-1">{label}</div>
+const KPI = ({ label, value, sub, color = "text-white", border = "" }) => (
+  <div className={`bg-[hsl(0,0%,9%)] p-4 border-l-4 ${border || "border-transparent"} relative overflow-hidden`}>
+    <div className="font-heading text-[10px] uppercase tracking-widest text-white/30 mb-1">{label}</div>
     <div className={`font-heading text-2xl font-bold ${color}`}>{value}</div>
-    {sub && <div className="text-[10px] text-foreground/40 mt-0.5 font-body">{sub}</div>}
+    {sub && <div className="text-[10px] text-white/30 mt-0.5 font-body">{sub}</div>}
   </div>
 );
 
@@ -104,17 +104,17 @@ export default function Dashboard() {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-px bg-border/60">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-px bg-[hsl(0,0%,14%)]">
         <KPI label="New Enquiries" value={newEnquiries.length} sub={`${todayEnquiries.length} today`} color="text-primary" border="border-primary" />
         <KPI label="Breakdown / Urgent" value={urgentEnquiries.length}
           sub={breakdownEnquiries.length > 0 ? `${breakdownEnquiries.length} breakdown` : "No breakdowns"}
-          color={urgentEnquiries.length > 0 ? "text-red-500" : "text-foreground"}
+          color={urgentEnquiries.length > 0 ? "text-red-400" : "text-white"}
           border={urgentEnquiries.length > 0 ? "border-red-500" : "border-transparent"} />
-        <KPI label="Open Quotes" value={openQuotes.length} sub={expiredQuotes.length > 0 ? `${expiredQuotes.length} expired` : "All current"} color="text-blue-500" border="border-blue-500" />
-        <KPI label="Active Orders" value={activeOrders.length} sub={`${todayOrders.length} today`} color="text-amber-500" border="border-amber-500" />
-        <KPI label="Low Stock" value={lowStock.length} sub={`${outOfStock.length} out of stock`} color={lowStock.length > 0 ? "text-red-500" : "text-foreground"} border={lowStock.length > 0 ? "border-red-500" : "border-transparent"} />
-        <KPI label="Open POs" value={openPOs.length} sub={overduePOs.length > 0 ? `${overduePOs.length} overdue` : "On schedule"} color="text-purple-500" border={overduePOs.length > 0 ? "border-red-500" : "border-purple-500"} />
-        <KPI label="Parts in Catalogue" value={parts.length} sub="Active & on order" color="text-foreground" />
+        <KPI label="Open Quotes" value={openQuotes.length} sub={expiredQuotes.length > 0 ? `${expiredQuotes.length} expired` : "All current"} color="text-blue-400" border="border-blue-500" />
+        <KPI label="Active Orders" value={activeOrders.length} sub={`${todayOrders.length} today`} color="text-amber-400" border="border-amber-500" />
+        <KPI label="Low Stock" value={lowStock.length} sub={`${outOfStock.length} out of stock`} color={lowStock.length > 0 ? "text-red-400" : "text-white"} border={lowStock.length > 0 ? "border-red-500" : "border-transparent"} />
+        <KPI label="Open POs" value={openPOs.length} sub={overduePOs.length > 0 ? `${overduePOs.length} overdue` : "On schedule"} color="text-purple-400" border={overduePOs.length > 0 ? "border-red-500" : "border-purple-500"} />
+        <KPI label="Parts in Catalogue" value={parts.length} sub="Active & on order" color="text-white" />
         <KPI label="Total Revenue" value={`$${Math.round(totalRevenue / 1000)}k`} sub="All orders combined" color="text-primary" border="border-primary" />
       </div>
 

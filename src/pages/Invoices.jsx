@@ -65,7 +65,7 @@ export default function Invoices() {
           <Filter className="w-4 h-4 text-muted-foreground" />
           {FILTERS.map(f => (
             <button key={f.value} onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {f.label}
             </button>
           ))}

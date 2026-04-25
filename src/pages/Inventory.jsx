@@ -118,33 +118,33 @@ export default function Inventory() {
       const low = !out && !neg && row.min_stock_level > 0 && v <= row.min_stock_level;
       return (
         <div className="flex items-center gap-1.5">
-          <span className={`font-bold text-sm tabular-nums ${neg ? "text-red-600" : out ? "text-red-500" : low ? "text-amber-500" : "text-foreground"}`}>{v ?? 0}</span>
+          <span className={`font-bold text-sm tabular-nums ${neg ? "text-red-400" : out ? "text-red-400" : low ? "text-amber-400" : "text-white"}`}>{v ?? 0}</span>
           {(out || neg) && <AlertTriangle className="w-3.5 h-3.5 text-red-500" />}
           {low && <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />}
         </div>
       );
     }},
-    { key: "allocated_stock", label: "Allocated", render: (v) => <span className="text-xs text-blue-600 tabular-nums font-medium">{v ?? 0}</span> },
-    { key: "min_stock_level", label: "Min", render: (v) => <span className="text-muted-foreground text-xs tabular-nums">{v ?? 0}</span> },
-    { key: "max_stock_level", label: "Max", render: (v) => <span className="text-muted-foreground text-xs tabular-nums">{v ?? 0}</span> },
+    { key: "allocated_stock", label: "Allocated", render: (v) => <span className="text-xs text-blue-400 tabular-nums font-medium">{v ?? 0}</span> },
+    { key: "min_stock_level", label: "Min", render: (v) => <span className="text-white/40 text-xs tabular-nums">{v ?? 0}</span> },
+    { key: "max_stock_level", label: "Max", render: (v) => <span className="text-white/40 text-xs tabular-nums">{v ?? 0}</span> },
     { key: "unit_cost", label: "Unit Cost", render: (v) => <span className="text-xs">${(v || 0).toFixed(2)}</span> },
     { key: "stock_quantity", label: "Stock Value", render: (v, row) => {
       const val = (v || 0) * (row.unit_cost || 0);
       return <span className="font-semibold text-xs">${val.toFixed(0)}</span>;
     }},
-    { key: "supplier_name", label: "Supplier", render: (v) => <span className="text-xs text-muted-foreground">{v || "—"}</span> },
+    { key: "supplier_name", label: "Supplier", render: (v) => <span className="text-xs text-white/40">{v || "—"}</span> },
     { key: "status", label: "Status", render: (v) => {
       if (!v) return null;
-      const cfg = { active: "bg-green-100 text-green-700", discontinued: "bg-red-100 text-red-700", inactive: "bg-gray-100 text-gray-600", on_order: "bg-blue-100 text-blue-700" };
+      const cfg = { active: "bg-green-500/15 text-green-400", discontinued: "bg-red-500/15 text-red-400", inactive: "bg-gray-500/15 text-gray-400", on_order: "bg-blue-500/15 text-blue-400" };
       return <span className={`text-[10px] font-heading uppercase tracking-wider px-1.5 py-0.5 rounded-sm font-bold ${cfg[v] || ""}`}>{v}</span>;
     }},
   ];
 
   const reorderStatus = (p) => {
-    if ((p.stock_quantity || 0) < 0) return { label: "Negative", cls: "bg-red-100 text-red-700" };
-    if ((p.stock_quantity || 0) === 0) return { label: "Out of Stock", cls: "bg-red-100 text-red-700" };
-    if (p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level) return { label: "Reorder", cls: "bg-amber-100 text-amber-700" };
-    return { label: "OK", cls: "bg-green-100 text-green-700" };
+    if ((p.stock_quantity || 0) < 0) return { label: "Negative", cls: "bg-red-500/15 text-red-400" };
+    if ((p.stock_quantity || 0) === 0) return { label: "Out of Stock", cls: "bg-red-500/15 text-red-400" };
+    if (p.min_stock_level > 0 && p.stock_quantity <= p.min_stock_level) return { label: "Reorder", cls: "bg-amber-500/15 text-amber-400" };
+    return { label: "OK", cls: "bg-green-500/15 text-green-400" };
   };
 
   return (
@@ -186,13 +186,13 @@ export default function Inventory() {
       )}
 
       {/* Tabs */}
-      <div className="bg-white border-b border-border px-6">
+      <div className="bg-[hsl(0,0%,8%)] border-b border-[hsl(0,0%,14%)] px-6">
         <div className="flex gap-0">
           {TABS.map(tab => {
             const Icon = tab.icon;
             return (
               <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-3 text-xs font-heading uppercase tracking-wider border-b-2 transition-colors ${activeTab === tab.id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+                className={`flex items-center gap-2 px-4 py-3 text-xs font-heading uppercase tracking-wider border-b-2 transition-colors ${activeTab === tab.id ? "border-primary text-primary" : "border-transparent text-white/40 hover:text-white"}`}>
                 <Icon className="w-3.5 h-3.5" /> {tab.label}
               </button>
             );
@@ -235,16 +235,16 @@ export default function Inventory() {
             </div>
 
             {/* Summary row */}
-            <div className="grid grid-cols-4 gap-px bg-border/60">
+            <div className="grid grid-cols-4 gap-px bg-[hsl(0,0%,14%)]">
               {[
                 { label: "Showing", value: displayParts.length },
-                { label: "Low Stock", value: lowStock.length, color: lowStock.length > 0 ? "text-amber-500" : "" },
-                { label: "Out of Stock", value: outOfStock.length, color: outOfStock.length > 0 ? "text-red-500" : "" },
+                { label: "Low Stock", value: lowStock.length, color: lowStock.length > 0 ? "text-amber-400" : "" },
+                { label: "Out of Stock", value: outOfStock.length, color: outOfStock.length > 0 ? "text-red-400" : "" },
                 { label: "Cost Value", value: `$${Math.round(displayParts.reduce((s, p) => s + (p.stock_quantity || 0) * (p.unit_cost || 0), 0)).toLocaleString("en-AU")}`, color: "text-primary" },
               ].map(s => (
-                <div key={s.label} className="bg-white px-4 py-2">
-                  <div className="text-[10px] text-muted-foreground uppercase tracking-wider font-heading">{s.label}</div>
-                  <div className={`font-heading text-lg font-bold ${s.color || "text-foreground"}`}>{s.value}</div>
+                <div key={s.label} className="bg-[hsl(0,0%,9%)] px-4 py-2">
+                  <div className="text-[10px] text-white/30 uppercase tracking-wider font-heading">{s.label}</div>
+                  <div className={`font-heading text-lg font-bold ${s.color || "text-white"}`}>{s.value}</div>
                 </div>
               ))}
             </div>
@@ -266,7 +266,7 @@ export default function Inventory() {
         {activeTab === "adjustments" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-heading text-sm uppercase tracking-wider font-bold text-foreground">Stock Adjustments</h3>
+              <h3 className="font-heading text-sm uppercase tracking-wider font-bold text-white">Stock Adjustments</h3>
               <button onClick={() => setShowAdjustment(true)}
                 className="flex items-center gap-2 px-3 py-1.5 text-xs font-heading uppercase tracking-wider bg-primary text-black rounded-sm hover:bg-primary/90">
                 <Plus className="w-3.5 h-3.5" /> New Adjustment
@@ -280,7 +280,7 @@ export default function Inventory() {
         {activeTab === "stocktakes" && (
           <div className="space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-heading text-sm uppercase tracking-wider font-bold text-foreground">Stocktakes</h3>
+              <h3 className="font-heading text-sm uppercase tracking-wider font-bold text-white">Stocktakes</h3>
               <button onClick={() => setShowStocktake(true)}
                 className="flex items-center gap-2 px-3 py-1.5 text-xs font-heading uppercase tracking-wider bg-primary text-black rounded-sm hover:bg-primary/90">
                 <Plus className="w-3.5 h-3.5" /> New Stocktake
@@ -293,7 +293,7 @@ export default function Inventory() {
         {/* MOVEMENTS TAB */}
         {activeTab === "movements" && (
           <div className="space-y-4">
-            <h3 className="font-heading text-sm uppercase tracking-wider font-bold text-foreground">Stock Movements Ledger</h3>
+            <h3 className="font-heading text-sm uppercase tracking-wider font-bold text-white">Stock Movements Ledger</h3>
             <StockMovementsLedger key={refreshKey} />
           </div>
         )}

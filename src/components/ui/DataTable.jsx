@@ -28,8 +28,8 @@ export default function DataTable({ columns, data, onRowClick, emptyMessage = "N
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-sm">
-        <div className="p-12 text-center text-muted-foreground text-sm">
+      <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm">
+        <div className="p-12 text-center text-white/40 text-sm">
           {emptyMessage}
         </div>
       </div>
@@ -37,18 +37,18 @@ export default function DataTable({ columns, data, onRowClick, emptyMessage = "N
   }
 
   return (
-    <div className="bg-white border border-border rounded-sm overflow-hidden">
+    <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-[hsl(0,0%,96%)] border-b border-border">
+            <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
               {columns.map(col => (
                 <th
                   key={col.key}
                   onClick={() => col.sortable !== false && handleSort(col)}
                   className={`
-                    text-left px-4 py-3 font-heading text-[11px] font-semibold uppercase tracking-wider text-foreground/60
-                    ${col.sortable !== false ? "cursor-pointer hover:text-foreground select-none" : ""}
+                    text-left px-4 py-3 font-heading text-[11px] font-semibold uppercase tracking-wider text-white/40
+                    ${col.sortable !== false ? "cursor-pointer hover:text-white select-none" : ""}
                     ${col.width || ""}
                   `}
                 >
@@ -68,13 +68,13 @@ export default function DataTable({ columns, data, onRowClick, emptyMessage = "N
                 key={row.id || i}
                 onClick={() => onRowClick && onRowClick(row)}
                 className={`
-                  border-b border-border/50 last:border-0 transition-colors
-                  ${onRowClick ? "cursor-pointer hover:bg-[hsl(0,0%,97%)]" : ""}
+                  border-b border-[hsl(0,0%,16%)] last:border-0 transition-colors
+                  ${onRowClick ? "cursor-pointer hover:bg-[hsl(0,0%,14%)]" : ""}
                   ${rowClassName ? rowClassName(row) : ""}
                 `}
               >
                 {columns.map(col => (
-                  <td key={col.key} className="px-4 py-3 text-sm font-body text-foreground">
+                  <td key={col.key} className="px-4 py-3 text-sm font-body text-white/80">
                     {col.render ? col.render(row[col.key], row) : (row[col.key] ?? "—")}
                   </td>
                 ))}

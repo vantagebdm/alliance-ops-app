@@ -197,7 +197,7 @@ export default function Parts() {
             <Filter className="w-4 h-4 text-muted-foreground flex-shrink-0" />
             {CATEGORIES.map(c => (
               <button key={c.value} onClick={() => setCatFilter(c.value)}
-                className={`px-2.5 py-1 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${catFilter === c.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+                className={`px-2.5 py-1 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${catFilter === c.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
                 {c.label}
               </button>
             ))}

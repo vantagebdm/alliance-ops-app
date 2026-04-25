@@ -41,14 +41,14 @@ export default function SalesTrends({ invoices }) {
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
 
       {/* Monthly Sales Chart */}
-      <div className="bg-white border border-border rounded-sm p-4">
+      <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wider">Monthly Sales</h3>
-            <p className="text-[10px] text-muted-foreground font-body mt-0.5">Last 6 months · Invoice totals</p>
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-white">Monthly Sales</h3>
+            <p className="text-[10px] text-white/40 font-body mt-0.5">Last 6 months · Invoice totals</p>
           </div>
           <div className="text-right">
-            <div className="font-heading text-[10px] uppercase tracking-widest text-muted-foreground">This Month</div>
+            <div className="font-heading text-[10px] uppercase tracking-widest text-white/40">This Month</div>
             <div className="font-heading text-xl font-bold text-primary">${thisMonth.toLocaleString("en-AU", { minimumFractionDigits: 2 })}</div>
           </div>
         </div>
@@ -67,34 +67,34 @@ export default function SalesTrends({ invoices }) {
       </div>
 
       {/* Pending Invoices */}
-      <div className="bg-white border border-border rounded-sm p-4">
+      <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm p-4">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="font-heading text-sm font-bold uppercase tracking-wider">Pending Invoices</h3>
-            <p className="text-[10px] text-muted-foreground font-body mt-0.5">
+            <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-white">Pending Invoices</h3>
+            <p className="text-[10px] text-white/40 font-body mt-0.5">
               {pendingInvoices.length} outstanding · {overdue.length > 0 ? <span className="text-red-500 font-semibold">{overdue.length} overdue</span> : "none overdue"}
             </p>
           </div>
           <div className="text-right">
-            <div className="font-heading text-[10px] uppercase tracking-widest text-muted-foreground">Total Owed</div>
+            <div className="font-heading text-[10px] uppercase tracking-widest text-white/40">Total Owed</div>
             <div className="font-heading text-xl font-bold text-amber-500">${totalPending.toLocaleString("en-AU", { minimumFractionDigits: 2 })}</div>
           </div>
         </div>
         {pendingInvoices.length === 0 ? (
-          <div className="flex items-center justify-center h-32 text-muted-foreground text-sm font-heading uppercase tracking-wider">
+          <div className="flex items-center justify-center h-32 text-white/30 text-sm font-heading uppercase tracking-wider">
             All invoices cleared ✓
           </div>
         ) : (
           <div className="space-y-1.5 overflow-y-auto max-h-[180px]">
             {pendingInvoices.map(inv => (
-              <div key={inv.id} className={`flex items-center justify-between px-3 py-2 rounded-sm border text-sm ${statusBg[inv.status] || "bg-muted/30 border-border"}`}>
+              <div key={inv.id} className={`flex items-center justify-between px-3 py-2 rounded-sm border text-sm ${statusBg[inv.status] || "bg-[hsl(0,0%,14%)] border-[hsl(0,0%,20%)]"}`}>
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-mono font-bold text-xs text-foreground/70 flex-shrink-0">{inv.invoice_number || "—"}</span>
-                  <span className="truncate text-xs text-muted-foreground">{inv.customer_name}</span>
+                  <span className="font-mono font-bold text-xs text-white/60 flex-shrink-0">{inv.invoice_number || "—"}</span>
+                  <span className="truncate text-xs text-white/40">{inv.customer_name}</span>
                 </div>
                 <div className="flex items-center gap-2 flex-shrink-0 ml-2">
-                  <span className={`text-[10px] font-heading font-bold uppercase tracking-wider ${statusColor[inv.status] || "text-muted-foreground"}`}>{inv.status}</span>
-                  <span className="font-semibold text-xs">${(inv.total || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span>
+                  <span className={`text-[10px] font-heading font-bold uppercase tracking-wider ${statusColor[inv.status] || "text-white/40"}`}>{inv.status}</span>
+                  <span className="font-semibold text-xs text-white">${(inv.total || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span>
                 </div>
               </div>
             ))}

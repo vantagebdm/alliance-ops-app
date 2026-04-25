@@ -35,11 +35,11 @@ export default function Purchasing() {
     { key: "supplier_name", label: "Supplier", render: (v) => <span className="font-medium">{v}</span> },
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
     { key: "total", label: "Total", render: (v) => <span className="font-semibold">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
-    { key: "items", label: "Lines", render: (v) => <span className="text-muted-foreground text-xs">{(v || []).length} items</span> },
+    { key: "items", label: "Lines", render: (v) => <span className="text-white/40 text-xs">{(v || []).length} items</span> },
     { key: "expected_date", label: "Expected", render: (v) => {
-      if (!v) return <span className="text-muted-foreground">—</span>;
+      if (!v) return <span className="text-white/30">—</span>;
       const late = moment(v).isBefore(moment());
-      return <span className={late ? "text-red-500 font-semibold" : ""}>{moment(v).format("DD/MM/YY")}</span>;
+      return <span className={late ? "text-red-400 font-semibold" : "text-white/80"}>{moment(v).format("DD/MM/YY")}</span>;
     }},
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
   ];
@@ -77,7 +77,7 @@ export default function Purchasing() {
           <Filter className="w-4 h-4 text-muted-foreground" />
           {FILTERS.map(f => (
             <button key={f.value} onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}>
+              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {f.label}
             </button>
           ))}
