@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { LayoutDashboard, BookOpen, Building2, Users, FileText, Calculator, BookMarked, BarChart2, CreditCard } from "lucide-react";
 import AccountingDashboard from "./accounting/AccountingDashboard";
 import ChartOfAccounts from "./accounting/ChartOfAccounts";
@@ -23,12 +23,10 @@ const TABS = [
 ];
 
 export default function Accounting() {
-  const [activeTab, setActiveTab] = useState("dashboard");
-  const urlParams = new URLSearchParams(window.location.search);
-  const tabParam = urlParams.get("tab");
-  const [tab, setTab] = useState(tabParam || "dashboard");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tab = searchParams.get("tab") || "dashboard";
 
-  const handleTab = (id) => setTab(id);
+  const handleTab = (id) => setSearchParams({ tab: id });
 
   const renderContent = () => {
     switch (tab) {
