@@ -29,7 +29,7 @@ export default function Admin() {
 
   const ADMIN_SECTIONS = [
     { icon: Users, label: "User Management", desc: "Manage team members, roles, permissions and access control", link: "/admin/user-management", highlight: true },
-    { icon: Shield, label: "Security", desc: "Authentication and access control" },
+    { icon: Shield, label: "Security", desc: "Authentication and access control", link: "/admin/security", highlight: true },
     { icon: Database, label: "Data Management", desc: "Import, export, and backup data" },
     { icon: Settings, label: "System Settings", desc: "Configure ERP preferences" },
     { icon: Hash, label: "Document Numbering", desc: "Configure auto-sequencing for all document types" },
