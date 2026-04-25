@@ -75,6 +75,44 @@
     --input: 0 0% 20%;
     --ring: 145 80% 42%;
   }
+
+  /* Light theme override */
+  .light-theme {
+    --background: 0 0% 97%;
+    --foreground: 0 0% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 10%;
+    --primary: 145 70% 35%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 10%;
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 145 70% 35%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+    --ring: 145 70% 35%;
+
+    --sidebar-background: 0 0% 96%;
+    --sidebar-foreground: 0 0% 20%;
+    --sidebar-primary: 145 70% 35%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent-foreground: 0 0% 10%;
+    --sidebar-border: 0 0% 82%;
+    --sidebar-ring: 145 70% 35%;
+
+    --topbar: 0 0% 100%;
+    --topbar-foreground: 0 0% 10%;
+    --surface-dark: 0 0% 96%;
+    --surface-charcoal: 0 0% 92%;
+    --industrial-green: 145 70% 35%;
+  }
 }
 
 @layer base {

@@ -33,6 +33,7 @@ import SystemSettings from './pages/SystemSettings';
 import DocumentNumbering from './pages/DocumentNumbering';
 import PartNumbering from './pages/PartNumbering';
 import { PermissionProvider } from '@/lib/PermissionContext';
+import { ThemeProvider } from '@/lib/ThemeContext';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -105,12 +106,14 @@ function App() {
   return (
     <AuthProvider>
       <PermissionProvider>
-        <QueryClientProvider client={queryClientInstance}>
-          <Router>
-            <AuthenticatedApp />
-          </Router>
-          <Toaster />
-        </QueryClientProvider>
+        <ThemeProvider>
+          <QueryClientProvider client={queryClientInstance}>
+            <Router>
+              <AuthenticatedApp />
+            </Router>
+            <Toaster />
+          </QueryClientProvider>
+        </ThemeProvider>
       </PermissionProvider>
     </AuthProvider>
   )

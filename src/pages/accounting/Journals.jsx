@@ -69,23 +69,23 @@ export default function Journals() {
         <div className="border border-border rounded-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/50 border-b border-border">
-                {["Journal #","Date","Reference","Description","Debits","Credits","Status","Action"].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground">{h}</th>
-                ))}
+              <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
+                 {["Journal #","Date","Reference","Description","Debits","Credits","Status","Action"].map(h => (
+                   <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30">{h}</th>
+                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {journals.length === 0 ? (
-                <tr><td colSpan={8} className="text-center py-8 text-muted-foreground text-xs">No journals yet</td></tr>
+                <tr><td colSpan={8} className="text-center py-8 text-white/30 text-xs">No journals yet</td></tr>
               ) : journals.map(j => (
-                <tr key={j.id} className="hover:bg-muted/20">
-                  <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{j.journal_number || "—"}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{j.journal_date}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{j.reference || "—"}</td>
-                  <td className="px-4 py-2.5 text-sm text-foreground">{j.description}</td>
-                  <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(j.total_debits)}</td>
-                  <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(j.total_credits)}</td>
+                <tr key={j.id} className="hover:bg-[hsl(0,0%,14%)]">
+                  <td className="px-4 py-2.5 font-mono text-xs text-white/40">{j.journal_number || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{j.journal_date}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{j.reference || "—"}</td>
+                  <td className="px-4 py-2.5 text-sm text-white">{j.description}</td>
+                  <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(j.total_debits)}</td>
+                  <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(j.total_credits)}</td>
                   <td className="px-4 py-2.5">
                     <span className={`px-1.5 py-0.5 rounded-sm text-[9px] font-heading uppercase tracking-wider border ${j.status === "posted" ? "bg-green-500/10 text-primary border-green-500/30" : "bg-amber-500/10 text-amber-400 border-amber-500/30"}`}>{j.status}</span>
                   </td>
@@ -127,9 +127,9 @@ export default function Journals() {
               <div className="border border-border rounded-sm overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-muted/50 border-b border-border">
+                    <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
                       {["Account","Description","Debit","Credit","GST",""].map(h => (
-                        <th key={h} className="px-3 py-2 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground">{h}</th>
+                        <th key={h} className="px-3 py-2 text-left font-heading text-[9px] uppercase tracking-wider text-white/30">{h}</th>
                       ))}
                     </tr>
                   </thead>
@@ -162,16 +162,16 @@ export default function Journals() {
                           </Select>
                         </td>
                         <td className="px-2 py-1.5">
-                          {lines.length > 2 && <button onClick={() => setLines(ls => ls.filter((_,j)=>j!==i))} className="text-muted-foreground hover:text-red-400"><X className="w-3.5 h-3.5" /></button>}
+                          {lines.length > 2 && <button onClick={() => setLines(ls => ls.filter((_,j)=>j!==i))} className="text-white/30 hover:text-red-400"><X className="w-3.5 h-3.5" /></button>}
                         </td>
                       </tr>
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-muted/30 border-t border-border">
-                      <td colSpan={2} className="px-3 py-2 font-heading text-[9px] uppercase tracking-wider text-muted-foreground">TOTALS</td>
-                      <td className="px-3 py-2 text-xs font-bold text-foreground">{fmt(totalDebits)}</td>
-                      <td className="px-3 py-2 text-xs font-bold text-foreground">{fmt(totalCredits)}</td>
+                    <tr className="bg-[hsl(0,0%,9%)] border-t border-[hsl(0,0%,18%)]">
+                       <td colSpan={2} className="px-3 py-2 font-heading text-[9px] uppercase tracking-wider text-white/30">TOTALS</td>
+                       <td className="px-3 py-2 text-xs font-bold text-white">{fmt(totalDebits)}</td>
+                       <td className="px-3 py-2 text-xs font-bold text-white">{fmt(totalCredits)}</td>
                       <td colSpan={2} className="px-3 py-2">
                         {balanced ? (
                           <span className="flex items-center gap-1 text-[9px] text-primary font-heading uppercase"><CheckCircle className="w-3 h-3" /> Balanced</span>

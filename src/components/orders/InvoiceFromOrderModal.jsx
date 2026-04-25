@@ -223,7 +223,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
   if (isIneligible) {
     return (
       <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div className="bg-white w-full max-w-md rounded-sm shadow-2xl">
+        <div className="bg-[hsl(0,0%,10%)] w-full max-w-md rounded-sm shadow-2xl">
           <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
             <h2 className="font-heading text-base font-bold text-white uppercase tracking-wider">Create Invoice</h2>
             <button onClick={onClose} className="text-white/60 hover:text-white"><X className="w-5 h-5" /></button>
@@ -232,7 +232,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
             <AlertTriangle className="w-6 h-6 text-amber-500 flex-shrink-0 mt-0.5" />
             <div>
               <p className="font-heading font-semibold text-sm uppercase tracking-wider mb-1">Order Not Eligible</p>
-              <p className="text-sm text-muted-foreground">Orders with status <strong className="capitalize">{order.status}</strong> cannot be invoiced. Invoice creation is available for confirmed, processing, ready, dispatched, or delivered orders.</p>
+              <p className="text-sm text-white/60">Orders with status <strong className="capitalize text-white">{order.status}</strong> cannot be invoiced. Invoice creation is available for confirmed, processing, ready, dispatched, or delivered orders.</p>
             </div>
           </div>
           <div className="px-6 py-4 border-t border-border flex justify-end">
@@ -245,7 +245,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl mx-4 flex flex-col">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-5xl rounded-sm shadow-2xl mx-4 flex flex-col">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-start justify-between rounded-t-sm sticky top-0 z-10">
@@ -283,7 +283,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
                 {INVOICE_BASIS.map(b => (
                   <button key={b.value} type="button" onClick={() => setBasis(b.value)}
                     className={`px-3 py-2.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm border transition-colors ${
-                      basis === b.value ? "bg-primary text-black border-primary" : "bg-white text-foreground border-border hover:border-primary/50"
+                      basis === b.value ? "bg-primary text-black border-primary" : "bg-[hsl(0,0%,14%)] text-white/70 border-[hsl(0,0%,22%)] hover:border-primary/50"
                     }`}>
                     {b.label}
                   </button>
@@ -349,20 +349,20 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs min-w-[900px]">
-                <thead className="bg-[hsl(0,0%,96%)] border-b border-border">
+                <thead className="bg-[hsl(0,0%,8%)] border-b border-[hsl(0,0%,18%)]">
                   <tr>
                     {basis === "selected" && <th className="w-8 px-2 py-2" />}
-                    <th className="text-left px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-24">Part #</th>
-                    <th className="text-left px-3 py-2 font-heading uppercase tracking-wider text-foreground/50">Description</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-16">Ordered</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-16">Dispatched</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-16">Invoiced</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-16">Available</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-20">Inv Qty</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-24">Unit Price</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-14">Disc%</th>
-                    <th className="text-center px-2 py-2 font-heading uppercase tracking-wider text-foreground/50 w-10">GST</th>
-                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-foreground/50 w-24">Total</th>
+                    <th className="text-left px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-24">Part #</th>
+                    <th className="text-left px-3 py-2 font-heading uppercase tracking-wider text-white/30">Description</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-16">Ordered</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-16">Dispatched</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-16">Invoiced</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-16">Available</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-20">Inv Qty</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-24">Unit Price</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-14">Disc%</th>
+                    <th className="text-center px-2 py-2 font-heading uppercase tracking-wider text-white/30 w-10">GST</th>
+                    <th className="text-right px-3 py-2 font-heading uppercase tracking-wider text-white/30 w-24">Total</th>
                     <th className="w-8" />
                   </tr>
                 </thead>
@@ -371,7 +371,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
                     const isCharge = !!line._charge;
                     const exceeds = !isCharge && line.invoice_qty > line.available_qty;
                     return (
-                      <tr key={i} className={`border-b border-border/40 ${isCharge ? "bg-blue-50/40" : line.available_qty === 0 && !isCharge ? "bg-muted/20 opacity-60" : ""}`}>
+                      <tr key={i} className={`border-b border-[hsl(0,0%,16%)] ${isCharge ? "bg-blue-500/10" : line.available_qty === 0 && !isCharge ? "bg-white/5 opacity-60" : ""}`}>
                         {basis === "selected" && (
                           <td className="px-2 py-2 text-center">
                             {!isCharge && (
@@ -380,19 +380,19 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
                             )}
                           </td>
                         )}
-                        <td className="px-3 py-2 font-mono text-primary text-[11px]">{line.part_number || (isCharge ? <span className="text-blue-600 text-[10px] font-heading uppercase">{line.description}</span> : "—")}</td>
-                        <td className="px-3 py-2 max-w-[200px]">
-                          {isCharge ? (
-                            <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
-                              className="w-full h-7 px-2 border border-input rounded-sm text-xs" />
-                          ) : (
-                            <span className="text-sm">{line.description}</span>
-                          )}
-                        </td>
-                        <td className="px-3 py-2 text-right text-muted-foreground">{isCharge ? "—" : line.ordered_qty}</td>
-                        <td className="px-3 py-2 text-right text-muted-foreground">{isCharge ? "—" : line.dispatched_qty || <span className="text-amber-500">0</span>}</td>
-                        <td className="px-3 py-2 text-right text-muted-foreground">{isCharge ? "—" : line.invoiced_qty || 0}</td>
-                        <td className={`px-3 py-2 text-right font-semibold ${line.available_qty === 0 && !isCharge ? "text-red-500" : "text-foreground"}`}>
+                        <td className="px-3 py-2 font-mono text-primary text-[11px]">{line.part_number || (isCharge ? <span className="text-blue-400 text-[10px] font-heading uppercase">{line.description}</span> : "—")}</td>
+                         <td className="px-3 py-2 max-w-[200px]">
+                           {isCharge ? (
+                             <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
+                               className="w-full h-7 px-2 border border-[hsl(0,0%,24%)] bg-[hsl(0,0%,14%)] text-white rounded-sm text-xs" />
+                           ) : (
+                             <span className="text-sm text-white/80">{line.description}</span>
+                           )}
+                         </td>
+                         <td className="px-3 py-2 text-right text-white/40">{isCharge ? "—" : line.ordered_qty}</td>
+                         <td className="px-3 py-2 text-right text-white/40">{isCharge ? "—" : line.dispatched_qty || <span className="text-amber-400">0</span>}</td>
+                         <td className="px-3 py-2 text-right text-white/40">{isCharge ? "—" : line.invoiced_qty || 0}</td>
+                         <td className={`px-3 py-2 text-right font-semibold ${line.available_qty === 0 && !isCharge ? "text-red-400" : "text-white"}`}>
                           {isCharge ? "—" : line.available_qty}
                         </td>
                         <td className="px-3 py-2">
@@ -405,25 +405,25 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
                               if (!isCharge && val > line.available_qty) return;
                               updateLine(i, "invoice_qty", val);
                             }}
-                            className={`w-full h-7 px-2 border rounded-sm text-xs text-right ${exceeds ? "border-red-400 bg-red-50" : "border-input"}`}
+                            className={`w-full h-7 px-2 border rounded-sm text-xs text-right bg-[hsl(0,0%,14%)] text-white ${exceeds ? "border-red-400" : "border-[hsl(0,0%,24%)]"}`}
                           />
                         </td>
                         <td className="px-3 py-2">
                           <input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
-                            className="w-full h-7 px-2 border border-input rounded-sm text-xs text-right" />
-                        </td>
-                        <td className="px-3 py-2">
-                          <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
-                            className="w-full h-7 px-2 border border-input rounded-sm text-xs text-right" />
+                            className="w-full h-7 px-2 border border-[hsl(0,0%,24%)] bg-[hsl(0,0%,14%)] text-white rounded-sm text-xs text-right" />
+                            </td>
+                            <td className="px-3 py-2">
+                            <input type="number" min="0" max="100" value={line.discount} onChange={e => updateLine(i, "discount", Number(e.target.value))}
+                              className="w-full h-7 px-2 border border-[hsl(0,0%,24%)] bg-[hsl(0,0%,14%)] text-white rounded-sm text-xs text-right" />
                         </td>
                         <td className="px-2 py-2 text-center">
                           <input type="checkbox" checked={line.gst} onChange={e => updateLine(i, "gst", e.target.checked)}
                             className="h-3.5 w-3.5 accent-primary" />
                         </td>
-                        <td className="px-3 py-2 text-right font-semibold">${(line.total || 0).toFixed(2)}</td>
+                        <td className="px-3 py-2 text-right font-semibold text-white">${(line.total || 0).toFixed(2)}</td>
                         <td className="px-1 py-2">
                           {(isCharge || line.available_qty === 0) && (
-                            <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
+                            <button onClick={() => removeLine(i)} className="text-white/30 hover:text-red-400">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           )}
@@ -435,42 +435,28 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
               </table>
             </div>
 
-            <div className="px-4 py-3 border-t border-border/50 bg-muted/10 flex flex-wrap gap-2">
-              <button onClick={() => addChargeLine("Freight")} type="button"
-                className="px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors">
-                + Freight
-              </button>
-              <button onClick={() => addChargeLine("Handling")} type="button"
-                className="px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors">
-                + Handling
-              </button>
-              <button onClick={() => addChargeLine("Remote Delivery Surcharge")} type="button"
-                className="px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors">
-                + Remote Surcharge
-              </button>
-              <button onClick={() => addChargeLine("After-hours Surcharge")} type="button"
-                className="px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors">
-                + After-hours
-              </button>
-              <button onClick={() => addChargeLine("Miscellaneous")} type="button"
-                className="px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-300 text-blue-600 hover:bg-blue-50 transition-colors">
-                + Misc Charge
-              </button>
+            <div className="px-4 py-3 border-t border-[hsl(0,0%,18%)] bg-[hsl(0,0%,9%)] flex flex-wrap gap-2">
+              {["Freight","Handling","Remote Delivery Surcharge","After-hours Surcharge","Miscellaneous"].map(label => (
+                <button key={label} onClick={() => addChargeLine(label)} type="button"
+                  className="px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 transition-colors">
+                  + {label}
+                </button>
+              ))}
             </div>
 
             {/* Totals */}
-            <div className="p-4 flex justify-end border-t border-border bg-muted/20">
+            <div className="p-4 flex justify-end border-t border-[hsl(0,0%,18%)] bg-[hsl(0,0%,9%)]">
               <div className="w-64 space-y-1.5 text-sm">
-                <div className="flex justify-between text-muted-foreground">
+                <div className="flex justify-between text-white/40">
                   <span className="font-heading text-[11px] uppercase tracking-wider">Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span className="text-white/80">${subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-muted-foreground">
+                <div className="flex justify-between text-white/40">
                   <span className="font-heading text-[11px] uppercase tracking-wider">GST (10%)</span>
-                  <span>${gstAmount.toFixed(2)}</span>
+                  <span className="text-white/80">${gstAmount.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between font-bold text-lg border-t border-border pt-2">
-                  <span className="font-heading uppercase tracking-wider">Total</span>
+                <div className="flex justify-between font-bold text-lg border-t border-[hsl(0,0%,20%)] pt-2">
+                  <span className="font-heading uppercase tracking-wider text-white">Total</span>
                   <span className="text-primary">${totalAmount.toFixed(2)}</span>
                 </div>
               </div>

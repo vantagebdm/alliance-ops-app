@@ -144,28 +144,28 @@ export default function ChartOfAccounts() {
         <div className="space-y-4">
           {Object.entries(grouped).map(([cat, accs]) => (
             <div key={cat} className="border border-border rounded-sm overflow-hidden">
-              <div className="bg-muted/50 px-4 py-2 border-b border-border">
-                <span className="font-heading text-[9px] uppercase tracking-widest text-muted-foreground">{cat}</span>
+              <div className="bg-[hsl(0,0%,9%)] px-4 py-2 border-b border-[hsl(0,0%,18%)]">
+                <span className="font-heading text-[9px] uppercase tracking-widest text-white/30">{cat}</span>
               </div>
               <table className="w-full text-sm">
                 <tbody className="divide-y divide-border">
                   {accs.map(a => (
                     <tr key={a.id} className={`${!a.is_active ? "opacity-40" : ""}`}>
-                      <td className="px-4 py-2.5 w-20 font-mono text-xs text-muted-foreground">{a.code}</td>
-                      <td className="px-4 py-2.5 font-medium text-foreground">{a.name}</td>
+                      <td className="px-4 py-2.5 w-20 font-mono text-xs text-white/40">{a.code}</td>
+                       <td className="px-4 py-2.5 font-medium text-white">{a.name}</td>
                       <td className="px-4 py-2.5">
                         <span className={`font-heading text-[9px] uppercase tracking-wider ${TYPE_COLORS[a.type] || ""}`}>{a.type}</span>
                       </td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{a.gst_treatment?.replace(/_/g," ")}</td>
-                      <td className="px-4 py-2.5 text-right font-heading text-xs font-bold text-foreground">
+                      <td className="px-4 py-2.5 text-xs text-white/40">{a.gst_treatment?.replace(/_/g," ")}</td>
+                       <td className="px-4 py-2.5 text-right font-heading text-xs font-bold text-white">
                         ${(a.current_balance || 0).toFixed(2)}
                       </td>
                       <td className="px-4 py-2.5 text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button onClick={() => toggle(a)} className="text-muted-foreground hover:text-foreground">
+                          <button onClick={() => toggle(a)} className="text-white/30 hover:text-white">
                             {a.is_active ? <CheckCircle className="w-4 h-4 text-primary" /> : <XCircle className="w-4 h-4 text-red-400" />}
                           </button>
-                          <button onClick={() => { setEditing(a.id); setForm(a); }} className="text-muted-foreground hover:text-foreground ml-1">
+                          <button onClick={() => { setEditing(a.id); setForm(a); }} className="text-white/30 hover:text-white ml-1">
                             <Pencil className="w-3.5 h-3.5" />
                           </button>
                         </div>

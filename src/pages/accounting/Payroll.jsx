@@ -108,7 +108,7 @@ export default function Payroll() {
       <div className="flex gap-0 border-b border-border">
         {TABS.map(t => (
           <button key={t} onClick={() => setTab(t)}
-            className={`px-4 py-2 font-heading text-xs uppercase tracking-wider border-b-2 transition-all ${tab === t ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            className={`px-4 py-2 font-heading text-xs uppercase tracking-wider border-b-2 transition-all ${tab === t ? "border-primary text-primary" : "border-transparent text-white/40 hover:text-white"}`}>
             {t}
           </button>
         ))}
@@ -125,23 +125,23 @@ export default function Payroll() {
               <div className="border border-border rounded-sm overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-muted/50 border-b border-border">
+                    <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
                       {["Name","Type","Pay Basis","Pay Rate","Super Rate","Super Fund","Status"].map(h => (
-                        <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground">{h}</th>
+                        <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {filtered.length === 0 ? (
-                      <tr><td colSpan={7} className="text-center py-8 text-muted-foreground text-xs">No employees found</td></tr>
-                    ) : filtered.map(e => (
-                      <tr key={e.id} className="hover:bg-muted/20">
-                        <td className="px-4 py-2.5 font-medium text-foreground">{e.first_name} {e.last_name}</td>
-                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{e.employment_type?.replace(/_/g," ")}</td>
-                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{e.pay_basis}</td>
-                        <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(e.pay_rate)}</td>
-                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{e.super_rate}%</td>
-                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{e.super_fund || "—"}</td>
+                      <tr><td colSpan={7} className="text-center py-8 text-white/30 text-xs">No employees found</td></tr>
+                      ) : filtered.map(e => (
+                        <tr key={e.id} className="hover:bg-[hsl(0,0%,14%)]">
+                          <td className="px-4 py-2.5 font-medium text-white">{e.first_name} {e.last_name}</td>
+                          <td className="px-4 py-2.5 text-xs text-white/40">{e.employment_type?.replace(/_/g," ")}</td>
+                          <td className="px-4 py-2.5 text-xs text-white/40">{e.pay_basis}</td>
+                          <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(e.pay_rate)}</td>
+                          <td className="px-4 py-2.5 text-xs text-white/40">{e.super_rate}%</td>
+                          <td className="px-4 py-2.5 text-xs text-white/40">{e.super_fund || "—"}</td>
                         <td className="px-4 py-2.5">
                           <span className={`px-1.5 py-0.5 rounded-sm text-[9px] font-heading uppercase tracking-wider border ${e.status === "active" ? "bg-green-500/10 text-primary border-green-500/30" : "bg-gray-500/10 text-gray-400 border-gray-500/30"}`}>{e.status}</span>
                         </td>
@@ -157,22 +157,22 @@ export default function Payroll() {
             <div className="border border-border rounded-sm overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="bg-muted/50 border-b border-border">
-                    {["Pay Run #","Pay Period","Pay Date","Employees","Gross Pay","PAYG","Super","Net Pay","Status"].map(h => (
-                      <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground">{h}</th>
-                    ))}
+                  <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
+                     {["Pay Run #","Pay Period","Pay Date","Employees","Gross Pay","PAYG","Super","Net Pay","Status"].map(h => (
+                       <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30">{h}</th>
+                     ))}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border">
                   {payRuns.length === 0 ? (
-                    <tr><td colSpan={9} className="text-center py-8 text-muted-foreground text-xs">No pay runs yet</td></tr>
+                    <tr><td colSpan={9} className="text-center py-8 text-white/30 text-xs">No pay runs yet</td></tr>
                   ) : payRuns.map(r => (
-                    <tr key={r.id} className="hover:bg-muted/20">
-                      <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{r.pay_run_number || "—"}</td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{r.pay_period_start} – {r.pay_period_end}</td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{r.pay_date}</td>
-                      <td className="px-4 py-2.5 text-xs text-muted-foreground">{(r.lines || []).length}</td>
-                      <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(r.total_gross)}</td>
+                    <tr key={r.id} className="hover:bg-[hsl(0,0%,14%)]">
+                      <td className="px-4 py-2.5 font-mono text-xs text-white/40">{r.pay_run_number || "—"}</td>
+                      <td className="px-4 py-2.5 text-xs text-white/40">{r.pay_period_start} – {r.pay_period_end}</td>
+                      <td className="px-4 py-2.5 text-xs text-white/40">{r.pay_date}</td>
+                      <td className="px-4 py-2.5 text-xs text-white/40">{(r.lines || []).length}</td>
+                      <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(r.total_gross)}</td>
                       <td className="px-4 py-2.5 text-xs text-amber-400">{fmt(r.total_payg)}</td>
                       <td className="px-4 py-2.5 text-xs text-blue-400">{fmt(r.total_super)}</td>
                       <td className="px-4 py-2.5 text-xs font-bold text-primary">{fmt(r.total_net)}</td>
@@ -277,19 +277,19 @@ export default function Payroll() {
               <div className="border border-border rounded-sm overflow-hidden">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-muted/50 border-b border-border">
+                    <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
                       {["Employee","Ord Hours","OT Hours","Rate","Gross","PAYG","Super","Net"].map(h => (
-                        <th key={h} className="px-3 py-2 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground">{h}</th>
+                        <th key={h} className="px-3 py-2 text-left font-heading text-[9px] uppercase tracking-wider text-white/30">{h}</th>
                       ))}
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {runLines.map((line, i) => (
                       <tr key={i}>
-                        <td className="px-3 py-2 text-xs font-medium text-foreground">{line.employee_name}</td>
+                        <td className="px-3 py-2 text-xs font-medium text-white">{line.employee_name}</td>
                         <td className="px-3 py-2"><Input type="number" value={line.ordinary_hours} onChange={e => setRunLines(ls => { const n = [...ls]; n[i] = recalc({...n[i], ordinary_hours: parseFloat(e.target.value)||0}, employees); return n; })} className="rounded-sm text-xs w-16 h-7" /></td>
                         <td className="px-3 py-2"><Input type="number" value={line.overtime_hours} onChange={e => setRunLines(ls => { const n = [...ls]; n[i] = recalc({...n[i], overtime_hours: parseFloat(e.target.value)||0}, employees); return n; })} className="rounded-sm text-xs w-16 h-7" /></td>
-                        <td className="px-3 py-2 text-xs text-muted-foreground">{fmt(line.pay_rate)}</td>
+                        <td className="px-3 py-2 text-xs text-white/40">{fmt(line.pay_rate)}</td>
                         <td className="px-3 py-2 text-xs font-bold text-foreground">{fmt(line.gross_pay)}</td>
                         <td className="px-3 py-2 text-xs text-amber-400">{fmt(line.payg_withheld)}</td>
                         <td className="px-3 py-2 text-xs text-blue-400">{fmt(line.super_amount)}</td>
@@ -298,8 +298,8 @@ export default function Payroll() {
                     ))}
                   </tbody>
                   <tfoot>
-                    <tr className="bg-muted/30 border-t border-border">
-                      <td colSpan={4} className="px-3 py-2 font-heading text-[9px] uppercase tracking-wider text-muted-foreground">TOTALS</td>
+                    <tr className="bg-[hsl(0,0%,9%)] border-t border-[hsl(0,0%,18%)]">
+                       <td colSpan={4} className="px-3 py-2 font-heading text-[9px] uppercase tracking-wider text-white/30">TOTALS</td>
                       <td className="px-3 py-2 text-xs font-bold text-foreground">{fmt(runLines.reduce((s,l)=>s+l.gross_pay,0))}</td>
                       <td className="px-3 py-2 text-xs font-bold text-amber-400">{fmt(runLines.reduce((s,l)=>s+l.payg_withheld,0))}</td>
                       <td className="px-3 py-2 text-xs font-bold text-blue-400">{fmt(runLines.reduce((s,l)=>s+l.super_amount,0))}</td>

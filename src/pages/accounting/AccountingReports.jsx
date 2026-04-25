@@ -35,8 +35,8 @@ function PLReport({ invoices, bills }) {
         <Row label="Parts Purchases" value={cogs} />
         <TotalRow label="Total COGS" value={cogs} />
       </Section>
-      <div className="bg-muted/30 rounded-sm p-3 flex justify-between items-center">
-        <span className="font-heading text-xs uppercase tracking-wider font-bold text-foreground">GROSS PROFIT</span>
+      <div className="bg-[hsl(0,0%,9%)] rounded-sm p-3 flex justify-between items-center">
+        <span className="font-heading text-xs uppercase tracking-wider font-bold text-white">GROSS PROFIT</span>
         <span className={`font-heading font-bold text-lg ${grossProfit >= 0 ? "text-primary" : "text-red-400"}`}>{fmt(grossProfit)}</span>
       </div>
       <Section title="Operating Expenses">
@@ -75,8 +75,8 @@ function ARAgingReport({ invoices }) {
           </div>
         );
       })}
-      <div className="flex justify-between items-center py-3 bg-muted/30 rounded-sm px-4 mt-2 border border-border">
-        <span className="font-heading text-xs uppercase tracking-wider font-bold text-foreground">TOTAL RECEIVABLE</span>
+      <div className="flex justify-between items-center py-3 bg-[hsl(0,0%,9%)] rounded-sm px-4 mt-2 border border-[hsl(0,0%,18%)]">
+        <span className="font-heading text-xs uppercase tracking-wider font-bold text-white">TOTAL RECEIVABLE</span>
         <span className="font-heading font-bold text-lg text-primary">{fmt(open.reduce((s, i) => s + (i.total - (i.amount_paid || 0)), 0))}</span>
       </div>
     </div>
@@ -101,14 +101,14 @@ function APAgingReport({ bills }) {
         });
         const total = items.reduce((s, i) => s + (i.balance_due || i.total || 0), 0);
         return (
-          <div key={b.label} className={`flex justify-between items-center py-2 px-4 rounded-sm ${b.label.includes("90+") ? "bg-red-500/10" : "bg-muted/20"}`}>
-            <span className="text-sm text-muted-foreground">{b.label} ({items.length} bills)</span>
-            <span className={`font-heading font-bold ${b.label.includes("90+") ? "text-red-400" : "text-foreground"}`}>{fmt(total)}</span>
+          <div key={b.label} className={`flex justify-between items-center py-2 px-4 rounded-sm ${b.label.includes("90+") ? "bg-red-500/10" : "bg-[hsl(0,0%,12%)]"}`}>
+            <span className="text-sm text-white/50">{b.label} ({items.length} bills)</span>
+            <span className={`font-heading font-bold ${b.label.includes("90+") ? "text-red-400" : "text-white"}`}>{fmt(total)}</span>
           </div>
         );
       })}
-      <div className="flex justify-between items-center py-3 bg-muted/30 rounded-sm px-4 mt-2 border border-border">
-        <span className="font-heading text-xs uppercase tracking-wider font-bold text-foreground">TOTAL PAYABLE</span>
+      <div className="flex justify-between items-center py-3 bg-[hsl(0,0%,9%)] rounded-sm px-4 mt-2 border border-[hsl(0,0%,18%)]">
+        <span className="font-heading text-xs uppercase tracking-wider font-bold text-white">TOTAL PAYABLE</span>
         <span className="font-heading font-bold text-lg text-amber-400">{fmt(open.reduce((s, i) => s + (i.balance_due || i.total || 0), 0))}</span>
       </div>
     </div>
@@ -123,8 +123,8 @@ function GSTReport({ invoices, bills }) {
     <div className="space-y-3">
       <Row label="GST Collected on Sales (1A)" value={gstCollected} />
       <Row label="GST Paid on Purchases (1B)" value={gstPaid} />
-      <div className="border-t border-border pt-3 flex justify-between items-center">
-        <span className="font-heading text-sm uppercase tracking-wider font-bold text-foreground">Net GST {net >= 0 ? "Payable" : "Refund"}</span>
+      <div className="border-t border-[hsl(0,0%,18%)] pt-3 flex justify-between items-center">
+        <span className="font-heading text-sm uppercase tracking-wider font-bold text-white">Net GST {net >= 0 ? "Payable" : "Refund"}</span>
         <span className={`font-heading font-bold text-xl ${net >= 0 ? "text-red-400" : "text-primary"}`}>{fmt(Math.abs(net))}</span>
       </div>
     </div>
@@ -134,8 +134,8 @@ function GSTReport({ invoices, bills }) {
 function Section({ title, children }) {
   return (
     <div>
-      <div className="font-heading text-[9px] uppercase tracking-widest text-muted-foreground mb-2 px-2">{title}</div>
-      <div className="border border-border rounded-sm divide-y divide-border">{children}</div>
+      <div className="font-heading text-[9px] uppercase tracking-widest text-white/30 mb-2 px-2">{title}</div>
+      <div className="border border-[hsl(0,0%,18%)] rounded-sm divide-y divide-[hsl(0,0%,16%)]">{children}</div>
     </div>
   );
 }
@@ -143,17 +143,17 @@ function Section({ title, children }) {
 function Row({ label, value, muted }) {
   return (
     <div className="flex justify-between items-center px-4 py-2">
-      <span className={`text-sm ${muted ? "text-muted-foreground" : "text-foreground"}`}>{label}</span>
-      <span className={`text-sm font-bold ${muted ? "text-muted-foreground" : "text-foreground"}`}>{fmt(value)}</span>
+      <span className={`text-sm ${muted ? "text-white/40" : "text-white/80"}`}>{label}</span>
+      <span className={`text-sm font-bold ${muted ? "text-white/40" : "text-white"}`}>{fmt(value)}</span>
     </div>
   );
 }
 
 function TotalRow({ label, value, color }) {
   return (
-    <div className="flex justify-between items-center px-4 py-2 bg-muted/30">
-      <span className="font-heading text-xs uppercase tracking-wider font-bold text-muted-foreground">{label}</span>
-      <span className={`font-heading font-bold text-sm ${color || "text-foreground"}`}>{fmt(value)}</span>
+    <div className="flex justify-between items-center px-4 py-2 bg-[hsl(0,0%,9%)]">
+      <span className="font-heading text-xs uppercase tracking-wider font-bold text-white/40">{label}</span>
+      <span className={`font-heading font-bold text-sm ${color || "text-white"}`}>{fmt(value)}</span>
     </div>
   );
 }
@@ -196,7 +196,7 @@ export default function AccountingReports() {
         <div className="bg-card border border-border rounded-sm p-2 space-y-0.5 h-fit">
           {REPORTS.map(r => (
             <button key={r.id} onClick={() => setActiveReport(r.id)}
-              className={`w-full text-left px-3 py-2 rounded-sm text-xs font-heading uppercase tracking-wider transition-all ${activeReport === r.id ? "bg-primary/15 text-primary border-l-2 border-primary pl-[10px]" : "text-muted-foreground hover:text-foreground hover:bg-white/5"}`}>
+              className={`w-full text-left px-3 py-2 rounded-sm text-xs font-heading uppercase tracking-wider transition-all ${activeReport === r.id ? "bg-primary/15 text-primary border-l-2 border-primary pl-[10px]" : "text-white/40 hover:text-white hover:bg-white/5"}`}>
               {r.label}
             </button>
           ))}

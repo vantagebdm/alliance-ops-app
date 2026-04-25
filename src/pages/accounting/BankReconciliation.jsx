@@ -137,20 +137,20 @@ export default function BankReconciliation() {
           <div className="border border-border rounded-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-muted/50 border-b border-border">
-                  {["Date","Description","Reference","Debit","Credit","Status","Action"].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground">{h}</th>
-                  ))}
+                <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
+                     {["Date","Description","Reference","Debit","Credit","Status","Action"].map(h => (
+                       <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30">{h}</th>
+                     ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
                 {filtered.length === 0 ? (
-                  <tr><td colSpan={7} className="text-center py-8 text-muted-foreground text-xs">No transactions found</td></tr>
+                  <tr><td colSpan={7} className="text-center py-8 text-white/30 text-xs">No transactions found</td></tr>
                 ) : filtered.map(t => (
-                  <tr key={t.id} className="hover:bg-muted/20">
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground whitespace-nowrap">{t.date}</td>
-                    <td className="px-4 py-2.5 text-sm text-foreground max-w-[200px] truncate">{t.description}</td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground font-mono">{t.reference || "—"}</td>
+                  <tr key={t.id} className="hover:bg-[hsl(0,0%,14%)]">
+                    <td className="px-4 py-2.5 text-xs text-white/40 whitespace-nowrap">{t.date}</td>
+                    <td className="px-4 py-2.5 text-sm text-white max-w-[200px] truncate">{t.description}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/40 font-mono">{t.reference || "—"}</td>
                     <td className="px-4 py-2.5 text-xs text-red-400 font-bold">{t.debit > 0 ? fmt(t.debit) : "—"}</td>
                     <td className="px-4 py-2.5 text-xs text-primary font-bold">{t.credit > 0 ? fmt(t.credit) : "—"}</td>
                     <td className="px-4 py-2.5">

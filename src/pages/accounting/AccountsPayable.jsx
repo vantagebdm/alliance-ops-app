@@ -108,23 +108,23 @@ export default function AccountsPayable() {
         <div className="border border-border rounded-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/50 border-b border-border">
-                {["Bill #","Supplier","Supplier Inv #","Bill Date","Due Date","Total","Balance Due","Status","Actions"].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">{h}</th>
-                ))}
+              <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
+                 {["Bill #","Supplier","Supplier Inv #","Bill Date","Due Date","Total","Balance Due","Status","Actions"].map(h => (
+                   <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30 whitespace-nowrap">{h}</th>
+                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
-                <tr><td colSpan={9} className="text-center py-8 text-muted-foreground text-xs">No bills found</td></tr>
+                <tr><td colSpan={9} className="text-center py-8 text-white/30 text-xs">No bills found</td></tr>
               ) : filtered.map(b => (
-                <tr key={b.id} className="hover:bg-muted/20 cursor-pointer" onClick={() => setSelected(b)}>
-                  <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{b.bill_number || "—"}</td>
-                  <td className="px-4 py-2.5 font-medium text-foreground">{b.supplier_name}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{b.supplier_invoice_number || "—"}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{b.bill_date}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{b.due_date || "—"}</td>
-                  <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(b.total)}</td>
+                <tr key={b.id} className="hover:bg-[hsl(0,0%,14%)] cursor-pointer" onClick={() => setSelected(b)}>
+                  <td className="px-4 py-2.5 font-mono text-xs text-white/40">{b.bill_number || "—"}</td>
+                  <td className="px-4 py-2.5 font-medium text-white">{b.supplier_name}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{b.supplier_invoice_number || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{b.bill_date}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{b.due_date || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(b.total)}</td>
                   <td className="px-4 py-2.5 text-xs font-bold text-amber-400">{fmt(b.balance_due)}</td>
                   <td className="px-4 py-2.5">
                     <span className={`px-1.5 py-0.5 rounded-sm text-[9px] font-heading uppercase tracking-wider border ${STATUS_STYLES[b.status] || ""}`}>{b.status?.replace(/_/g," ")}</span>

@@ -1,13 +1,15 @@
 import { useState } from "react";
-import { User, Menu } from "lucide-react";
+import { User, Menu, Sun, Moon } from "lucide-react";
 import GlobalSearch from "./GlobalSearch";
 import QuickAddButton from "@/components/QuickAdd/QuickAddButton";
 import { useQuickAddContext } from "@/hooks/useQuickAddContext";
 import NotificationBell from "@/components/notifications/NotificationBell";
+import { useTheme } from "@/lib/ThemeContext";
 
 export default function TopBar({ onToggleSidebar }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const contextData = useQuickAddContext();
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <header className="h-14 bg-[hsl(0,0%,4%)] border-b border-[hsl(0,0%,12%)] flex items-center px-4 gap-4 fixed top-0 left-0 right-0 z-50">
@@ -39,6 +41,13 @@ export default function TopBar({ onToggleSidebar }) {
       {/* Right actions */}
       <div className="flex items-center gap-2">
         <NotificationBell />
+        <button
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          className="p-2 text-white/60 hover:text-white transition-colors rounded-sm hover:bg-white/10"
+        >
+          {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        </button>
         <div className="hidden sm:block">
           <QuickAddButton contextData={contextData} />
         </div>

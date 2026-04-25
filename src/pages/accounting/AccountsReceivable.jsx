@@ -124,29 +124,29 @@ export default function AccountsReceivable() {
         <div className="border border-border rounded-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/50 border-b border-border">
-                {["Invoice #","Customer","Invoice Date","Due Date","Total","Paid","Balance","Days Due","Status","Actions"].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">{h}</th>
-                ))}
+              <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
+                 {["Invoice #","Customer","Invoice Date","Due Date","Total","Paid","Balance","Days Due","Status","Actions"].map(h => (
+                   <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30 whitespace-nowrap">{h}</th>
+                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {filtered.length === 0 ? (
-                <tr><td colSpan={10} className="text-center py-8 text-muted-foreground text-xs">No invoices found</td></tr>
+                <tr><td colSpan={10} className="text-center py-8 text-white/30 text-xs">No invoices found</td></tr>
               ) : filtered.map(inv => {
                 const balance = inv.total - (inv.amount_paid || 0);
                 const days = daysOverdue(inv);
                 return (
-                  <tr key={inv.id} className="hover:bg-muted/20">
-                    <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{inv.invoice_number || "—"}</td>
-                    <td className="px-4 py-2.5 text-sm font-medium text-foreground">{inv.customer_name}</td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{inv.created_date?.slice(0,10)}</td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{inv.due_date || "—"}</td>
-                    <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(inv.total)}</td>
+                  <tr key={inv.id} className="hover:bg-[hsl(0,0%,14%)]">
+                    <td className="px-4 py-2.5 font-mono text-xs text-white/40">{inv.invoice_number || "—"}</td>
+                    <td className="px-4 py-2.5 text-sm font-medium text-white">{inv.customer_name}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/40">{inv.created_date?.slice(0,10)}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/40">{inv.due_date || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(inv.total)}</td>
                     <td className="px-4 py-2.5 text-xs text-primary">{fmt(inv.amount_paid)}</td>
                     <td className="px-4 py-2.5 text-xs font-bold text-amber-400">{fmt(balance)}</td>
                     <td className="px-4 py-2.5 text-xs">
-                      {days > 0 ? <span className="text-red-400 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{days}d</span> : <span className="text-muted-foreground">—</span>}
+                      {days > 0 ? <span className="text-red-400 flex items-center gap-1"><AlertTriangle className="w-3 h-3" />{days}d</span> : <span className="text-white/30">—</span>}
                     </td>
                     <td className="px-4 py-2.5">
                       <span className={`px-1.5 py-0.5 rounded-sm text-[9px] font-heading uppercase tracking-wider border ${STATUS_STYLES[inv.status] || ""}`}>{inv.status?.replace(/_/g," ")}</span>

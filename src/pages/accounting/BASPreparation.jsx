@@ -85,25 +85,25 @@ export default function BASPreparation() {
         <div className="border border-border rounded-sm overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-muted/50 border-b border-border">
-                {["BAS #","Period","Start","End","G1 Sales","1A GST on Sales","1B GST on Purchases","Net GST","BAS Payable","Status","Actions"].map(h => (
-                  <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">{h}</th>
-                ))}
+              <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
+                 {["BAS #","Period","Start","End","G1 Sales","1A GST on Sales","1B GST on Purchases","Net GST","BAS Payable","Status","Actions"].map(h => (
+                   <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30 whitespace-nowrap">{h}</th>
+                 ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {returns.length === 0 ? (
-                <tr><td colSpan={11} className="text-center py-8 text-muted-foreground text-xs">No BAS returns yet</td></tr>
+                <tr><td colSpan={11} className="text-center py-8 text-white/30 text-xs">No BAS returns yet</td></tr>
               ) : returns.map(r => (
-                <tr key={r.id} className="hover:bg-muted/20 cursor-pointer" onClick={() => setSelected(r)}>
-                  <td className="px-4 py-2.5 font-mono text-xs text-muted-foreground">{r.bas_number || "—"}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground capitalize">{r.period}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{r.period_start}</td>
-                  <td className="px-4 py-2.5 text-xs text-muted-foreground">{r.period_end}</td>
+                <tr key={r.id} className="hover:bg-[hsl(0,0%,14%)] cursor-pointer" onClick={() => setSelected(r)}>
+                  <td className="px-4 py-2.5 font-mono text-xs text-white/40">{r.bas_number || "—"}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40 capitalize">{r.period}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{r.period_start}</td>
+                  <td className="px-4 py-2.5 text-xs text-white/40">{r.period_end}</td>
                   <td className="px-4 py-2.5 text-xs font-bold text-primary">{fmt(r.g1_total_sales)}</td>
-                  <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(r.g1a_gst_on_sales)}</td>
-                  <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(r.g1b_gst_on_purchases)}</td>
-                  <td className="px-4 py-2.5 text-xs font-bold text-foreground">{fmt(r.net_gst)}</td>
+                  <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(r.g1a_gst_on_sales)}</td>
+                   <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(r.g1b_gst_on_purchases)}</td>
+                   <td className="px-4 py-2.5 text-xs font-bold text-white">{fmt(r.net_gst)}</td>
                   <td className="px-4 py-2.5 text-xs font-bold text-amber-400">{fmt(r.bas_payable)}</td>
                   <td className="px-4 py-2.5">
                     <span className={`px-1.5 py-0.5 rounded-sm text-[9px] font-heading uppercase tracking-wider border ${STATUS_STYLES[r.status] || ""}`}>{r.status}</span>
@@ -138,12 +138,12 @@ export default function BASPreparation() {
                   ["Net GST Position", selected.net_gst, selected.net_gst > 0 ? "text-red-400" : "text-primary"],
                   ["PAYG Withholding", selected.payg_withheld || 0, "text-amber-400"],
                 ].map(([label, val, color]) => (
-                  <div key={label} className="flex justify-between items-center py-2 border-b border-border">
-                    <span className="text-sm text-muted-foreground">{label}</span>
+                  <div key={label} className="flex justify-between items-center py-2 border-b border-[hsl(0,0%,18%)]">
+                    <span className="text-sm text-white/50">{label}</span>
                     <span className={`font-heading font-bold text-sm ${color}`}>{fmt(val)}</span>
                   </div>
                 ))}
-                <div className="flex justify-between items-center py-3 bg-muted/30 rounded-sm px-3 mt-2">
+                <div className="flex justify-between items-center py-3 bg-[hsl(0,0%,9%)] rounded-sm px-3 mt-2">
                   <span className="font-heading text-xs uppercase tracking-wider font-bold text-foreground">BAS {selected.bas_payable >= 0 ? "PAYABLE TO ATO" : "REFUND FROM ATO"}</span>
                   <span className={`font-heading font-bold text-lg ${selected.bas_payable >= 0 ? "text-red-400" : "text-primary"}`}>{fmt(Math.abs(selected.bas_payable))}</span>
                 </div>
