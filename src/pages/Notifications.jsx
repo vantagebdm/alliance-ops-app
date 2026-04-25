@@ -108,7 +108,7 @@ export default function Notifications() {
                 key={t.key}
                 onClick={() => setTab(t.key)}
                 className={`flex-shrink-0 px-4 py-2.5 text-xs font-heading uppercase tracking-wider whitespace-nowrap border-b-2 transition-colors ${
-                  tab === t.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+                  tab === t.key ? "border-primary text-primary" : "border-transparent text-white/40 hover:text-white"
                 }`}
               >
                 {t.label}
@@ -141,7 +141,7 @@ export default function Notifications() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <input type="checkbox" className="rounded-sm" checked={selected.size === filtered.length} onChange={e => e.target.checked ? selectAll() : clearSelect()} />
-              <span className="text-xs text-muted-foreground font-heading uppercase tracking-wider">
+              <span className="text-xs text-white/40 font-heading uppercase tracking-wider">
                 {filtered.length} notification{filtered.length !== 1 ? "s" : ""}
               </span>
             </div>
@@ -159,13 +159,13 @@ export default function Notifications() {
         ) : filtered.length === 0 ? (
           <div className="text-center py-20 border-2 border-dashed border-border rounded-sm">
             <Bell className="w-12 h-12 mx-auto text-muted-foreground/30 mb-4" />
-            <p className="font-heading text-lg uppercase tracking-wider text-foreground/40">No notifications found</p>
+            <p className="font-heading text-lg uppercase tracking-wider text-white/30">No notifications found</p>
           </div>
         ) : (
           <div className="border border-border rounded-sm overflow-hidden">
             {filtered.map(n => (
               <div key={n.id} className="flex items-stretch">
-                <div className="flex items-center px-3 border-r border-border/40 bg-muted/10 flex-shrink-0">
+                <div className="flex items-center px-3 border-r border-[hsl(0,0%,18%)] bg-[hsl(0,0%,9%)] flex-shrink-0">
                   <input
                     type="checkbox"
                     className="rounded-sm"

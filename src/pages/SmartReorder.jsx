@@ -121,7 +121,7 @@ export default function SmartReorder() {
             <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
           </div>
         ) : lowStockParts.length === 0 ? (
-          <div className="text-center py-20 text-muted-foreground">
+          <div className="text-center py-20 text-white/30">
             <Package className="w-12 h-12 mx-auto mb-3 opacity-30" />
             <p className="font-heading uppercase tracking-wider text-sm">All stock levels are healthy</p>
             <p className="text-xs mt-1">No parts are at or below minimum stock levels.</p>
@@ -131,7 +131,7 @@ export default function SmartReorder() {
             {/* Summary banner */}
             <div className="bg-amber-500/10 border border-amber-500/30 rounded-sm px-4 py-3 flex items-center gap-3">
               <AlertTriangle className="w-4 h-4 text-amber-500 flex-shrink-0" />
-              <span className="text-amber-700 font-heading text-xs uppercase tracking-wider font-semibold">
+              <span className="text-amber-400 font-heading text-xs uppercase tracking-wider font-semibold">
                 {lowStockParts.length} parts at or below minimum stock · {supplierNames.length} supplier{supplierNames.length !== 1 ? "s" : ""} to order from
               </span>
             </div>

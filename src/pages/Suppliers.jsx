@@ -12,11 +12,11 @@ import POForm from "../components/purchasing/POForm";
 import SupplierAppPreview from "../components/supplierapp/SupplierAppPreview";
 
 function StarRating({ value }) {
-  if (!value) return <span className="text-muted-foreground text-xs">—</span>;
+  if (!value) return <span className="text-white/30 text-xs">—</span>;
   return (
     <div className="flex items-center gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
-        <Star key={i} className={`w-3 h-3 ${i < value ? "text-amber-400 fill-amber-400" : "text-gray-300"}`} />
+        <Star key={i} className={`w-3 h-3 ${i < value ? "text-amber-400 fill-amber-400" : "text-white/15"}`} />
       ))}
     </div>
   );
@@ -106,7 +106,7 @@ export default function Suppliers() {
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px] max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
             <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search suppliers..." className="pl-9 rounded-sm" />
           </div>
           <Select value={filterStatus} onValueChange={setFilterStatus}>
@@ -135,7 +135,7 @@ export default function Suppliers() {
           )}
           {(filterStatus !== "all" || filterCategory !== "all" || search) && (
             <button onClick={() => { setSearch(""); setFilterStatus("all"); setFilterCategory("all"); }}
-              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground font-heading uppercase tracking-wider">
+              className="flex items-center gap-1 text-xs text-white/40 hover:text-white font-heading uppercase tracking-wider">
               <X className="w-3 h-3" /> Clear
             </button>
           )}
@@ -147,48 +147,48 @@ export default function Suppliers() {
             <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-muted-foreground/50 font-heading uppercase tracking-wider text-xs">
+          <div className="text-center py-16 text-white/20 font-heading uppercase tracking-wider text-xs">
             No suppliers found
           </div>
         ) : (
-          <div className="border border-border rounded-sm overflow-hidden">
+          <div className="border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-muted/50 border-b border-border">
+                <tr className="bg-[hsl(0,0%,9%)] border-b border-[hsl(0,0%,18%)]">
                   {["Supplier Name","Code","Categories","City","Terms","Lead Time","Preferred","Rating","Status"].map(h => (
-                    <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-muted-foreground whitespace-nowrap">{h}</th>
+                    <th key={h} className="px-4 py-2.5 text-left font-heading text-[9px] uppercase tracking-wider text-white/30 whitespace-nowrap">{h}</th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-[hsl(0,0%,16%)]">
                 {filtered.map(s => (
                   <tr key={s.id}
                     onClick={() => setSelected(s)}
-                    className="hover:bg-muted/30 cursor-pointer transition-colors">
+                    className="hover:bg-[hsl(0,0%,14%)] cursor-pointer transition-colors">
                     <td className="px-4 py-2.5">
-                     <div className="font-semibold text-foreground">{s.trading_name || s.name}</div>
-                     {s.trading_name && s.trading_name !== s.name && <div className="text-[10px] text-muted-foreground">{s.name}</div>}
+                     <div className="font-semibold text-white">{s.trading_name || s.name}</div>
+                     {s.trading_name && s.trading_name !== s.name && <div className="text-[10px] text-white/30">{s.name}</div>}
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground font-mono">{s.supplier_code || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/40 font-mono">{s.supplier_code || "—"}</td>
                     <td className="px-4 py-2.5">
                       {(s.categories_supplied || []).length > 0 ? (
                         <div className="flex flex-wrap gap-1">
                           {(s.categories_supplied || []).slice(0, 2).map(c => (
-                            <span key={c} className="px-1.5 py-0.5 text-[9px] font-heading uppercase tracking-wider bg-muted border border-border rounded-sm">{c}</span>
+                            <span key={c} className="px-1.5 py-0.5 text-[9px] font-heading uppercase tracking-wider bg-[hsl(0,0%,18%)] border border-[hsl(0,0%,24%)] rounded-sm text-white/60">{c}</span>
                           ))}
                           {(s.categories_supplied || []).length > 2 && (
-                            <span className="text-[9px] text-muted-foreground">+{(s.categories_supplied || []).length - 2}</span>
+                            <span className="text-[9px] text-white/30">+{(s.categories_supplied || []).length - 2}</span>
                           )}
                         </div>
-                      ) : <span className="text-muted-foreground text-xs">—</span>}
+                      ) : <span className="text-white/30 text-xs">—</span>}
                     </td>
-                    <td className="px-4 py-2.5 text-xs text-muted-foreground">{[s.city, s.state].filter(Boolean).join(", ") || "—"}</td>
-                    <td className="px-4 py-2.5 text-xs">{(s.payment_terms || "").replace(/_/g, " ") || "—"}</td>
-                    <td className="px-4 py-2.5 text-xs">{s.lead_time_standard ? `${s.lead_time_standard}d` : "—"}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/40">{[s.city, s.state].filter(Boolean).join(", ") || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/70">{(s.payment_terms || "").replace(/_/g, " ") || "—"}</td>
+                    <td className="px-4 py-2.5 text-xs text-white/70">{s.lead_time_standard ? `${s.lead_time_standard}d` : "—"}</td>
                     <td className="px-4 py-2.5 text-center">
                       {s.preferred_supplier
                         ? <span className="text-primary text-sm font-bold">★</span>
-                        : <span className="text-muted-foreground text-xs">—</span>}
+                        : <span className="text-white/20 text-xs">—</span>}
                     </td>
                     <td className="px-4 py-2.5"><StarRating value={s.rating} /></td>
                     <td className="px-4 py-2.5"><StatusBadge status={s.status} /></td>
