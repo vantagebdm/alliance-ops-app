@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
-import { generateDocNumber } from "@/hooks/useDocNumber";
+import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 import { format } from "date-fns";
 
 const today = format(new Date(), "yyyy-MM-dd");
@@ -101,6 +101,13 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
   const [orderResults, setOrderResults] = useState([]);
   const [dispatchResults, setDispatchResults] = useState([]);
   const [accountWarning, setAccountWarning] = useState(null);
+
+  // Pre-populate invoice number with the next prefix on mount
+  useEffect(() => {
+    previewDocNumber("invoice").then(num => {
+      if (num) u("invoice_number", num);
+    });
+  }, []);
 
   const customerAC = useAutocomplete("Customer", "name");
   const companyAC = useAutocomplete("Customer", "company");
