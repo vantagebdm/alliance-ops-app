@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Filter, Send, X } from "lucide-react";
+import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/ui/PageHeader";
@@ -18,49 +19,8 @@ function ResendModal({ invoice, onClose }) {
   const send = async () => {
     if (!email) return alert("Please enter an email address.");
     setSending(true);
-    const itemRows = (invoice.items || []).map(item =>
-      `<tr>
-        <td style="padding:6px 10px;border-bottom:1px solid #333;">${item.part_number || ""}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid #333;">${item.description || ""}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid #333;text-align:right;">${Number(item.quantity || 0)}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid #333;text-align:right;">$${Number(item.unit_price || 0).toFixed(2)}</td>
-        <td style="padding:6px 10px;border-bottom:1px solid #333;text-align:right;">$${Number(item.total || 0).toFixed(2)}</td>
-      </tr>`
-    ).join("");
-    const subtotal = invoice.subtotal || 0;
-    const gstAmount = invoice.gst || 0;
-    const totalAmount = invoice.total || 0;
-    const emailBody = `
-<div style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;background:#111;color:#eee;padding:24px;border-radius:6px;">
-  <h2 style="color:#4ade80;font-size:22px;margin:0 0 4px 0;">INVOICE</h2>
-  <p style="color:#888;margin:0 0 20px 0;">Invoice #${invoice.invoice_number}</p>
-  <table style="width:100%;margin-bottom:16px;font-size:13px;">
-    <tr><td style="color:#888;padding:3px 0;">Customer:</td><td style="padding:3px 0;font-weight:bold;">${invoice.customer_name}</td></tr>
-    ${invoice.company ? `<tr><td style="color:#888;padding:3px 0;">Company:</td><td style="padding:3px 0;">${invoice.company}</td></tr>` : ""}
-    <tr><td style="color:#888;padding:3px 0;">Invoice Date:</td><td style="padding:3px 0;">${invoice.invoice_date || ""}</td></tr>
-    <tr><td style="color:#888;padding:3px 0;">Due Date:</td><td style="padding:3px 0;color:#fbbf24;font-weight:bold;">${invoice.due_date || ""}</td></tr>
-    ${invoice.customer_po_number ? `<tr><td style="color:#888;padding:3px 0;">PO Number:</td><td style="padding:3px 0;">${invoice.customer_po_number}</td></tr>` : ""}
-  </table>
-  <table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:16px;">
-    <thead>
-      <tr style="background:#222;color:#aaa;">
-        <th style="padding:8px 10px;text-align:left;">Part #</th>
-        <th style="padding:8px 10px;text-align:left;">Description</th>
-        <th style="padding:8px 10px;text-align:right;">Qty</th>
-        <th style="padding:8px 10px;text-align:right;">Unit Price</th>
-        <th style="padding:8px 10px;text-align:right;">Total</th>
-      </tr>
-    </thead>
-    <tbody>${itemRows}</tbody>
-  </table>
-  <div style="text-align:right;font-size:13px;margin-bottom:8px;">
-    <div style="color:#888;">Subtotal: <strong style="color:#eee;">$${Number(subtotal).toFixed(2)}</strong></div>
-    <div style="color:#888;">GST (10%): <strong style="color:#eee;">$${Number(gstAmount).toFixed(2)}</strong></div>
-    <div style="font-size:18px;margin-top:8px;">Total Due: <strong style="color:#4ade80;">$${Number(totalAmount).toFixed(2)}</strong></div>
-  </div>
-  ${invoice.customer_notes ? `<div style="margin-top:16px;padding:12px;background:#1a1a1a;border-radius:4px;font-size:12px;color:#aaa;">${invoice.customer_notes}</div>` : ""}
-  <p style="font-size:11px;color:#555;margin-top:24px;">This is an automated invoice. Please do not reply to this email.</p>
-</div>`;
+    const pdfUrl = await generateAndUploadInvoicePDF(invoice, base44);
+    const emailBody = buildInvoiceEmailBody(invoice, pdfUrl);
     await base44.integrations.Core.SendEmail({
       to: email,
       subject: `Invoice ${invoice.invoice_number} — ${invoice.customer_name}`,
