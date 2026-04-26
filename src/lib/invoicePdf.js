@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { getLogo } from "@/lib/companyLogos";
 
 export function generateInvoicePDF(invoice) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
@@ -13,10 +14,17 @@ export function generateInvoicePDF(invoice) {
   // Header bar - dark grey
   doc.setFillColor(40, 40, 40);
   doc.rect(0, 0, pageW, 28, "F");
+
+  // Logo (invoice logo preferred, fallback to company logo)
+  const logoUrl = getLogo("invoice_logo") || getLogo("company_logo");
+  if (logoUrl) {
+    try { doc.addImage(logoUrl, "PNG", margin, 4, 40, 20, undefined, "FAST"); } catch (_) {}
+  }
+
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);
   doc.setFont("helvetica", "bold");
-  doc.text("INVOICE", margin, 17);
+  doc.text("INVOICE", logoUrl ? margin + 44 : margin, 17);
   doc.setTextColor(200, 200, 200);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");

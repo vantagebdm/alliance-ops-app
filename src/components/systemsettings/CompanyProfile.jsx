@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
-import { Save, Upload, X } from "lucide-react";
+import { Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
+import { getAllLogos, setLogo, removeLogo } from "@/lib/companyLogos";
 
 const Field = ({ label, required, error, children }) => (
   <div>
@@ -42,7 +43,7 @@ export default function CompanyProfile() {
   });
   const [errors, setErrors] = useState({});
   const [saved, setSaved] = useState(false);
-  const [logos, setLogos] = useState({ company_logo: null, invoice_logo: null });
+  const [logos, setLogos] = useState(() => getAllLogos());
   const [uploading, setUploading] = useState({ company_logo: false, invoice_logo: false });
   const companyLogoRef = useRef();
   const invoiceLogoRef = useRef();
@@ -51,8 +52,14 @@ export default function CompanyProfile() {
     if (!file) return;
     setUploading(u => ({ ...u, [key]: true }));
     const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setLogo(key, file_url);
     setLogos(l => ({ ...l, [key]: file_url }));
     setUploading(u => ({ ...u, [key]: false }));
+  };
+
+  const handleRemoveLogo = (key) => {
+    removeLogo(key);
+    setLogos(l => ({ ...l, [key]: null }));
   };
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
@@ -160,7 +167,7 @@ export default function CompanyProfile() {
                   <img src={logos[key]} alt={label} className="max-h-20 max-w-full object-contain" />
                   <div className="flex gap-2 mt-1">
                     <button onClick={() => ref.current.click()} className="text-[10px] text-white/40 hover:text-white/70 font-heading uppercase tracking-wider">Change</button>
-                    <button onClick={() => setLogos(l => ({ ...l, [key]: null }))} className="text-[10px] text-red-400/60 hover:text-red-400 font-heading uppercase tracking-wider">Remove</button>
+                    <button onClick={() => handleRemoveLogo(key)} className="text-[10px] text-red-400/60 hover:text-red-400 font-heading uppercase tracking-wider">Remove</button>
                   </div>
                 </div>
               ) : (

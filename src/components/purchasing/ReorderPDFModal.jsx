@@ -3,6 +3,7 @@ import { X, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import jsPDF from "jspdf";
 import { COMPANY } from "@/lib/companyDetails";
+import { getLogo } from "@/lib/companyLogos";
 
 export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
   const previewRef = useRef(null);
@@ -23,6 +24,13 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
     // Header bar
     doc.setFillColor(20, 20, 20);
     doc.rect(0, 0, pageW, 36, "F");
+
+    // Logo
+    const logoUrl = getLogo("company_logo") || getLogo("invoice_logo");
+    if (logoUrl) {
+      try { doc.addImage(logoUrl, "PNG", pageW - margin - 36, 3, 36, 18, undefined, "FAST"); } catch (_) {}
+    }
+
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(15);
