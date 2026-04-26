@@ -1,23 +1,35 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
-function buildMimeMessage(to, subject, htmlBody, fromEmail) {
+function buildMimeWithAttachment(to, subject, htmlBody, fromEmail, pdfBase64, pdfFilename) {
   const boundary = `boundary_${Date.now()}`;
-  const raw = [
+  const lines = [
     `From: ${fromEmail}`,
     `To: ${to}`,
     `Subject: ${subject}`,
     `MIME-Version: 1.0`,
-    `Content-Type: multipart/alternative; boundary="${boundary}"`,
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
     ``,
     `--${boundary}`,
     `Content-Type: text/html; charset=UTF-8`,
     `Content-Transfer-Encoding: quoted-printable`,
     ``,
     htmlBody,
-    `--${boundary}--`,
-  ].join('\r\n');
+  ];
 
-  // Base64url encode
+  if (pdfBase64 && pdfFilename) {
+    lines.push(
+      `--${boundary}`,
+      `Content-Type: application/pdf; name="${pdfFilename}"`,
+      `Content-Disposition: attachment; filename="${pdfFilename}"`,
+      `Content-Transfer-Encoding: base64`,
+      ``,
+      pdfBase64,
+    );
+  }
+
+  lines.push(`--${boundary}--`);
+  const raw = lines.join('\r\n');
+
   return btoa(unescape(encodeURIComponent(raw)))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
@@ -30,7 +42,7 @@ Deno.serve(async (req) => {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
-    const { to, subject, body } = await req.json();
+    const { to, subject, body, pdfUrl, pdfFilename } = await req.json();
     if (!to || !subject || !body) {
       return Response.json({ error: 'Missing required fields: to, subject, body' }, { status: 400 });
     }
@@ -44,7 +56,19 @@ Deno.serve(async (req) => {
     const profile = await profileRes.json();
     const fromEmail = profile.emailAddress;
 
-    const raw = buildMimeMessage(to, subject, body, fromEmail);
+    // Fetch PDF and convert to base64 if URL provided
+    let pdfBase64 = null;
+    let filename = pdfFilename || 'invoice.pdf';
+    if (pdfUrl) {
+      const pdfRes = await fetch(pdfUrl);
+      const pdfBuffer = await pdfRes.arrayBuffer();
+      const uint8 = new Uint8Array(pdfBuffer);
+      let binary = '';
+      for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
+      pdfBase64 = btoa(binary);
+    }
+
+    const raw = buildMimeWithAttachment(to, subject, body, fromEmail, pdfBase64, filename);
 
     const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',

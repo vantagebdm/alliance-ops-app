@@ -280,6 +280,8 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
           to: form.billing_email,
           subject: `Invoice Due`,
           body: emailBody,
+          pdfUrl,
+          pdfFilename: `Invoice-${invoiceNumber || 'INV'}.pdf`,
         });
       }
 

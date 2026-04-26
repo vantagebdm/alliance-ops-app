@@ -25,6 +25,8 @@ function ResendModal({ invoice, onClose }) {
       to: email,
       subject: `Invoice Due`,
       body: emailBody,
+      pdfUrl,
+      pdfFilename: `Invoice-${invoice.invoice_number || 'INV'}.pdf`,
     });
     setSending(false);
     setSent(true);
