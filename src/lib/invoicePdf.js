@@ -10,14 +10,14 @@ export function generateInvoicePDF(invoice) {
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pageW, 297, "F");
 
-  // Header bar - dark green
-  doc.setFillColor(22, 101, 52);
+  // Header bar - dark grey
+  doc.setFillColor(40, 40, 40);
   doc.rect(0, 0, pageW, 28, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(20);
   doc.setFont("helvetica", "bold");
   doc.text("INVOICE", margin, 17);
-  doc.setTextColor(200, 240, 210);
+  doc.setTextColor(200, 200, 200);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.text(`Invoice #${invoice.invoice_number || ""}`, pageW - margin, 17, { align: "right" });
@@ -45,7 +45,7 @@ export function generateInvoicePDF(invoice) {
   y += 6;
 
   // Table header
-  doc.setFillColor(22, 101, 52);
+  doc.setFillColor(40, 40, 40);
   doc.rect(margin, y, pageW - margin * 2, 9, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
@@ -106,8 +106,8 @@ export function generateInvoicePDF(invoice) {
   doc.line(totalsX, y, pageW - margin, y);
   y += 6;
 
-  // Total row - green background
-  doc.setFillColor(22, 101, 52);
+  // Total row - dark grey background
+  doc.setFillColor(40, 40, 40);
   doc.rect(totalsX - 4, y - 4, pageW - margin - totalsX + 4 + 4, 10, "F");
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
@@ -144,9 +144,9 @@ export async function generateAndUploadInvoicePDF(invoice, base44) {
 export function buildInvoiceEmailBody(invoice, pdfUrl) {
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;color:#111111;padding:0;border-radius:6px;border:1px solid #e0e0e0;">
-  <div style="background:#166534;padding:24px 28px;border-radius:6px 6px 0 0;">
+  <div style="background:#282828;padding:24px 28px;border-radius:6px 6px 0 0;">
     <h2 style="color:#ffffff;font-size:22px;margin:0 0 4px 0;">INVOICE</h2>
-    <p style="color:#bbf7d0;margin:0;">Invoice #${invoice.invoice_number || ""}</p>
+    <p style="color:#cccccc;margin:0;">Invoice #${invoice.invoice_number || ""}</p>
   </div>
   <div style="padding:24px 28px;">
     <table style="width:100%;font-size:14px;margin-bottom:24px;border-collapse:collapse;">
@@ -154,7 +154,7 @@ export function buildInvoiceEmailBody(invoice, pdfUrl) {
       ${invoice.company ? `<tr><td style="color:#666;padding:5px 0;">Company:</td><td style="color:#111;">${invoice.company}</td></tr>` : ""}
       <tr><td style="color:#666;padding:5px 0;">Invoice Date:</td><td style="color:#111;">${invoice.invoice_date || ""}</td></tr>
       <tr><td style="color:#666;padding:5px 0;">Due Date:</td><td style="color:#b45309;font-weight:bold;">${invoice.due_date || ""}</td></tr>
-      <tr><td style="color:#666;padding:5px 0;">Total Due:</td><td style="color:#166534;font-weight:bold;font-size:18px;">$${Number(invoice.total || 0).toFixed(2)}</td></tr>
+      <tr><td style="color:#666;padding:5px 0;">Total Due:</td><td style="color:#282828;font-weight:bold;font-size:18px;">$${Number(invoice.total || 0).toFixed(2)}</td></tr>
     </table>
     <p style="color:#444;font-size:13px;">Please find your invoice attached as a PDF to this email.</p>
     ${invoice.customer_notes ? `<p style="font-size:12px;color:#888;margin-top:16px;border-top:1px solid #eee;padding-top:12px;">${invoice.customer_notes}</p>` : ""}
