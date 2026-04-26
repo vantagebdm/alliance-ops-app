@@ -122,7 +122,12 @@ Deno.serve(async (req) => {
     const profile = await profileRes.json();
     const fromEmail = profile.emailAddress;
 
-    const subject = notification.title;
+    // Strip emojis, em-dashes and other non-ASCII characters from subject
+    const subject = (notification.title || 'Notification')
+      .replace(/[\u2013\u2014]/g, '-')   // em-dash / en-dash → hyphen
+      .replace(/[^\x00-\x7F]/g, '')      // strip any remaining non-ASCII (emojis etc)
+      .replace(/\s{2,}/g, ' ')           // collapse double spaces
+      .trim();
     const htmlBody = buildEmailHtml(notification);
     const raw = buildMimeMessage(notifEmail, subject, htmlBody, fromEmail);
 
