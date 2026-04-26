@@ -106,8 +106,9 @@ export function generateInvoicePDF(invoice) {
 export async function generateAndUploadInvoicePDF(invoice, base44) {
   const blob = generateInvoicePDF(invoice);
   const file = new File([blob], `Invoice-${invoice.invoice_number || "INV"}.pdf`, { type: "application/pdf" });
-  const { file_url } = await base44.integrations.Core.UploadFile({ file });
-  return file_url;
+  const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+  const { signed_url } = await base44.integrations.Core.CreateFileSignedUrl({ file_uri, expires_in: 604800 }); // 7 days
+  return signed_url;
 }
 
 export function buildInvoiceEmailBody(invoice, pdfUrl) {
