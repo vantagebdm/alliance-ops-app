@@ -23,7 +23,7 @@ function ResendModal({ invoice, onClose }) {
     const emailBody = buildInvoiceEmailBody(invoice, pdfUrl);
     await base44.functions.invoke('sendInvoiceEmail', {
       to: email,
-      subject: `Invoice ${invoice.invoice_number} — ${invoice.customer_name}`,
+      subject: `Invoice Due`,
       body: emailBody,
     });
     setSending(false);
