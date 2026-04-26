@@ -276,7 +276,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer }) 
         const invoiceData = { ...data, invoice_number: invoiceNumber, subtotal, gst: gstAmount, total: totalAmount };
         const pdfUrl = await generateAndUploadInvoicePDF(invoiceData, base44);
         const emailBody = buildInvoiceEmailBody(invoiceData, pdfUrl);
-        await base44.integrations.Core.SendEmail({
+        await base44.functions.invoke('sendInvoiceEmail', {
           to: form.billing_email,
           subject: `Invoice ${invoiceNumber} — ${form.customer_name}`,
           body: emailBody,
