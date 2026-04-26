@@ -67,7 +67,7 @@ export default function DocumentNumberingSettings() {
 
   if (configs.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-sm p-8 text-center">
+      <div className="bg-[hsl(0,0%,10%)] border border-[hsl(0,0%,18%)] rounded-sm p-8 text-center">
         <Hash className="w-10 h-10 text-muted-foreground mx-auto mb-3" />
         <h3 className="font-heading text-sm font-bold uppercase tracking-wider mb-1">No Numbering Configs Found</h3>
         <p className="text-xs text-muted-foreground mb-4">Click below to initialize the default document numbering sequences.</p>
@@ -91,7 +91,7 @@ export default function DocumentNumberingSettings() {
           : null;
 
         return (
-          <div key={config.id} className="bg-white border border-border rounded-sm overflow-hidden">
+          <div key={config.id} className="bg-[hsl(0,0%,10%)] border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
             {/* Config header */}
             <div className="bg-[hsl(0,0%,10%)] px-4 py-2.5 flex items-center justify-between">
               <div>
@@ -111,13 +111,13 @@ export default function DocumentNumberingSettings() {
             </div>
 
             {/* Config body */}
-            <div className="p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
+            <div className="p-4 grid grid-cols-1 sm:grid-cols-4 gap-4 items-end bg-[hsl(0,0%,10%)]">
               <div>
                 <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Prefix</label>
                 <Input
                   value={config.prefix}
                   onChange={e => updateLocal(config.id, "prefix", e.target.value)}
-                  className="rounded-sm font-mono text-sm"
+                  className="rounded-sm font-mono text-sm bg-[hsl(0,0%,13%)] border-[hsl(0,0%,22%)] text-white"
                   placeholder="e.g. Q-"
                 />
               </div>
@@ -128,7 +128,7 @@ export default function DocumentNumberingSettings() {
                   min="1"
                   value={config.current_sequence}
                   onChange={e => updateLocal(config.id, "current_sequence", e.target.value)}
-                  className="rounded-sm"
+                  className="rounded-sm bg-[hsl(0,0%,13%)] border-[hsl(0,0%,22%)] text-white"
                 />
               </div>
               <div>
@@ -139,13 +139,13 @@ export default function DocumentNumberingSettings() {
                   max="10"
                   value={config.number_padding}
                   onChange={e => updateLocal(config.id, "number_padding", e.target.value)}
-                  className="rounded-sm"
+                  className="rounded-sm bg-[hsl(0,0%,13%)] border-[hsl(0,0%,22%)] text-white"
                 />
               </div>
               <div className="flex flex-col gap-1">
                 <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Preview</label>
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 bg-muted/50 border border-border rounded-sm px-3 py-2 font-mono text-sm text-primary font-bold">
+                  <div className="flex-1 bg-[hsl(0,0%,13%)] border border-[hsl(0,0%,22%)] rounded-sm px-3 py-2 font-mono text-sm text-primary font-bold">
                     {nextExample}
                   </div>
                   <Button
@@ -167,12 +167,12 @@ export default function DocumentNumberingSettings() {
             </div>
 
             {/* Example strip */}
-            <div className="border-t border-border/50 px-4 py-2 bg-muted/20 flex items-center gap-1 flex-wrap">
+            <div className="border-t border-[hsl(0,0%,16%)] px-4 py-2 bg-[hsl(0,0%,8%)] flex items-center gap-1 flex-wrap">
               <span className="font-heading text-[9px] uppercase tracking-wider text-foreground/40 mr-1">
                 <Eye className="w-3 h-3 inline mr-1" />Examples:
               </span>
               {[0, 1, 2, 9, 99].map(offset => (
-                <span key={offset} className="font-mono text-[10px] text-foreground/60 bg-border/50 px-1.5 py-0.5 rounded-sm">
+                <span key={offset} className="font-mono text-[10px] text-white/50 bg-[hsl(0,0%,14%)] px-1.5 py-0.5 rounded-sm">
                   {formatExample(config.prefix, (config.current_sequence || 1) + offset, config.number_padding)}
                 </span>
               ))}
