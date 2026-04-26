@@ -17,11 +17,11 @@ const TYPE_TO_SETTINGS_KEY = {
 };
 
 const PRIORITY_LABELS = {
-  low: '🔵 Info',
-  normal: '🟢 Notice',
-  important: '🟡 Important',
-  urgent: '🟠 Urgent',
-  critical: '🔴 CRITICAL',
+  low: 'Info',
+  normal: 'Notice',
+  important: 'Important',
+  urgent: 'Urgent',
+  critical: 'CRITICAL',
 };
 
 const PRIORITY_COLORS = {
@@ -43,7 +43,7 @@ function buildEmailHtml(notification) {
     <table style="width:100%;font-size:13px;margin-bottom:20px;border-collapse:collapse;">
       <tr>
         <td style="color:#888;padding:5px 0;width:120px;">Priority:</td>
-        <td style="color:#111;font-weight:bold;">${PRIORITY_LABELS[notification.priority] || notification.priority}</td>
+        <td style="color:#111;font-weight:bold;">${PRIORITY_LABELS[notification.priority] || notification.priority || ''}</td>
       </tr>
       ${notification.category ? `<tr><td style="color:#888;padding:5px 0;">Category:</td><td style="color:#111;text-transform:capitalize;">${notification.category}</td></tr>` : ''}
       ${notification.entity_ref ? `<tr><td style="color:#888;padding:5px 0;">Reference:</td><td style="color:#111;font-weight:bold;">${notification.entity_ref}</td></tr>` : ''}
