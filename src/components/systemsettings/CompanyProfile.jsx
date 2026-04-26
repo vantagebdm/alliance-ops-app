@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { Save, Upload, AlertTriangle } from "lucide-react";
+import { useState, useRef } from "react";
+import { Save, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { base44 } from "@/api/base44Client";
 
 const Field = ({ label, required, error, children }) => (
   <div>
@@ -41,6 +42,18 @@ export default function CompanyProfile() {
   });
   const [errors, setErrors] = useState({});
   const [saved, setSaved] = useState(false);
+  const [logos, setLogos] = useState({ company_logo: null, invoice_logo: null });
+  const [uploading, setUploading] = useState({ company_logo: false, invoice_logo: false });
+  const companyLogoRef = useRef();
+  const invoiceLogoRef = useRef();
+
+  const handleLogoUpload = async (key, file) => {
+    if (!file) return;
+    setUploading(u => ({ ...u, [key]: true }));
+    const { file_url } = await base44.integrations.Core.UploadFile({ file });
+    setLogos(l => ({ ...l, [key]: file_url }));
+    setUploading(u => ({ ...u, [key]: false }));
+  };
 
   const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
@@ -129,13 +142,42 @@ export default function CompanyProfile() {
       <div className="bg-[hsl(0,0%,11%)] border border-[hsl(0,0%,18%)] rounded-sm p-5 space-y-4">
         <SectionTitle>Branding & Logos</SectionTitle>
         <div className="grid grid-cols-2 gap-4">
-          {[{ label: "Company Logo", hint: "PNG/SVG · max 2MB" }, { label: "Invoice Logo", hint: "PNG/SVG · max 2MB" }].map(l => (
-            <div key={l.label}>
-              <label className="block text-[10px] font-heading uppercase tracking-wider text-white/40 mb-1.5">{l.label}</label>
-              <div className="border-2 border-dashed border-[hsl(0,0%,22%)] rounded-sm p-6 flex flex-col items-center gap-2 cursor-pointer hover:border-primary/40 transition-all">
-                <Upload className="w-5 h-5 text-white/20" />
-                <span className="text-[10px] text-white/30 font-heading uppercase">{l.hint}</span>
-              </div>
+          {[
+            { label: "Company Logo", key: "company_logo", ref: companyLogoRef },
+            { label: "Invoice Logo", key: "invoice_logo", ref: invoiceLogoRef },
+          ].map(({ label, key, ref }) => (
+            <div key={key}>
+              <label className="block text-[10px] font-heading uppercase tracking-wider text-white/40 mb-1.5">{label}</label>
+              <input
+                type="file"
+                accept="image/png,image/svg+xml,image/jpeg"
+                ref={ref}
+                className="hidden"
+                onChange={e => handleLogoUpload(key, e.target.files[0])}
+              />
+              {logos[key] ? (
+                <div className="relative border border-[hsl(0,0%,22%)] rounded-sm p-3 flex flex-col items-center gap-2 bg-[hsl(0,0%,13%)]">
+                  <img src={logos[key]} alt={label} className="max-h-20 max-w-full object-contain" />
+                  <div className="flex gap-2 mt-1">
+                    <button onClick={() => ref.current.click()} className="text-[10px] text-white/40 hover:text-white/70 font-heading uppercase tracking-wider">Change</button>
+                    <button onClick={() => setLogos(l => ({ ...l, [key]: null }))} className="text-[10px] text-red-400/60 hover:text-red-400 font-heading uppercase tracking-wider">Remove</button>
+                  </div>
+                </div>
+              ) : (
+                <div
+                  onClick={() => ref.current.click()}
+                  className="border-2 border-dashed border-[hsl(0,0%,22%)] rounded-sm p-6 flex flex-col items-center gap-2 cursor-pointer hover:border-primary/40 transition-all"
+                >
+                  {uploading[key] ? (
+                    <div className="w-5 h-5 border-2 border-white/20 border-t-primary rounded-full animate-spin" />
+                  ) : (
+                    <Upload className="w-5 h-5 text-white/20" />
+                  )}
+                  <span className="text-[10px] text-white/30 font-heading uppercase">
+                    {uploading[key] ? "Uploading..." : "PNG/SVG · max 2MB"}
+                  </span>
+                </div>
+              )}
             </div>
           ))}
         </div>
