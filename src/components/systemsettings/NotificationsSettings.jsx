@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { base44 } from "@/api/base44Client";
 
 const STORAGE_KEY = "app_notification_settings";
 
@@ -47,12 +48,39 @@ export default function NotificationsSettings() {
   const [notifEmail, setNotifEmail] = useState(stored?.notifEmail ?? "mitch@alliancepartsgroup.com.au");
   const [notifSms, setNotifSms] = useState(stored?.notifSms ?? "0402 910 119");
   const [saved, setSaved] = useState(false);
+  const [settingRecordId, setSettingRecordId] = useState(null);
+
+  // Load server-side settings on mount
+  useEffect(() => {
+    base44.entities.AppSettings.filter({ key: STORAGE_KEY }).then(records => {
+      if (records && records.length > 0) {
+        try {
+          const data = JSON.parse(records[0].value);
+          if (data.channels) setChannels(data.channels);
+          if (data.notifications) setNotifications(data.notifications);
+          if (data.notifEmail) setNotifEmail(data.notifEmail);
+          if (data.notifSms) setNotifSms(data.notifSms);
+          setSettingRecordId(records[0].id);
+        } catch (_) {}
+      }
+    }).catch(() => {});
+  }, []);
 
   const toggleChannel = (k) => setChannels(c => ({ ...c, [k]: !c[k] }));
   const toggleNotif = (key, ch) => setNotifications(n => ({ ...n, [key]: { ...n[key], [ch]: !n[key][ch] } }));
 
-  const handleSave = () => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ channels, notifications, notifEmail, notifSms }));
+  const handleSave = async () => {
+    const data = { channels, notifications, notifEmail, notifSms };
+    // Save to localStorage (for fast local reads)
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    // Save to server-side entity so backend functions can read it
+    const value = JSON.stringify(data);
+    if (settingRecordId) {
+      await base44.entities.AppSettings.update(settingRecordId, { value });
+    } else {
+      const record = await base44.entities.AppSettings.create({ key: STORAGE_KEY, value });
+      setSettingRecordId(record.id);
+    }
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
