@@ -122,7 +122,7 @@ Deno.serve(async (req) => {
     const profile = await profileRes.json();
     const fromEmail = profile.emailAddress;
 
-    const subject = `${PRIORITY_LABELS[notification.priority] || ''} | ${notification.title}`;
+    const subject = notification.title;
     const htmlBody = buildEmailHtml(notification);
     const raw = buildMimeMessage(notifEmail, subject, htmlBody, fromEmail);
 
