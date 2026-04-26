@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
 import { getAllLogos, setLogo, removeLogo } from "@/lib/companyLogos";
+import { getCompanyProfile, saveCompanyProfile } from "@/lib/companyDetails";
 
 const Field = ({ label, required, error, children }) => (
   <div>
@@ -22,25 +23,7 @@ const SectionTitle = ({ children }) => (
 );
 
 export default function CompanyProfile() {
-  const [form, setForm] = useState({
-    legal_name: "Alliance Priority Parts Pty Ltd",
-    trading_name: "Alliance Priority Parts",
-    abn: "12 345 678 901",
-    acn: "345 678 901",
-    reg_address: "14 Industrial Drive, Karratha WA 6714",
-    postal_address: "PO Box 123, Karratha WA 6714",
-    phone: "(08) 9144 1234",
-    email: "info@allianceparts.com.au",
-    website: "www.allianceparts.com.au",
-    footer_text: "Alliance Priority Parts Pty Ltd | ABN 12 345 678 901 | All prices are in AUD and include GST where applicable.",
-    bank_name: "ANZ Bank",
-    bank_bsb: "016-123",
-    bank_account: "1234 5678",
-    bank_account_name: "Alliance Priority Parts Pty Ltd",
-    remittance_email: "accounts@allianceparts.com.au",
-    business_hours: "Mon–Fri 7:00am–5:00pm AWST",
-    afterhours_contact: "0400 000 000",
-  });
+  const [form, setForm] = useState(() => getCompanyProfile());
   const [errors, setErrors] = useState({});
   const [saved, setSaved] = useState(false);
   const [logos, setLogos] = useState(() => getAllLogos());
@@ -76,7 +59,11 @@ export default function CompanyProfile() {
     if (form.email && !validateEmail(form.email)) errs.email = "Invalid email format.";
     if (form.remittance_email && !validateEmail(form.remittance_email)) errs.remittance_email = "Invalid email format.";
     setErrors(errs);
-    if (Object.keys(errs).length === 0) { setSaved(true); setTimeout(() => setSaved(false), 2000); }
+    if (Object.keys(errs).length === 0) {
+      saveCompanyProfile(form);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    }
   };
 
   return (
