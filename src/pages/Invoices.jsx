@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter, Send, X } from "lucide-react";
+import { Plus, Filter, Send, X, Eye, FileText, ChevronDown } from "lucide-react";
 import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -71,12 +71,66 @@ function ResendModal({ invoice, onClose }) {
   );
 }
 
+function InvoiceActions({ row, onResend, onViewPdf }) {
+  const [open, setOpen] = useState(false);
+
+  const handleViewPdf = async (e) => {
+    e.stopPropagation();
+    setOpen(false);
+    onViewPdf(row);
+  };
+
+  return (
+    <div className="relative" onClick={e => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-500/40 text-blue-400 hover:bg-blue-500/10 transition-colors"
+      >
+        Actions <ChevronDown className="w-3 h-3" />
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute right-0 top-full mt-1 z-20 bg-[hsl(0,0%,12%)] border border-border rounded-sm shadow-xl min-w-[170px] overflow-hidden">
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onResend(row, "view"); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wider text-white/70 hover:bg-primary/10 hover:text-primary transition-colors text-left"
+            >
+              <Eye className="w-3.5 h-3.5" /> View Invoice
+            </button>
+            <button
+              onClick={handleViewPdf}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wider text-white/70 hover:bg-primary/10 hover:text-primary transition-colors text-left"
+            >
+              <FileText className="w-3.5 h-3.5" /> View PDF
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onResend(row, "send"); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wider text-white/70 hover:bg-blue-400/10 hover:text-blue-400 transition-colors text-left"
+            >
+              <Send className="w-3.5 h-3.5" /> Send PDF
+            </button>
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onResend(row, "resend"); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wider text-white/70 hover:bg-blue-400/10 hover:text-blue-400 transition-colors text-left border-t border-border"
+            >
+              <Send className="w-3.5 h-3.5" /> Resend Invoice
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [resendInvoice, setResendInvoice] = useState(null);
+  const [viewingPdf, setViewingPdf] = useState(null);
+  const [pdfLoading, setPdfLoading] = useState(false);
   const navigate = useNavigate();
 
   const load = useCallback(() => {
@@ -91,6 +145,21 @@ export default function Invoices() {
 
   const filtered = filter === "all" ? invoices : invoices.filter(inv => inv.status === filter);
 
+  const handleAction = (row, action) => {
+    if (action === "view") {
+      navigate(`/invoices/${row.id}`);
+    } else {
+      setResendInvoice(row);
+    }
+  };
+
+  const handleViewPdf = async (row) => {
+    setPdfLoading(true);
+    const url = await generateAndUploadInvoicePDF(row, base44);
+    setPdfLoading(false);
+    setViewingPdf(url);
+  };
+
   const columns = [
     { key: "invoice_number", label: "Invoice #", render: (v) => <span className="font-mono font-semibold">{v || "—"}</span> },
     { key: "customer_name", label: "Customer" },
@@ -101,13 +170,8 @@ export default function Invoices() {
     { key: "payment_method", label: "Payment", render: (v) => <span className="text-xs uppercase">{(v || "").replace("_", " ")}</span> },
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
     {
-      key: "_resend", label: "", render: (_, row) => (
-        <button
-          onClick={e => { e.stopPropagation(); setResendInvoice(row); }}
-          className="flex items-center gap-1 px-2.5 py-1 text-[11px] font-heading font-semibold uppercase tracking-wider rounded-sm border border-blue-500/40 text-blue-400 hover:bg-blue-500/10 transition-colors"
-        >
-          <Send className="w-3 h-3" /> Resend
-        </button>
+      key: "_actions", label: "", render: (_, row) => (
+        <InvoiceActions row={row} onResend={handleAction} onViewPdf={handleViewPdf} />
       )
     },
   ];
@@ -149,6 +213,25 @@ export default function Invoices() {
           <DataTable columns={columns} data={filtered} onRowClick={(row) => navigate(`/invoices/${row.id}`)} emptyMessage="No invoices found." />
         )}
       </div>
+
+      {pdfLoading && (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
+            <span className="text-white/60 font-heading text-xs uppercase tracking-wider">Generating PDF...</span>
+          </div>
+        </div>
+      )}
+
+      {viewingPdf && (
+        <div className="fixed inset-0 bg-black/90 z-50 flex flex-col">
+          <div className="flex items-center justify-between px-5 py-3 bg-[hsl(0,0%,8%)] border-b border-border">
+            <span className="font-heading text-sm font-bold text-white uppercase tracking-wider">Invoice PDF</span>
+            <button onClick={() => setViewingPdf(null)} className="text-white/40 hover:text-white"><X className="w-5 h-5" /></button>
+          </div>
+          <iframe src={viewingPdf} className="flex-1 w-full" title="Invoice PDF" />
+        </div>
+      )}
 
       {resendInvoice && (
         <ResendModal invoice={resendInvoice} onClose={() => setResendInvoice(null)} />
