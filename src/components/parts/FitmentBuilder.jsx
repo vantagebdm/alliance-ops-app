@@ -290,7 +290,7 @@ function FitmentCard({ fitment, onChange, onRemove }) {
       </div>
 
       {expanded && (
-        <div className="p-3 grid grid-cols-2 gap-3 bg-white">
+        <div className="p-3 grid grid-cols-2 gap-3 bg-[hsl(0,0%,10%)]">
           {/* Equipment Type */}
           <div>
             <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">Equipment Type *</label>

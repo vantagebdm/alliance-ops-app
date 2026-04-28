@@ -3,11 +3,11 @@ import { base44 } from "@/api/base44Client";
 import { BarChart2 } from "lucide-react";
 
 const STATUS_COLOR = {
-  draft: "bg-gray-100 text-gray-600",
-  pending_approval: "bg-amber-100 text-amber-700",
-  approved: "bg-blue-100 text-blue-700",
-  posted: "bg-green-100 text-green-800",
-  rejected: "bg-red-100 text-red-700",
+  draft: "bg-gray-500/10 text-gray-400",
+  pending_approval: "bg-amber-500/10 text-amber-400",
+  approved: "bg-blue-500/10 text-blue-400",
+  posted: "bg-green-500/10 text-green-400",
+  rejected: "bg-red-500/10 text-red-400",
 };
 
 const TYPE_LABEL = {
@@ -81,7 +81,7 @@ export default function StockAdjustmentList({ onNewAdjustment, partId = null }) 
             </thead>
             <tbody>
               {adjustments.map((a, idx) => (
-                <tr key={a.id} className={`border-t border-border/50 ${idx % 2 === 0 ? "bg-white" : "bg-muted/20"}`}>
+                <tr key={a.id} className={`border-t border-border/50 ${idx % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/20"}`}>
                   <td className="px-3 py-2 font-mono text-xs font-bold text-primary">{a.adjustment_number}</td>
                   <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(a.adjustment_date)}</td>
                   {!partId && <td className="px-3 py-2 font-mono text-xs font-bold text-primary">{a.part_number}</td>}

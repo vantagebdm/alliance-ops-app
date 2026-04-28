@@ -15,7 +15,7 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
 
   return (
     <div className="fixed inset-0 bg-black/75 z-50 flex items-start justify-center pt-8 pb-8 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl mx-4">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-3xl rounded-sm shadow-2xl mx-4">
 
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-start justify-between rounded-t-sm">
           <div>
@@ -52,7 +52,7 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
                 <div className="flex gap-2 items-start">
                   <span className="text-muted-foreground w-28 flex-shrink-0">Category</span>
                   <div>
-                    <span className={`text-[10px] font-heading uppercase tracking-wider px-1.5 py-0.5 rounded-sm font-bold ${CATEGORY_COLORS[part.category] || "bg-gray-100 text-gray-500"}`}>{CATEGORY_LABEL[part.category] || part.category}</span>
+                    <span className={`text-[10px] font-heading uppercase tracking-wider px-1.5 py-0.5 rounded-sm font-bold ${CATEGORY_COLORS[part.category] || "bg-gray-500/10 text-gray-400"}`}>{CATEGORY_LABEL[part.category] || part.category}</span>
                     {part.subcategory && <span className="ml-2 text-xs text-muted-foreground">{part.subcategory}</span>}
                   </div>
                 </div>
@@ -99,8 +99,8 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
               )}
               {marginPct && (
                 <div className="col-span-2 bg-green-500/10 border border-green-500/20 rounded-sm p-3 flex items-center justify-between">
-                  <span className="font-heading text-[10px] uppercase tracking-wider text-green-600/70">Gross Margin</span>
-                  <span className="font-heading text-lg font-bold text-green-600">{marginPct}%</span>
+                  <span className="font-heading text-[10px] uppercase tracking-wider text-green-400/70">Gross Margin</span>
+                  <span className="font-heading text-lg font-bold text-green-400">{marginPct}%</span>
                 </div>
               )}
             </div>

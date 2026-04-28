@@ -5,19 +5,19 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const MOVEMENT_TYPE_LABELS = {
-  goods_receipt: { label: "Goods Receipt", color: "text-green-600 bg-green-50" },
-  stock_adjustment: { label: "Adjustment", color: "text-blue-600 bg-blue-50" },
-  stocktake_posting: { label: "Stocktake", color: "text-purple-600 bg-purple-50" },
-  transfer_out: { label: "Transfer Out", color: "text-orange-600 bg-orange-50" },
-  transfer_in: { label: "Transfer In", color: "text-cyan-600 bg-cyan-50" },
-  sales_allocation: { label: "Sales Alloc.", color: "text-indigo-600 bg-indigo-50" },
-  dispatch: { label: "Dispatch", color: "text-blue-600 bg-blue-50" },
-  return_in: { label: "Return In", color: "text-green-600 bg-green-50" },
-  return_out: { label: "Return Out", color: "text-red-600 bg-red-50" },
-  warranty_hold: { label: "Warranty Hold", color: "text-amber-600 bg-amber-50" },
-  quarantine_move: { label: "Quarantine", color: "text-amber-600 bg-amber-50" },
-  writeoff: { label: "Write-off", color: "text-red-600 bg-red-50" },
-  opening_balance: { label: "Opening Bal.", color: "text-gray-600 bg-gray-50" },
+  goods_receipt: { label: "Goods Receipt", color: "text-green-400 bg-green-500/10" },
+  stock_adjustment: { label: "Adjustment", color: "text-blue-400 bg-blue-500/10" },
+  stocktake_posting: { label: "Stocktake", color: "text-purple-400 bg-purple-500/10" },
+  transfer_out: { label: "Transfer Out", color: "text-orange-400 bg-orange-500/10" },
+  transfer_in: { label: "Transfer In", color: "text-cyan-400 bg-cyan-500/10" },
+  sales_allocation: { label: "Sales Alloc.", color: "text-indigo-400 bg-indigo-500/10" },
+  dispatch: { label: "Dispatch", color: "text-blue-400 bg-blue-500/10" },
+  return_in: { label: "Return In", color: "text-green-400 bg-green-500/10" },
+  return_out: { label: "Return Out", color: "text-red-400 bg-red-500/10" },
+  warranty_hold: { label: "Warranty Hold", color: "text-amber-400 bg-amber-500/10" },
+  quarantine_move: { label: "Quarantine", color: "text-amber-400 bg-amber-500/10" },
+  writeoff: { label: "Write-off", color: "text-red-400 bg-red-500/10" },
+  opening_balance: { label: "Opening Bal.", color: "text-gray-400 bg-gray-500/10" },
 };
 
 export default function StockMovementsLedger({ partId = null, partNumber = null }) {
@@ -100,9 +100,9 @@ export default function StockMovementsLedger({ partId = null, partNumber = null 
               {filtered.length === 0 ? (
                 <tr><td colSpan={9} className="px-3 py-8 text-center text-muted-foreground text-sm">No movements found.</td></tr>
               ) : filtered.map((m, idx) => {
-                const typeConfig = MOVEMENT_TYPE_LABELS[m.movement_type] || { label: m.movement_type, color: "text-gray-600 bg-gray-50" };
+                const typeConfig = MOVEMENT_TYPE_LABELS[m.movement_type] || { label: m.movement_type, color: "text-gray-400 bg-gray-500/10" };
                 return (
-                  <tr key={m.id} className={`border-t border-border/50 ${idx % 2 === 0 ? "bg-white" : "bg-muted/20"}`}>
+                  <tr key={m.id} className={`border-t border-border/50 ${idx % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/20"}`}>
                     <td className="px-3 py-2 font-mono text-xs font-bold text-muted-foreground">{m.movement_number || "—"}</td>
                     <td className="px-3 py-2 text-xs text-muted-foreground whitespace-nowrap">{formatDate(m.movement_date)}</td>
                     {(!partId && !partNumber) && <td className="px-3 py-2 font-mono text-xs font-bold text-primary">{m.part_number}</td>}
