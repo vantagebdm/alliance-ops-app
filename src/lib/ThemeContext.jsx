@@ -1,30 +1,21 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect } from "react";
 
+// App is permanently dark-themed — light mode is not supported
+// as all components use hardcoded dark colour values
 const ThemeContext = createContext({ theme: "dark", toggleTheme: () => {} });
 
 export function ThemeProvider({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem("erp-theme") || "dark");
-
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "light") {
-      root.classList.add("light-theme");
-      root.classList.remove("dark-theme");
-      document.body.style.backgroundColor = "hsl(0 0% 97%)";
-      document.body.style.color = "hsl(0 0% 10%)";
-    } else {
-      root.classList.remove("light-theme");
-      root.classList.add("dark-theme");
-      document.body.style.backgroundColor = "hsl(0 0% 6%)";
-      document.body.style.color = "hsl(0 0% 95%)";
-    }
-    localStorage.setItem("erp-theme", theme);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme(t => t === "dark" ? "light" : "dark");
+    // Always enforce dark theme
+    document.documentElement.classList.remove("light-theme");
+    document.documentElement.classList.add("dark-theme");
+    document.body.style.backgroundColor = "hsl(0 0% 6%)";
+    document.body.style.color = "hsl(0 0% 95%)";
+    localStorage.setItem("erp-theme", "dark");
+  }, []);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: "dark", toggleTheme: () => {} }}>
       {children}
     </ThemeContext.Provider>
   );
