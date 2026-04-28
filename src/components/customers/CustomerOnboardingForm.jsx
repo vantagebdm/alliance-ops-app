@@ -162,7 +162,7 @@ export default function CustomerOnboardingForm({ onClose, onSaved, initial }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-5xl rounded-sm shadow-2xl mx-4">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-5xl rounded-sm shadow-2xl mx-4">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,5%)] px-6 py-5 flex items-center justify-between rounded-t-sm sticky top-0 z-10">
@@ -179,7 +179,7 @@ export default function CustomerOnboardingForm({ onClose, onSaved, initial }) {
 
           {/* Entry Method */}
           {!initial && (
-            <div className="bg-[hsl(0,0%,97%)] border border-border rounded-sm p-4">
+            <div className="bg-[hsl(0,0%,13%)] border border-border rounded-sm p-4">
               <p className="font-heading text-[11px] uppercase tracking-widest text-foreground/50 mb-3">Create Customer Method</p>
               <div className="flex gap-3">
                 <button
@@ -247,7 +247,7 @@ export default function CustomerOnboardingForm({ onClose, onSaved, initial }) {
 
         {/* Footer Actions */}
         {showForm && (
-          <div className="px-6 py-4 bg-[hsl(0,0%,97%)] border-t border-border flex flex-wrap justify-between items-center gap-3 rounded-b-sm">
+          <div className="px-6 py-4 bg-[hsl(0,0%,8%)] border-t border-border flex flex-wrap justify-between items-center gap-3 rounded-b-sm">
             <Button variant="outline" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">
               Cancel
             </Button>

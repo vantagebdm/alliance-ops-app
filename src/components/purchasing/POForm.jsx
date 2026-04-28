@@ -131,7 +131,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                       className={`px-2 py-2 text-[10px] font-heading font-semibold uppercase tracking-wider rounded-sm border transition-colors text-left ${
                         poType === opt.value
                           ? "bg-primary text-black border-primary"
-                          : "bg-white text-foreground border-border hover:border-primary/50"
+                          : "bg-[hsl(0,0%,14%)] text-foreground border-border hover:border-primary/50"
                       }`}
                     >
                       <div>{opt.label}</div>
@@ -193,7 +193,7 @@ export default function POForm({ onClose, onSaved, initial }) {
 
           <div className="flex-1 border border-border rounded-sm overflow-auto">
             <table className="w-full text-sm">
-              <thead className="bg-[hsl(0,0%,96%)] border-b border-border sticky top-0">
+              <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
                 <tr>
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-44">Part #</th>
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
