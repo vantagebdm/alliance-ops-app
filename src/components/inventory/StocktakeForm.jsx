@@ -192,7 +192,7 @@ export default function StocktakeForm({ onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-4xl rounded-sm shadow-2xl flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="bg-secondary px-5 py-3 flex items-center justify-between flex-shrink-0">
           <div>
@@ -286,9 +286,9 @@ export default function StocktakeForm({ onClose, onSaved }) {
                 <div className="flex items-center gap-3">
                   <span className="text-xs text-muted-foreground">{countedLines}/{lines.length} counted</span>
                   {form.count_mode === "blind" ? (
-                    <span className="flex items-center gap-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-sm"><EyeOff className="w-3 h-3" /> Blind Mode</span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-sm"><Eye className="w-3 h-3" /> Visible Mode</span>
+                    <span className="flex items-center gap-1 text-xs text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded-sm"><EyeOff className="w-3 h-3" /> Blind Mode</span>
+                                  ) : (
+                                    <span className="flex items-center gap-1 text-xs text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-sm"><Eye className="w-3 h-3" /> Visible Mode</span>
                   )}
                 </div>
               </div>
@@ -308,7 +308,7 @@ export default function StocktakeForm({ onClose, onSaved }) {
                     {lines.map((line, idx) => {
                       const hasVariance = line.counted_qty !== null && line.variance_qty !== 0;
                       return (
-                        <tr key={line._id} className={`border-t border-border/50 ${hasVariance ? "bg-amber-50/50" : idx % 2 === 0 ? "bg-white" : "bg-muted/20"}`}>
+                        <tr key={line._id} className={`border-t border-border/50 ${hasVariance ? "bg-amber-500/10" : idx % 2 === 0 ? "bg-[hsl(0,0%,12%)]" : "bg-muted/20"}`}>
                           <td className="px-3 py-1.5 font-mono text-xs font-bold text-primary">{line.part_number}</td>
                           <td className="px-3 py-1.5 text-xs text-muted-foreground max-w-[180px] truncate">{line.description}</td>
                           <td className="px-3 py-1.5 font-mono text-xs">{line.bin || "—"}</td>
@@ -349,11 +349,11 @@ export default function StocktakeForm({ onClose, onSaved }) {
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-sm">
+                  <div className="flex items-center gap-3 p-3 bg-amber-500/10 border border-amber-500/30 rounded-sm">
                     <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0" />
                     <div>
-                      <div className="font-heading font-bold text-sm uppercase text-amber-800">{varianceLines.length} Variances Found</div>
-                      <div className="text-xs text-amber-700">
+                      <div className="font-heading font-bold text-sm uppercase text-amber-400">{varianceLines.length} Variances Found</div>
+                                          <div className="text-xs text-amber-400/80">
                         Total value impact: ${Math.abs(varianceLines.reduce((s, l) => s + l.variance_value, 0)).toFixed(2)}
                       </div>
                     </div>
@@ -372,7 +372,7 @@ export default function StocktakeForm({ onClose, onSaved }) {
                       </thead>
                       <tbody>
                         {varianceLines.map((line, idx) => (
-                          <tr key={line._id} className={`border-t border-border/50 ${idx % 2 === 0 ? "bg-white" : "bg-muted/20"}`}>
+                          <tr key={line._id} className={`border-t border-border/50 ${idx % 2 === 0 ? "bg-[hsl(0,0%,12%)]" : "bg-muted/20"}`}>
                             <td className="px-3 py-2 font-mono text-xs font-bold text-primary">{line.part_number}</td>
                             <td className="px-3 py-2 text-xs text-muted-foreground">{line.description}</td>
                             <td className="px-3 py-2 text-center font-bold">{line.system_qty}</td>

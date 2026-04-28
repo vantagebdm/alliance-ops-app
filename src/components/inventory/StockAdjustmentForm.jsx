@@ -179,7 +179,7 @@ export default function StockAdjustmentForm({ onClose, onSaved, prefillPart = nu
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-2xl rounded-sm shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-2xl rounded-sm shadow-2xl flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="bg-secondary px-5 py-3 flex items-center justify-between flex-shrink-0">
           <div>
@@ -203,7 +203,7 @@ export default function StockAdjustmentForm({ onClose, onSaved, prefillPart = nu
                   className="flex h-9 w-full rounded-sm border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 />
                 {showPartDrop && partSuggestions.length > 0 && (
-                  <div className="absolute top-full left-0 right-0 bg-white border border-border rounded-sm shadow-lg z-50 max-h-40 overflow-y-auto mt-0.5">
+                  <div className="absolute top-full left-0 right-0 bg-[hsl(0,0%,12%)] border border-border rounded-sm shadow-lg z-50 max-h-40 overflow-y-auto mt-0.5">
                     {partSuggestions.map(p => (
                       <button key={p.id} type="button" onClick={() => selectPart(p)}
                         className="w-full text-left px-3 py-2 hover:bg-primary/10 text-sm transition-colors">
@@ -281,7 +281,7 @@ export default function StockAdjustmentForm({ onClose, onSaved, prefillPart = nu
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider block mb-1">Qty Before</label>
               <div className="font-heading text-2xl font-bold text-foreground">{form.qty_before}</div>
             </div>
-            <div className="bg-white rounded-sm border-2 border-primary p-3">
+            <div className="bg-[hsl(0,0%,13%)] rounded-sm border-2 border-primary p-3">
               <label className="text-xs font-medium text-primary uppercase tracking-wider block mb-1">Adjustment Qty *</label>
               <Input
                 type="number"

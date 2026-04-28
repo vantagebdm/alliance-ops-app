@@ -154,7 +154,7 @@ export default function StockTransferForm({ onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl flex flex-col max-h-[92vh]">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-3xl rounded-sm shadow-2xl flex flex-col max-h-[92vh]">
         <div className="bg-secondary px-5 py-3 flex items-center justify-between flex-shrink-0">
           <div>
             <h2 className="font-heading text-sm font-bold uppercase tracking-widest text-white">Stock Transfer</h2>
@@ -184,8 +184,8 @@ export default function StockTransferForm({ onClose, onSaved }) {
 
           {/* From / To */}
           <div className="grid grid-cols-5 gap-3 items-center">
-            <div className="col-span-2 bg-red-50/50 border border-red-200 rounded-sm p-3 space-y-2">
-              <div className="text-xs font-heading font-bold uppercase tracking-wider text-red-700">From</div>
+            <div className="col-span-2 bg-red-500/10 border border-red-500/30 rounded-sm p-3 space-y-2">
+              <div className="text-xs font-heading font-bold uppercase tracking-wider text-red-400">From</div>
               <Select value={form.from_warehouse} onValueChange={v => set("from_warehouse", v)}>
                 <SelectTrigger className="rounded-sm h-8 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>{WAREHOUSES.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
@@ -195,8 +195,8 @@ export default function StockTransferForm({ onClose, onSaved }) {
             <div className="flex justify-center">
               <ArrowRight className="w-6 h-6 text-muted-foreground" />
             </div>
-            <div className="col-span-2 bg-green-50/50 border border-green-200 rounded-sm p-3 space-y-2">
-              <div className="text-xs font-heading font-bold uppercase tracking-wider text-green-700">To</div>
+            <div className="col-span-2 bg-green-500/10 border border-green-500/30 rounded-sm p-3 space-y-2">
+              <div className="text-xs font-heading font-bold uppercase tracking-wider text-green-400">To</div>
               <Select value={form.to_warehouse} onValueChange={v => set("to_warehouse", v)}>
                 <SelectTrigger className="rounded-sm h-8 text-xs"><SelectValue /></SelectTrigger>
                 <SelectContent>{WAREHOUSES.map(w => <SelectItem key={w} value={w}>{w}</SelectItem>)}</SelectContent>
@@ -216,7 +216,7 @@ export default function StockTransferForm({ onClose, onSaved }) {
                 className="flex h-9 w-full rounded-sm border border-input bg-transparent px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
               />
               {showPartDrop && partSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-border rounded-sm shadow-lg z-50 max-h-40 overflow-y-auto mt-0.5">
+                <div className="absolute top-full left-0 right-0 bg-[hsl(0,0%,12%)] border border-border rounded-sm shadow-lg z-50 max-h-40 overflow-y-auto mt-0.5">
                   {partSuggestions.map(p => (
                     <button key={p.id} type="button" onClick={() => addLine(p)}
                       className="w-full text-left px-3 py-2 hover:bg-primary/10 text-sm transition-colors flex items-center gap-3">
