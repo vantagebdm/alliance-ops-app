@@ -50,7 +50,7 @@ export default function ReceiptTypeSelector({ value, onChange }) {
               className={`w-full flex items-center gap-4 px-5 py-4 rounded-sm border transition-all text-left ${
                 active
                   ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border bg-white hover:border-primary/40 hover:bg-muted/20"
+                  : "border-border bg-[hsl(0,0%,13%)] hover:border-primary/40 hover:bg-muted/20"
               }`}
             >
               <div className={`w-10 h-10 rounded-sm flex items-center justify-center flex-shrink-0 ${active ? "bg-primary" : "bg-muted"}`}>

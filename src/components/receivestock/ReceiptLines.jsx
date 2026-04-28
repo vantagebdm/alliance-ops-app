@@ -102,9 +102,9 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
       </div>
 
       {hasDiscrepancy && (
-        <div className="mb-3 flex items-center gap-2 bg-yellow-50 border border-yellow-200 rounded-sm px-4 py-2">
-          <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-          <span className="text-xs text-yellow-800 font-body">One or more lines have non-Good condition. Review destination and add notes.</span>
+        <div className="mb-3 flex items-center gap-2 bg-amber-500/10 border border-amber-500/30 rounded-sm px-4 py-2">
+          <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0" />
+          <span className="text-xs text-amber-400 font-body">One or more lines have non-Good condition. Review destination and add notes.</span>
         </div>
       )}
 
@@ -137,7 +137,7 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
               const outstanding = Math.max(0, (line.outstanding_qty ?? (line.ordered_qty - (line.previously_received_qty || 0))));
               const isDiscrepancy = line.condition !== "good";
               return (
-                <tr key={idx} className={`border-b border-border ${isDiscrepancy ? "bg-yellow-50/60" : idx % 2 === 0 ? "bg-white" : "bg-muted/10"}`}>
+                <tr key={idx} className={`border-b border-border ${isDiscrepancy ? "bg-amber-500/10" : idx % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/10"}`}>
                   <td className="px-2 py-2">
                     <button type="button" onClick={() => toggleSelect(idx)}>
                       {line.selected
@@ -207,7 +207,7 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
                     <select
                       value={line.condition || "good"}
                       onChange={e => updateLine(idx, "condition", e.target.value)}
-                      className={`w-full h-7 px-1 border rounded-sm text-[10px] ${isDiscrepancy ? "border-yellow-400 bg-yellow-50" : "border-input bg-transparent"}`}
+                      className={`w-full h-7 px-1 border rounded-sm text-[10px] ${isDiscrepancy ? "border-amber-500/50 bg-amber-500/10" : "border-input bg-transparent"}`}
                     >
                       {CONDITIONS.map(c => <option key={c.value} value={c.value}>{c.label}</option>)}
                     </select>
@@ -224,25 +224,25 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
         <div className="mt-3 space-y-2">
           <div className="font-heading text-[10px] uppercase tracking-wider text-muted-foreground">Discrepancy Details</div>
           {lines.map((line, idx) => line.condition !== "good" && (
-            <div key={idx} className="grid grid-cols-2 gap-3 bg-yellow-50 border border-yellow-200 rounded-sm px-3 py-2">
+            <div key={idx} className="grid grid-cols-2 gap-3 bg-amber-500/10 border border-amber-500/30 rounded-sm px-3 py-2">
               <div>
-                <div className="font-heading text-[9px] uppercase tracking-wider text-yellow-700 mb-1">{line.part_number} — Destination</div>
+                <div className="font-heading text-[9px] uppercase tracking-wider text-amber-400 mb-1">{line.part_number} — Destination</div>
                 <select
                   value={line.destination || "available_stock"}
                   onChange={e => updateLine(idx, "destination", e.target.value)}
-                  className="w-full h-7 px-2 border border-yellow-400 rounded-sm text-[11px] bg-white"
+                  className="w-full h-7 px-2 border border-amber-500/50 rounded-sm text-[11px] bg-[hsl(0,0%,13%)]"
                 >
                   {DESTINATIONS.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
                 </select>
               </div>
               <div>
-                <div className="font-heading text-[9px] uppercase tracking-wider text-yellow-700 mb-1">Notes *</div>
+                <div className="font-heading text-[9px] uppercase tracking-wider text-amber-400 mb-1">Notes *</div>
                 <input
                   type="text"
                   value={line.notes || ""}
                   onChange={e => updateLine(idx, "notes", e.target.value)}
                   placeholder="Describe the issue..."
-                  className="w-full h-7 px-2 border border-yellow-400 rounded-sm text-[11px] bg-white"
+                  className="w-full h-7 px-2 border border-amber-500/50 rounded-sm text-[11px] bg-[hsl(0,0%,13%)]"
                 />
               </div>
             </div>

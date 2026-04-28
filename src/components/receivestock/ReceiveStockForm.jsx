@@ -233,7 +233,7 @@ export default function ReceiveStockForm({ onClose, onSaved, initialPO }) {
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-6xl rounded-sm shadow-2xl flex flex-col mx-4" style={{ minHeight: "min(94vh, 950px)" }}>
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-6xl rounded-sm shadow-2xl flex flex-col mx-4" style={{ minHeight: "min(94vh, 950px)" }}>
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-center justify-between rounded-t-sm flex-shrink-0">

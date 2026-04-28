@@ -2,9 +2,9 @@ import { AlertTriangle, CheckCircle2, Clock, XCircle } from "lucide-react";
 
 const MATCH_STATUSES = {
   not_matched: { label: "Not Matched", icon: Clock, color: "text-muted-foreground bg-muted" },
-  matched: { label: "Matched", icon: CheckCircle2, color: "text-green-700 bg-green-50 border-green-200" },
-  variance_detected: { label: "Variance Detected", icon: AlertTriangle, color: "text-yellow-700 bg-yellow-50 border-yellow-200" },
-  pending_review: { label: "Pending Review", icon: XCircle, color: "text-blue-700 bg-blue-50 border-blue-200" },
+  matched: { label: "Matched", icon: CheckCircle2, color: "text-green-400 bg-green-500/10 border-green-500/30" },
+  variance_detected: { label: "Variance Detected", icon: AlertTriangle, color: "text-amber-400 bg-amber-500/10 border-amber-500/30" },
+  pending_review: { label: "Pending Review", icon: XCircle, color: "text-blue-400 bg-blue-500/10 border-blue-500/30" },
 };
 
 export default function InvoiceMatching({ form, update, receiptTotal }) {
@@ -72,7 +72,7 @@ export default function InvoiceMatching({ form, update, receiptTotal }) {
                 value={form.variance_note || ""}
                 onChange={e => update("variance_note", e.target.value)}
                 placeholder="Explain the variance (price difference, freight, etc.)"
-                className="flex w-full rounded-sm border border-yellow-400 bg-yellow-50 px-3 py-2 text-sm min-h-[60px]"
+                className="flex w-full rounded-sm border border-amber-500/50 bg-amber-500/10 px-3 py-2 text-sm min-h-[60px]"
               />
             </div>
           )}
