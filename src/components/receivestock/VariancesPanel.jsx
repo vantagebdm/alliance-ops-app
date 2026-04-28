@@ -48,14 +48,14 @@ export default function VariancesPanel({ variances, onChange, lines }) {
       </div>
 
       {discrepancyLines.length > 0 && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-sm p-4">
+        <div className="bg-amber-500/10 border border-amber-500/30 rounded-sm p-4">
           <div className="flex items-center gap-2 mb-2">
-            <AlertTriangle className="w-4 h-4 text-yellow-600" />
-            <span className="font-heading text-xs font-bold uppercase tracking-wider text-yellow-800">Detected from line items</span>
+            <AlertTriangle className="w-4 h-4 text-amber-400" />
+            <span className="font-heading text-xs font-bold uppercase tracking-wider text-amber-400">Detected from line items</span>
           </div>
           <div className="space-y-1">
             {discrepancyLines.map((l, i) => (
-              <div key={i} className="text-xs text-yellow-800 flex gap-3">
+              <div key={i} className="text-xs text-amber-300 flex gap-3">
                 <span className="font-bold">{l.part_number || "Unknown"}</span>
                 <span className="capitalize">{l.condition?.replace("_", " ")}</span>
                 {l.notes && <span className="text-yellow-700">— {l.notes}</span>}
@@ -77,7 +77,7 @@ export default function VariancesPanel({ variances, onChange, lines }) {
             </thead>
             <tbody>
               {variances.map((v, idx) => (
-                <tr key={v._id} className={`border-b border-border ${idx % 2 === 0 ? "bg-white" : "bg-muted/10"}`}>
+                <tr key={v._id} className={`border-b border-border ${idx % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/10"}`}>
                   <td className="px-3 py-1.5">
                     <select
                       value={v.part_number || ""}
@@ -119,8 +119,8 @@ export default function VariancesPanel({ variances, onChange, lines }) {
                   </td>
                   <td className="px-3 py-1.5">
                     <span className={`px-2 py-0.5 rounded-sm text-[10px] font-heading font-bold uppercase ${
-                      v.status === "resolved" ? "bg-green-100 text-green-700" :
-                      v.status === "open" ? "bg-yellow-100 text-yellow-700" : "bg-blue-100 text-blue-700"
+                      v.status === "resolved" ? "bg-green-500/10 text-green-400" :
+                      v.status === "open" ? "bg-amber-500/10 text-amber-400" : "bg-blue-500/10 text-blue-400"
                     }`}>{v.status}</span>
                   </td>
                   <td className="px-3 py-1.5">

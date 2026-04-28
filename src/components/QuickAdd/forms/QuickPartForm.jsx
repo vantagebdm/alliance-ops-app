@@ -25,7 +25,7 @@ export default function QuickPartForm({ onClose, onSaved }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-md rounded-sm shadow-2xl">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-md rounded-sm shadow-2xl">
         <div className="bg-[hsl(0,0%,8%)] px-6 py-3 flex items-center justify-between rounded-t-sm">
           <h2 className="font-heading text-base font-bold text-white uppercase tracking-wider">New Part</h2>
           <button onClick={onClose} className="text-white/60 hover:text-white">

@@ -78,7 +78,7 @@ export default function ReceiptAttachments({ attachments, onChange }) {
             </thead>
             <tbody>
               {attachments.map((att, idx) => (
-                <tr key={att._id} className={`border-b border-border ${idx % 2 === 0 ? "bg-white" : "bg-muted/10"}`}>
+                <tr key={att._id} className={`border-b border-border ${idx % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/10"}`}>
                   <td className="px-3 py-2">
                     <span className="px-2 py-0.5 bg-muted rounded-sm text-[10px] font-heading uppercase tracking-wider">
                       {DOC_TYPES.find(d => d.value === att.doc_type)?.label || att.doc_type}

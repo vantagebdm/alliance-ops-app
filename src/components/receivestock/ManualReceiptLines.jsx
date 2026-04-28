@@ -101,7 +101,7 @@ export default function ManualReceiptLines({ lines, onChange, form, update }) {
           </thead>
           <tbody>
             {lines.map((line, idx) => (
-              <tr key={line._id} className={`border-b border-border ${idx % 2 === 0 ? "bg-white" : "bg-muted/10"}`}>
+              <tr key={line._id} className={`border-b border-border ${idx % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/10"}`}>
                 <td className="px-2 py-1.5">
                   <input
                     type="text"

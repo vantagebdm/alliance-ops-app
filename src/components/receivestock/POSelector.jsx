@@ -84,7 +84,7 @@ export default function POSelector({ onSelect, selectedPO }) {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by PO number or supplier..."
-          className="w-full h-9 pl-9 pr-3 border border-input rounded-sm text-sm bg-white focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+          className="w-full h-9 pl-9 pr-3 border border-input rounded-sm text-sm bg-[hsl(0,0%,10%)] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
         />
       </div>
 
@@ -107,14 +107,14 @@ export default function POSelector({ onSelect, selectedPO }) {
                 <tr
                   key={po.id}
                   onClick={() => onSelect(po)}
-                  className={`cursor-pointer border-b border-border hover:bg-primary/5 transition-colors ${i % 2 === 0 ? "bg-white" : "bg-muted/10"}`}
+                  className={`cursor-pointer border-b border-border hover:bg-primary/5 transition-colors ${i % 2 === 0 ? "bg-[hsl(0,0%,11%)]" : "bg-muted/10"}`}
                 >
                   <td className="px-3 py-2 font-heading font-bold text-primary">{po.po_number}</td>
                   <td className="px-3 py-2">{po.supplier_name}</td>
                   <td className="px-3 py-2 capitalize">
                     <span className={`px-2 py-0.5 rounded-sm text-[10px] font-heading font-bold uppercase ${
-                      po.status === "partial" ? "bg-yellow-100 text-yellow-800" :
-                      po.status === "confirmed" ? "bg-blue-100 text-blue-800" :
+                      po.status === "partial" ? "bg-amber-500/10 text-amber-400" :
+                      po.status === "confirmed" ? "bg-blue-500/10 text-blue-400" :
                       "bg-muted text-muted-foreground"
                     }`}>{po.status}</span>
                   </td>

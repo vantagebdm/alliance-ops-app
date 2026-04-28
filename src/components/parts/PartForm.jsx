@@ -111,7 +111,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
 
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-start justify-center pt-4 pb-4 overflow-y-auto">
-      <div className="bg-white w-full max-w-4xl rounded-sm shadow-2xl mx-4">
+      <div className="bg-[hsl(0,0%,10%)] w-full max-w-4xl rounded-sm shadow-2xl mx-4">
         <div className="bg-[hsl(0,0%,8%)] px-6 py-4 flex items-center justify-between rounded-t-sm">
           <h2 className="font-heading text-lg font-bold text-white uppercase tracking-wider">
             {initial ? "Edit Part" : "New Part"}
@@ -275,7 +275,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
           {/* Section 3: Hazmat / Safety (oils, sprays, chemicals) */}
           {isHazmat && (
             <div>
-              <SectionHeader num={3} title="Safety & Storage" badge="Hazmat" badgeColor="bg-rose-100 text-rose-700" />
+              <SectionHeader num={3} title="Safety & Storage" badge="Hazmat" badgeColor="bg-rose-500/10 text-rose-400" />
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 flex gap-6">
                   {[
@@ -309,7 +309,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
           {/* Section 3/4: Compliance fields */}
           {isCompliance && (
             <div>
-              <SectionHeader num={3} title="Compliance Details" badge="Compliance" badgeColor="bg-green-100 text-green-700" />
+              <SectionHeader num={3} title="Compliance Details" badge="Compliance" badgeColor="bg-green-500/10 text-green-400" />
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 flex gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -341,7 +341,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
           {/* Consumables extra */}
           {isConsumable && (
             <div>
-              <SectionHeader num={3} title="Consumable Details" badge="Consumables" badgeColor="bg-teal-100 text-teal-700" />
+              <SectionHeader num={3} title="Consumable Details" badge="Consumables" badgeColor="bg-teal-500/10 text-teal-400" />
               <div className="grid grid-cols-2 gap-3">
                 <div className="col-span-2 flex gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
