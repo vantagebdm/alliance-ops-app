@@ -18,7 +18,7 @@ export default function ReorderSupplierGroup({
   return (
     <div className="border border-border rounded-sm bg-card overflow-hidden">
       {/* Supplier header */}
-      <div className="flex items-center gap-3 px-4 py-3 bg-[hsl(0,0%,96%)] border-b border-border">
+      <div className="flex items-center gap-3 px-4 py-3 bg-[hsl(0,0%,13%)] border-b border-border">
         <button onClick={() => setCollapsed(c => !c)} className="text-muted-foreground hover:text-foreground">
           {collapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
         </button>
