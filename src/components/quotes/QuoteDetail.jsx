@@ -17,7 +17,7 @@ export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
 
   return (
     <div className="fixed inset-0 bg-black/75 z-50 flex items-start justify-center pt-8 pb-8 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl mx-4">
+      <div className="bg-card w-full max-w-3xl rounded-sm shadow-2xl mx-4">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-start justify-between rounded-t-sm">
@@ -70,7 +70,7 @@ export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
               <span className="font-heading text-xs font-semibold text-white uppercase tracking-wider">Line Items</span>
             </div>
             <table className="w-full text-sm">
-              <thead className="bg-[hsl(0,0%,96%)] border-b border-border">
+              <thead className="bg-[hsl(0,0%,10%)] border-b border-border">
                 <tr>
                   <th className="text-left px-4 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Part #</th>
                   <th className="text-left px-4 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>

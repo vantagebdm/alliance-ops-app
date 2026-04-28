@@ -175,7 +175,7 @@ export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, on
       {/* Deactivate Modal */}
       {showDeactivateModal && (
         <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-sm shadow-2xl max-w-md w-full">
+          <div className="bg-card rounded-sm shadow-2xl max-w-md w-full">
             <div className="bg-red-950/80 px-6 py-4 flex items-center gap-3 rounded-t-sm">
               <XCircle className="w-5 h-5 text-red-400" />
               <h3 className="font-heading text-sm font-bold text-white uppercase tracking-wider">Deactivate Customer</h3>
@@ -185,7 +185,7 @@ export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, on
               <div>
                 <label className="block text-xs font-heading uppercase tracking-wider text-foreground/50 mb-2">Deactivation Reason *</label>
                 <select value={deactivateReason} onChange={(e) => setDeactivateReason(e.target.value)}
-                  className="w-full h-9 px-3 border border-input rounded-sm text-sm bg-white">
+                  className="w-full h-9 px-3 border border-input rounded-sm text-sm bg-[hsl(0,0%,10%)] text-foreground">
                   <option value="">Select a reason...</option>
                   <option value="No longer in business">No longer in business</option>
                   <option value="Bankruptcy">Bankruptcy</option>
@@ -200,9 +200,9 @@ export default function ProfileHeader({ customer, onEdit, onClose, onUpdated, on
                 <label className="block text-xs font-heading uppercase tracking-wider text-foreground/50 mb-2">Additional Notes</label>
                 <textarea value={deactivateNotes} onChange={(e) => setDeactivateNotes(e.target.value)}
                   placeholder="Optional record keeping notes..."
-                  className="w-full h-20 px-3 py-2 border border-input rounded-sm text-sm resize-none" />
+                  className="w-full h-20 px-3 py-2 border border-input rounded-sm text-sm resize-none bg-[hsl(0,0%,10%)] text-foreground" />
               </div>
-              <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-sm px-3 py-2">
+              <p className="text-xs text-amber-400 bg-amber-500/10 border border-amber-500/30 rounded-sm px-3 py-2">
                 Deactivation will be logged with timestamp and stored in customer notes for record keeping.
               </p>
             </div>

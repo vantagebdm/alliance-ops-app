@@ -39,7 +39,7 @@ export default function EnquiryDetail({ enquiry, onClose, onUpdated }) {
 
   return (
     <div className="fixed inset-0 bg-black/75 z-50 flex items-start justify-center pt-8 pb-8 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl mx-4">
+      <div className="bg-card w-full max-w-3xl rounded-sm shadow-2xl mx-4">
 
         {/* Header */}
         <div className="bg-[hsl(0,0%,6%)] px-6 py-4 flex items-start justify-between rounded-t-sm">

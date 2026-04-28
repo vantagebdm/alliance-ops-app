@@ -115,6 +115,11 @@
   }
 }
 
+/* Force dark mode — no OS override permitted */
+:root {
+  color-scheme: dark !important;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -122,6 +127,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-body);
+    color-scheme: dark;
   }
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);

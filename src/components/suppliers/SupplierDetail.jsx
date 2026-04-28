@@ -246,11 +246,11 @@ export default function SupplierDetail({ supplier, onClose, onEdit, onStatusChan
 
   return (
     <div className="fixed inset-0 bg-black/80 z-50 flex items-start justify-center pt-6 pb-6 overflow-y-auto">
-      <div className="bg-white w-full max-w-3xl rounded-sm shadow-2xl flex flex-col" style={{ minHeight: "min(90vh, 800px)" }}>
+      <div className="bg-card w-full max-w-3xl rounded-sm shadow-2xl flex flex-col" style={{ minHeight: "min(90vh, 800px)" }}>
         <SupplierProfileHeader supplier={s} onEdit={onEdit} onClose={onClose} onStatusChanged={onStatusChanged} onNewPO={onNewPO} onViewOpenPOs={onViewOpenPOs} />
 
         {/* Tab nav */}
-        <div className="bg-[hsl(0,0%,96%)] border-b border-border flex gap-0 overflow-x-auto flex-shrink-0">
+        <div className="bg-[hsl(0,0%,10%)] border-b border-border flex gap-0 overflow-x-auto flex-shrink-0">
           {TABS.map(t => (
             <button key={t} onClick={() => setTab(t)}
               className={`px-4 py-2.5 text-[10px] font-heading uppercase tracking-wider whitespace-nowrap transition-colors border-b-2 ${
@@ -264,7 +264,7 @@ export default function SupplierDetail({ supplier, onClose, onEdit, onStatusChan
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6 bg-white">
+        <div className="flex-1 overflow-y-auto p-6 bg-card">
           {renderTab()}
         </div>
       </div>
