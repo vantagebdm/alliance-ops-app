@@ -225,13 +225,13 @@ export default function POForm({ onClose, onSaved, initial }) {
                         />
                       </td>
                       <td className="px-2 py-1.5 flex-1 border-r border-border/50">
-                        <Input 
-                          value={line.description || ""} 
-                          onChange={e => updateLine(i, "description", e.target.value)}
-                          placeholder="Description" 
-                          className="rounded-sm h-8 text-xs w-full bg-[hsl(0,0%,10%)]" 
-                        />
-                      </td>
+                         <input 
+                           value={line.description || ""} 
+                           onChange={e => updateLine(i, "description", e.target.value)}
+                           placeholder="Description" 
+                           className="h-8 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground" 
+                         />
+                       </td>
                       <td className="px-2 py-1.5 w-16 border-r border-border/50">
                         <Input type="number" min="1" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
                           className="rounded-sm h-8 text-xs text-right" />
