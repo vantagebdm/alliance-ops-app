@@ -212,18 +212,15 @@ export default function POForm({ onClose, onSaved, initial }) {
                     <tr key={i} className="border-b border-border/50">
                       <td className="px-2 py-1.5 w-28 border-r border-border/50">
                         <PartAutocomplete 
-                          value={line.part_number}
+                          value={line.supplier_sku || line.part_number}
                           onSelect={(part) => { 
-                            updateLine(i, "part_number", part.supplier_sku || part.app_part_number || part.part_number); 
-                            updateLine(i, "description", part.description || part.name || ""); 
+                            updateLine(i, "part_number", part.part_number); 
                             updateLine(i, "supplier_sku", part.supplier_sku || part.app_part_number || ""); 
+                            updateLine(i, "description", part.description || part.name || ""); 
                             updateLine(i, "unit_cost", part.unit_cost || 0);
-                            // Store additional part data for reference
-                            updateLine(i, "oem_number", part.oem_number || "");
-                            updateLine(i, "brand", part.brand || "");
-                            updateLine(i, "category", part.category || "");
+                            updateLine(i, "quantity", 1);
                           }}
-                          onChange={(val) => updateLine(i, "part_number", val)}
+                          onChange={(val) => updateLine(i, "supplier_sku", val)}
                           placeholder="Part #"
                           className="rounded-sm h-8 text-xs font-mono w-full"
                         />
@@ -237,11 +234,11 @@ export default function POForm({ onClose, onSaved, initial }) {
                          />
                        </td>
                       <td className="px-2 py-1.5 w-16 border-r border-border/50">
-                        <Input type="number" min="1" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
+                        <Input type="number" min="1" value={line.quantity || 1} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
                           className="rounded-sm h-8 text-xs text-right" />
                       </td>
                       <td className="px-2 py-1.5 w-24 border-r border-border/50">
-                        <Input type="number" step="0.01" value={line.unit_cost} onChange={e => updateLine(i, "unit_cost", Number(e.target.value))}
+                        <Input type="number" step="0.01" value={line.unit_cost || 0} onChange={e => updateLine(i, "unit_cost", Number(e.target.value))}
                           className="rounded-sm h-8 text-xs text-right" />
                       </td>
                       <td className="px-3 py-1.5 w-24 text-right font-semibold">${(line.total || 0).toFixed(2)}</td>
