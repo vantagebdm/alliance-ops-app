@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Users, Shield, Settings, Database, Hash, Package, ChevronRight } from "lucide-react";
+import { Users, Shield, Settings, Database, Hash, Package, ChevronRight, FileText } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
 import DocumentNumberingSettings from "@/components/admin/DocumentNumberingSettings";
 import PartNumberingSettings from "@/components/admin/PartNumberingSettings";
+import PDFRegenerationTool from "@/components/admin/PDFRegenerationTool";
 import { Link } from "react-router-dom";
 
 export default function Admin() {
@@ -80,6 +81,15 @@ export default function Admin() {
             <h2 className="font-heading text-lg font-bold uppercase tracking-wider">Part Numbering Settings</h2>
           </div>
           <PartNumberingSettings />
+        </div>
+
+        {/* PDF Regeneration Tool */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <FileText className="w-5 h-5 text-primary" />
+            <h2 className="font-heading text-lg font-bold uppercase tracking-wider">PDF Regeneration</h2>
+          </div>
+          <PDFRegenerationTool />
         </div>
 
         {/* Users table */}
