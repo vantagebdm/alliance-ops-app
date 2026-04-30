@@ -36,6 +36,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
       const results = await base44.entities.Part.list(null, 500);
       const filtered = results.filter(item =>
         String(item.part_number || "").toLowerCase().includes(val.toLowerCase()) ||
+        String(item.app_part_number || "").toLowerCase().includes(val.toLowerCase()) ||
         String(item.name || "").toLowerCase().includes(val.toLowerCase())
       );
       setSuggestions(filtered);
@@ -48,7 +49,8 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   };
 
   const handleSelect = (item) => {
-    onChange(item.part_number);
+    const displayValue = `${item.part_number}${item.app_part_number ? ` / ${item.app_part_number}` : ""}`;
+    onChange(displayValue);
     onSelect(item);
     setSuggestions([]);
     setOpen(false);
