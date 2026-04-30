@@ -36,8 +36,13 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
       const results = await base44.entities.Part.list(null, 500);
       const filtered = results.filter(item =>
         String(item.part_number || "").toLowerCase().includes(val.toLowerCase()) ||
+        String(item.supplier_sku || "").toLowerCase().includes(val.toLowerCase()) ||
         String(item.app_part_number || "").toLowerCase().includes(val.toLowerCase()) ||
-        String(item.name || "").toLowerCase().includes(val.toLowerCase())
+        String(item.oem_number || "").toLowerCase().includes(val.toLowerCase()) ||
+        String(item.aftermarket_number || "").toLowerCase().includes(val.toLowerCase()) ||
+        String(item.cross_references || "").toLowerCase().includes(val.toLowerCase()) ||
+        String(item.name || "").toLowerCase().includes(val.toLowerCase()) ||
+        String(item.brand || "").toLowerCase().includes(val.toLowerCase())
       );
       setSuggestions(filtered);
       setOpen(filtered.length > 0);
@@ -49,9 +54,9 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   };
 
   const handleSelect = (item) => {
-    console.log('Part selected:', item);
-    onChange(item.supplier_sku || item.part_number);
+    const displayValue = item.supplier_sku || item.app_part_number || item.part_number;
     onSelect(item);
+    onChange(displayValue);
     setSuggestions([]);
     setOpen(false);
   };
@@ -84,10 +89,18 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
                 key={idx}
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
-                className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors flex items-baseline gap-2 border-b border-border/30 last:border-b-0"
+                className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors flex flex-col gap-1 border-b border-border/30 last:border-b-0"
               >
-                <span className="font-mono font-semibold text-foreground">{item.supplier_sku || item.part_number}</span>
-                {item.name && <span className="text-xs text-muted-foreground truncate">— {item.name}</span>}
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-semibold text-foreground">{item.app_part_number}</span>
+                  <span className="text-xs text-muted-foreground">|</span>
+                  <span className="font-mono font-semibold text-primary">{item.supplier_sku}</span>
+                </div>
+                <div className="text-xs text-muted-foreground">{item.name}</div>
+                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                  {item.oem_number && <span>OEM: {item.oem_number}</span>}
+                  {item.unit_cost > 0 && <span>Cost: ${item.unit_cost.toFixed(2)}</span>}
+                </div>
               </button>
             ))
           ) : (
