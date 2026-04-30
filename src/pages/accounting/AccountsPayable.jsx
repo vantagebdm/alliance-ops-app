@@ -5,6 +5,7 @@ import { Plus, Search, X, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import BillDetailModal from "@/components/accounting/BillDetailModal";
 
 const STATUS_STYLES = {
   draft: "bg-gray-500/10 text-gray-400 border-gray-500/30",
@@ -140,6 +141,10 @@ export default function AccountsPayable() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {selected && (
+        <BillDetailModal bill={selected} onClose={() => { setSelected(null); load(); }} onSaved={() => { setSelected(null); load(); }} />
       )}
 
       {/* New Bill Modal */}
