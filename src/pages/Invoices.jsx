@@ -255,7 +255,7 @@ export default function Invoices() {
       )}
 
       {editingInvoice && (
-        <InvoiceEditForm
+        <QuickInvoiceForm
           invoice={editingInvoice}
           onClose={() => setEditingInvoice(null)}
           onSaved={() => { setEditingInvoice(null); load(); }}
