@@ -85,7 +85,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
                 onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
                 className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors flex items-baseline gap-2 border-b border-border/30 last:border-b-0"
               >
-                <span className="font-mono font-semibold text-foreground">{item.part_number}</span>
+                <span className="font-mono font-semibold text-foreground">{item.supplier_sku || item.part_number}</span>
                 {item.name && <span className="text-xs text-muted-foreground truncate">— {item.name}</span>}
               </button>
             ))
