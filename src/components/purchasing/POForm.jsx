@@ -216,8 +216,12 @@ export default function POForm({ onClose, onSaved, initial }) {
                           onSelect={(part) => { 
                             updateLine(i, "part_number", part.supplier_sku || part.app_part_number || part.part_number); 
                             updateLine(i, "description", part.description || part.name || ""); 
-                            updateLine(i, "supplier_sku", part.supplier_sku || ""); 
+                            updateLine(i, "supplier_sku", part.supplier_sku || part.app_part_number || ""); 
                             updateLine(i, "unit_cost", part.unit_cost || 0);
+                            // Store additional part data for reference
+                            updateLine(i, "oem_number", part.oem_number || "");
+                            updateLine(i, "brand", part.brand || "");
+                            updateLine(i, "category", part.category || "");
                           }}
                           onChange={(val) => updateLine(i, "part_number", val)}
                           placeholder="Part #"

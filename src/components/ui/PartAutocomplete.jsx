@@ -87,17 +87,22 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
                 key={idx}
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
-                className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors flex flex-col gap-1 border-b border-border/30 last:border-b-0"
+                className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors flex flex-col gap-1.5 border-b border-border/30 last:border-b-0"
               >
-                <div className="flex items-center gap-2">
-                  <span className="font-mono font-semibold text-foreground">{item.app_part_number}</span>
-                  <span className="text-xs text-muted-foreground">|</span>
-                  <span className="font-mono font-semibold text-primary">{item.supplier_sku}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-semibold text-foreground">{item.app_part_number}</span>
+                    <span className="text-xs text-muted-foreground">|</span>
+                    <span className="font-mono font-semibold text-primary">{item.supplier_sku}</span>
+                  </div>
+                  {item.unit_cost > 0 && <span className="text-xs font-semibold text-primary ml-auto">${item.unit_cost.toFixed(2)}</span>}
                 </div>
-                <div className="text-xs text-muted-foreground">{item.name}</div>
-                <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
+                <div className="text-xs text-muted-foreground">{item.description || item.name}</div>
+                <div className="grid grid-cols-2 gap-2 text-[11px] text-muted-foreground">
+                  {item.brand && <span>Brand: {item.brand}</span>}
+                  {item.category && <span>Category: {item.category}</span>}
                   {item.oem_number && <span>OEM: {item.oem_number}</span>}
-                  {item.unit_cost > 0 && <span>Cost: ${item.unit_cost.toFixed(2)}</span>}
+                  {item.aftermarket_number && <span>Aftermarket: {item.aftermarket_number}</span>}
                 </div>
               </button>
             ))
