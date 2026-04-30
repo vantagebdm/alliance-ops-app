@@ -195,11 +195,10 @@ export default function POForm({ onClose, onSaved, initial }) {
             <table className="w-full text-sm">
               <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
                 <tr>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-48">Part #</th>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-40">Supplier SKU</th>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 flex-1">Description</th>
+                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-44">Part #</th>
+                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-16">Qty</th>
-                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Unit Cost</th>
+                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Unit Cost</th>
                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Total</th>
                    <th className="w-10" />
                 </tr>
@@ -218,10 +217,6 @@ export default function POForm({ onClose, onSaved, initial }) {
                          placeholder="SKU"
                          className="rounded-sm h-8 text-xs font-mono"
                        />
-                     </td>
-                     <td className="px-2 py-1.5">
-                       <Input value={line.supplier_sku} onChange={e => updateLine(i, "supplier_sku", e.target.value)}
-                         placeholder="Supplier SKU" className="rounded-sm h-8 text-xs font-mono" readOnly />
                      </td>
                      <td className="px-2 py-1.5">
                        <Input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}
