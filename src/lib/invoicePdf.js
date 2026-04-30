@@ -33,7 +33,7 @@ export function generateInvoicePDF(invoice) {
   doc.text(`Invoice #${invoice.invoice_number || ""}`, pageW - margin, 17, { align: "right" });
   y = 38;
 
-  // Info block
+  // Info block (left side)
   const infoRows = [
     ["Customer:", invoice.customer_name || ""],
     invoice.company ? ["Company:", invoice.company] : null,
@@ -52,6 +52,51 @@ export function generateInvoicePDF(invoice) {
     doc.text(String(val), margin + 34, y);
     y += 7;
   });
+
+  // Company contact details box (right side)
+  const boxX = 130;
+  const boxY = 38;
+  const boxW = 70;
+  const boxH = 42;
+  
+  // Draw green border box
+  doc.setDrawColor(34, 197, 94);
+  doc.setLineWidth(1.5);
+  doc.rect(boxX, boxY, boxW, boxH);
+  
+  // Add company details inside the box
+  if (company) {
+    let boxYPos = boxY + 4;
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(0, 0, 0);
+    doc.text(company.trading_name || company.legal_name || "", boxX + 2, boxYPos);
+    
+    boxYPos += 5;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7);
+    
+    if (company.address_1) {
+      const addrLines = doc.splitTextToSize(`${company.address_1}${company.address_2 ? ', ' + company.address_2 : ''}`, boxW - 4);
+      doc.text(addrLines, boxX + 2, boxYPos);
+      boxYPos += addrLines.length * 3.5 + 1;
+    }
+    
+    if (company.phone) {
+      doc.text(`Ph: ${company.phone}`, boxX + 2, boxYPos);
+      boxYPos += 3.5;
+    }
+    
+    if (company.email) {
+      doc.text(`Email: ${company.email}`, boxX + 2, boxYPos);
+      boxYPos += 3.5;
+    }
+    
+    if (company.abn) {
+      doc.text(`ABN: ${company.abn}`, boxX + 2, boxYPos);
+    }
+  }
+
   y += 6;
 
   // Table header

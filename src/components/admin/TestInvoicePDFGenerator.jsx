@@ -6,41 +6,48 @@ import { generateInvoicePDF } from "@/lib/invoicePdf";
 
 const SAMPLE_INVOICE = {
   invoice_number: "INV-2026-001",
-  customer_name: "ABC Manufacturing Pty Ltd",
-  company: "Alliance Priority Parts",
+  customer_name: "Specialised Truck Services",
+  company: "Specialised Truck Services",
   invoice_date: "2026-04-30",
   due_date: "2026-05-30",
   customer_po_number: "PO-12345",
   customer_notes: "Thank you for your business. Please remit payment to the account details shown in the footer.",
   items: [
     {
-      part_number: "APP-ENG0001",
-      description: "Complete Engine Gasket Set",
-      quantity: 2,
-      unit_price: 245.50,
-      discount: 0,
-      total: 491.00
-    },
-    {
-      part_number: "APP-BRK0002",
-      description: "Brake Pad Set (Front Axle)",
-      quantity: 4,
-      unit_price: 89.95,
-      discount: 5,
-      total: 342.20
-    },
-    {
-      part_number: "APP-OIL0001",
-      description: "Premium Engine Oil (20L)",
+      part_number: "CF30527",
+      description: "FUEL FILTER, CLOSED END",
       quantity: 1,
-      unit_price: 125.00,
+      unit_price: 51.14,
       discount: 0,
-      total: 125.00
+      total: 51.14
+    },
+    {
+      part_number: "CA40339",
+      description: "AIR FILTER, PRIMARY",
+      quantity: 1,
+      unit_price: 41.47,
+      discount: 0,
+      total: 41.47
+    },
+    {
+      part_number: "CO50487",
+      description: "ENGINE OIL FILTER",
+      quantity: 1,
+      unit_price: 31.18,
+      discount: 0,
+      total: 31.18
+    },
+    {
+      description: "Freight",
+      quantity: 1,
+      unit_price: 22.00,
+      discount: 0,
+      total: 22.00
     }
   ],
-  subtotal: 958.20,
-  gst: 95.82,
-  total: 1054.02
+  subtotal: 145.79,
+  gst: 14.58,
+  total: 147.99
 };
 
 export default function TestInvoicePDFGenerator() {
