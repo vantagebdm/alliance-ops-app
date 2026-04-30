@@ -215,16 +215,24 @@ export default function POForm({ onClose, onSaved, initial }) {
                           suggestions={partAC.suggestions}
                           open={partAC.open}
                           loading={partAC.loading}
-                          onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
+                          onInputChange={(val) => { 
+                            updateLine(i, "part_number", val); 
+                            if (val.length >= 1) {
+                              partAC.handleInputChange(val);
+                            } else {
+                              partAC.setOpen(false);
+                              partAC.setSuggestions([]);
+                            }
+                          }}
                           onSelect={(item) => { 
-                            const displayNum = item.part_number;
-                            updateLine(i, "part_number", displayNum); 
+                            updateLine(i, "part_number", item.part_number); 
                             updateLine(i, "description", item.name || ""); 
                             updateLine(i, "supplier_sku", item.supplier_sku || ""); 
                             updateLine(i, "unit_cost", item.unit_cost || 0);
-                            partAC.setQuery(displayNum);
                             partAC.setOpen(false);
+                            partAC.setSuggestions([]);
                           }}
+                          onShowAll={() => partAC.handleShowAll()}
                           placeholder="Part #"
                           className="rounded-sm h-8 text-xs font-mono w-full"
                         />
