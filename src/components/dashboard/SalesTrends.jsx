@@ -5,7 +5,7 @@ import moment from "moment";
 const fmt = (v) => `$${(v / 1000).toFixed(1)}k`;
 
 export default function SalesTrends({ invoices }) {
-  // Monthly sales for last 6 months
+  // Monthly sales for last 6 months (paid + pending)
   const monthlySales = useMemo(() => {
     const months = [];
     for (let i = 5; i >= 0; i--) {
@@ -13,7 +13,7 @@ export default function SalesTrends({ invoices }) {
       const key = m.format("YYYY-MM");
       const label = m.format("MMM");
       const total = invoices
-        .filter(inv => moment(inv.created_date).format("YYYY-MM") === key)
+        .filter(inv => moment(inv.created_date).format("YYYY-MM") === key && ["paid", "sent", "draft", "overdue"].includes(inv.status))
         .reduce((s, inv) => s + (inv.total || 0), 0);
       months.push({ label, total });
     }
@@ -31,7 +31,7 @@ export default function SalesTrends({ invoices }) {
   const totalPending = pendingInvoices.reduce((s, i) => s + (i.total || 0), 0);
   const overdue = pendingInvoices.filter(i => i.status === "overdue");
   const thisMonth = invoices
-    .filter(i => moment(i.created_date).isSame(moment(), "month"))
+    .filter(i => moment(i.created_date).isSame(moment(), "month") && ["paid", "sent", "draft", "overdue"].includes(i.status))
     .reduce((s, i) => s + (i.total || 0), 0);
 
   const statusColor = { draft: "text-amber-400", sent: "text-blue-400", overdue: "text-red-400" };
@@ -45,7 +45,7 @@ export default function SalesTrends({ invoices }) {
         <div className="flex items-center justify-between mb-4">
           <div>
             <h3 className="font-heading text-sm font-bold uppercase tracking-wider text-white">Monthly Sales</h3>
-            <p className="text-[10px] text-white/40 font-body mt-0.5">Last 6 months · Invoice totals</p>
+            <p className="text-[10px] text-white/40 font-body mt-0.5">Last 6 months · Paid + Pending invoices</p>
           </div>
           <div className="text-right">
             <div className="font-heading text-[10px] uppercase tracking-widest text-white/40">This Month</div>
