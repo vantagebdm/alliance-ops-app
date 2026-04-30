@@ -206,21 +206,23 @@ export default function POForm({ onClose, onSaved, initial }) {
               <tbody>
                 {form.items.map((line, i) => (
                    <tr key={i} className="border-b border-border/50">
-                     <td className="px-2 py-1.5 w-56">
-                       <Autocomplete
-                         value={line.part_number}
-                         suggestions={partAC.suggestions}
-                         open={partAC.open}
-                         loading={partAC.loading}
-                         onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                         onSelect={(item) => { updateLine(i, "part_number", item.supplier_sku || item.part_number); updateLine(i, "description", item.name || ""); updateLine(i, "supplier_sku", item.supplier_sku || ""); updateLine(i, "unit_cost", item.unit_cost || 0); partAC.handleSelectSuggestion(item); }}
-                         placeholder="Part #"
-                         className="rounded-sm h-8 text-xs font-mono"
-                       />
+                     <td className="px-2 py-1.5">
+                       <div className="min-w-56">
+                         <Autocomplete
+                           value={line.part_number}
+                           suggestions={partAC.suggestions}
+                           open={partAC.open}
+                           loading={partAC.loading}
+                           onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
+                           onSelect={(item) => { updateLine(i, "part_number", item.supplier_sku || item.part_number); updateLine(i, "description", item.name || ""); updateLine(i, "supplier_sku", item.supplier_sku || ""); updateLine(i, "unit_cost", item.unit_cost || 0); partAC.handleSelectSuggestion(item); }}
+                           placeholder="Part #"
+                           className="rounded-sm h-8 text-xs font-mono w-full"
+                         />
+                       </div>
                      </td>
-                     <td className="px-2 py-1.5 flex-1">
+                     <td className="px-2 py-1.5 min-w-64">
                        <Input value={line.description || ""} onChange={e => updateLine(i, "description", e.target.value)}
-                         placeholder="Description" className="rounded-sm h-8 text-xs" />
+                         placeholder="Description" className="rounded-sm h-8 text-xs w-full" />
                      </td>
                      <td className="px-2 py-1.5">
                        <Input type="number" min="1" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
