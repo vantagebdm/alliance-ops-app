@@ -54,6 +54,7 @@ export function useAutocomplete(entityName, searchField, extraSearchFields = [])
     query,
     setQuery,
     suggestions,
+    setSuggestions,
     open,
     setOpen,
     loading,

@@ -32,6 +32,9 @@ export default function POForm({ onClose, onSaved, initial }) {
   const supplierAC = useAutocomplete("Supplier", "name");
   const partAC = useAutocomplete("Part", "part_number");
 
+  // Track which line's autocomplete is active to sync state
+  const [activeLineIndex, setActiveLineIndex] = useState(null);
+
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const updateLine = (i, k, v) => {
@@ -214,12 +217,13 @@ export default function POForm({ onClose, onSaved, initial }) {
                           loading={partAC.loading}
                           onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
                           onSelect={(item) => { 
-                            const displayNum = item.supplier_sku || item.part_number;
+                            const displayNum = item.part_number;
                             updateLine(i, "part_number", displayNum); 
                             updateLine(i, "description", item.name || ""); 
                             updateLine(i, "supplier_sku", item.supplier_sku || ""); 
                             updateLine(i, "unit_cost", item.unit_cost || 0);
-                            partAC.setSuggestions([]);
+                            partAC.setQuery(displayNum);
+                            partAC.setOpen(false);
                           }}
                           placeholder="Part #"
                           className="rounded-sm h-8 text-xs font-mono w-full"
