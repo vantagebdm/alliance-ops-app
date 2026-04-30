@@ -192,57 +192,55 @@ export default function POForm({ onClose, onSaved, initial }) {
           </div>
 
           <div className="flex-1 border border-border rounded-sm overflow-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
-                <tr>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-56">Part #</th>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 flex-1">Description</th>
-                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-16">Qty</th>
-                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Unit Cost</th>
-                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Total</th>
-                   <th className="w-10" />
-                </tr>
-              </thead>
-              <tbody>
-                {form.items.map((line, i) => (
-                   <tr key={i} className="border-b border-border/50">
-                     <td className="px-2 py-1.5">
-                       <div className="min-w-56">
-                         <Autocomplete
-                           value={line.part_number}
-                           suggestions={partAC.suggestions}
-                           open={partAC.open}
-                           loading={partAC.loading}
-                           onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                           onSelect={(item) => { updateLine(i, "part_number", item.supplier_sku || item.part_number); updateLine(i, "description", item.name || ""); updateLine(i, "supplier_sku", item.supplier_sku || ""); updateLine(i, "unit_cost", item.unit_cost || 0); partAC.handleSelectSuggestion(item); }}
-                           placeholder="Part #"
-                           className="rounded-sm h-8 text-xs font-mono w-full"
-                         />
-                       </div>
-                     </td>
-                     <td className="px-2 py-1.5 min-w-64">
-                       <Input value={line.description || ""} onChange={e => updateLine(i, "description", e.target.value)}
-                         placeholder="Description" className="rounded-sm h-8 text-xs w-full" />
-                     </td>
-                     <td className="px-2 py-1.5">
-                       <Input type="number" min="1" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
-                         className="rounded-sm h-8 text-xs text-right" />
-                     </td>
-                     <td className="px-2 py-1.5">
-                       <Input type="number" step="0.01" value={line.unit_cost} onChange={e => updateLine(i, "unit_cost", Number(e.target.value))}
-                         className="rounded-sm h-8 text-xs text-right" />
-                     </td>
-                     <td className="px-3 py-1.5 text-right font-semibold">${(line.total || 0).toFixed(2)}</td>
-                     <td className="px-2 py-1.5">
-                       <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
-                         <Trash2 className="w-4 h-4" />
-                       </button>
-                     </td>
-                   </tr>
-                 ))}
-              </tbody>
-            </table>
-          </div>
+             <table className="text-sm border-collapse">
+               <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
+                 <tr>
+                    <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-72 border-r border-border">Part #</th>
+                    <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-96 border-r border-border">Description</th>
+                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20 border-r border-border">Qty</th>
+                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32 border-r border-border">Unit Cost</th>
+                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Total</th>
+                    <th className="w-12" />
+                 </tr>
+               </thead>
+               <tbody>
+                 {form.items.map((line, i) => (
+                    <tr key={i} className="border-b border-border/50">
+                      <td className="px-2 py-1.5 w-72 border-r border-border/50">
+                        <Autocomplete
+                          value={line.part_number}
+                          suggestions={partAC.suggestions}
+                          open={partAC.open}
+                          loading={partAC.loading}
+                          onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
+                          onSelect={(item) => { updateLine(i, "part_number", item.supplier_sku || item.part_number); updateLine(i, "description", item.name || ""); updateLine(i, "supplier_sku", item.supplier_sku || ""); updateLine(i, "unit_cost", item.unit_cost || 0); partAC.handleSelectSuggestion(item); }}
+                          placeholder="Part #"
+                          className="rounded-sm h-8 text-xs font-mono w-full"
+                        />
+                      </td>
+                      <td className="px-2 py-1.5 w-96 border-r border-border/50">
+                        <Input value={line.description || ""} onChange={e => updateLine(i, "description", e.target.value)}
+                          placeholder="Description" className="rounded-sm h-8 text-xs w-full" />
+                      </td>
+                      <td className="px-2 py-1.5 w-20 border-r border-border/50">
+                        <Input type="number" min="1" value={line.quantity} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
+                          className="rounded-sm h-8 text-xs text-right" />
+                      </td>
+                      <td className="px-2 py-1.5 w-32 border-r border-border/50">
+                        <Input type="number" step="0.01" value={line.unit_cost} onChange={e => updateLine(i, "unit_cost", Number(e.target.value))}
+                          className="rounded-sm h-8 text-xs text-right" />
+                      </td>
+                      <td className="px-3 py-1.5 w-28 text-right font-semibold">${(line.total || 0).toFixed(2)}</td>
+                      <td className="px-2 py-1.5 w-12">
+                        <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+               </tbody>
+             </table>
+           </div>
 
           <div className="flex justify-end mt-3">
             <div className="w-64 space-y-1 text-sm">
