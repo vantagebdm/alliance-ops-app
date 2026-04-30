@@ -215,7 +215,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                           value={line.part_number}
                           onSelect={(part) => { 
                             updateLine(i, "part_number", part.supplier_sku || part.app_part_number || part.part_number); 
-                            updateLine(i, "description", part.name || ""); 
+                            updateLine(i, "description", part.description || part.name || ""); 
                             updateLine(i, "supplier_sku", part.supplier_sku || ""); 
                             updateLine(i, "unit_cost", part.unit_cost || 0);
                           }}
