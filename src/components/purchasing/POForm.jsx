@@ -214,11 +214,21 @@ export default function POForm({ onClose, onSaved, initial }) {
                         <PartAutocomplete 
                           value={line.supplier_sku || line.part_number}
                           onSelect={(part) => { 
-                            updateLine(i, "part_number", part.part_number); 
-                            updateLine(i, "supplier_sku", part.supplier_sku || part.app_part_number || ""); 
-                            updateLine(i, "description", part.description || part.name || ""); 
-                            updateLine(i, "unit_cost", part.unit_cost || 0);
-                            updateLine(i, "quantity", 1);
+                            const items = form.items.map((line, idx) => {
+                              if (idx !== i) return line;
+                              const updated = {
+                                ...line,
+                                part_number: part.part_number,
+                                supplier_sku: part.supplier_sku || part.app_part_number || "",
+                                description: part.description || part.name || "",
+                                unit_cost: part.unit_cost || 0,
+                                quantity: 1
+                              };
+                              updated.total = (updated.quantity || 0) * (updated.unit_cost || 0);
+                              return updated;
+                            });
+                            const subtotal = items.reduce((s, l) => s + (Number(l.total) || 0), 0);
+                            setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
                           }}
                           onChange={(val) => updateLine(i, "supplier_sku", val)}
                           placeholder="Part #"
