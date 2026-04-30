@@ -1,18 +1,20 @@
 import { jsPDF } from "jspdf";
 import { getLogo } from "@/lib/companyLogos";
+import { getCompanyProfile } from "@/lib/companyDetails";
 
 export function generateInvoicePDF(invoice) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
   const margin = 18;
   let y = 20;
+  const company = getCompanyProfile();
 
   // White background
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pageW, 297, "F");
 
-  // Header bar - dark grey
-  doc.setFillColor(40, 40, 40);
+  // Header bar - black (#000000)
+  doc.setFillColor(0, 0, 0);
   doc.rect(0, 0, pageW, 28, "F");
 
   // Logo (invoice logo preferred, fallback to company logo)
@@ -53,7 +55,7 @@ export function generateInvoicePDF(invoice) {
   y += 6;
 
   // Table header
-  doc.setFillColor(40, 40, 40);
+  doc.setFillColor(0, 0, 0);
   doc.rect(margin, y, pageW - margin * 2, 9, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(8);
@@ -114,8 +116,8 @@ export function generateInvoicePDF(invoice) {
   doc.line(totalsX, y, pageW - margin, y);
   y += 6;
 
-  // Total row - dark grey background
-  doc.setFillColor(40, 40, 40);
+  // Total row - black background
+  doc.setFillColor(0, 0, 0);
   doc.rect(totalsX - 4, y - 4, pageW - margin - totalsX + 4 + 4, 10, "F");
   doc.setFontSize(10);
   doc.setFont("helvetica", "bold");
@@ -134,10 +136,13 @@ export function generateInvoicePDF(invoice) {
   // Footer
   doc.setFillColor(240, 240, 240);
   doc.rect(0, 282, pageW, 15, "F");
-  doc.setFontSize(7.5);
+  doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
-  doc.setTextColor(120, 120, 120);
-  doc.text("This is an automated invoice. Please contact us if you have any queries.", pageW / 2, 290, { align: "center" });
+  doc.setTextColor(100, 100, 100);
+  doc.text(company.trading_name || company.legal_name, margin, 286);
+  doc.text(`${company.bank_name} | BSB: ${company.bank_bsb} | Account: ${company.bank_account}`, margin, 290);
+  doc.text(company.phone, pageW - margin, 286, { align: "right" });
+  doc.text(company.email, pageW - margin, 290, { align: "right" });
 
   return doc.output("blob");
 }
