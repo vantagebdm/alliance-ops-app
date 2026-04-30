@@ -196,21 +196,21 @@ export default function POForm({ onClose, onSaved, initial }) {
           </div>
 
           <div className="flex-1 border border-border rounded-sm overflow-auto">
-             <table className="text-sm border-collapse">
+             <table className="w-full text-sm border-collapse">
                <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
-                 <tr>
-                    <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-40 border-r border-border">Part #</th>
-                    <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 flex-1 border-r border-border">Description</th>
-                    <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-20 border-r border-border">Qty</th>
-                    <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-28 border-r border-border">Unit Cost</th>
-                    <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-28">Total</th>
-                    <th className="w-10" />
-                 </tr>
+                  <tr>
+                     <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-48 border-r border-border">Part #</th>
+                     <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 flex-1 border-r border-border">Description</th>
+                     <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-24 border-r border-border">Qty</th>
+                     <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-32 border-r border-border">Unit Cost</th>
+                     <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-32">Total</th>
+                     <th className="w-10" />
+                  </tr>
                </thead>
                <tbody>
                  {form.items.map((line, i) => (
-                    <tr key={i} className="border-b border-border/50">
-                      <td className="px-4 py-1 w-40 border-r border-border/50">
+                     <tr key={i} className="border-b border-border/50">
+                       <td className="px-4 py-1 w-48 border-r border-border/50">
                         <PartAutocomplete 
                           value={line.supplier_sku || line.part_number}
                           onSelect={(part) => { 
@@ -243,15 +243,15 @@ export default function POForm({ onClose, onSaved, initial }) {
                            className="h-7 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors" 
                          />
                        </td>
-                      <td className="px-4 py-1 w-20 border-r border-border/50">
+                      <td className="px-4 py-1 w-24 border-r border-border/50">
                         <Input type="number" min="1" value={line.quantity || 1} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
                           className="rounded-sm h-7 text-xs text-right" />
                       </td>
-                      <td className="px-4 py-1 w-28 border-r border-border/50">
+                      <td className="px-4 py-1 w-32 border-r border-border/50">
                         <Input type="number" step="0.01" value={line.unit_cost || 0} onChange={e => updateLine(i, "unit_cost", Number(e.target.value))}
                           className="rounded-sm h-7 text-xs text-right" />
                       </td>
-                      <td className="px-4 py-1 w-28 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
+                      <td className="px-4 py-1 w-32 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
                       <td className="px-2 py-1 w-10 flex items-center justify-center">
                         <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500 p-0.5">
                           <Trash2 className="w-3 h-3" />
