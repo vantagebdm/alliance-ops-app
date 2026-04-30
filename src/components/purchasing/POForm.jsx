@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
+import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 
@@ -210,29 +211,15 @@ export default function POForm({ onClose, onSaved, initial }) {
                  {form.items.map((line, i) => (
                     <tr key={i} className="border-b border-border/50">
                       <td className="px-2 py-1.5 w-72 border-r border-border/50">
-                        <Autocomplete
+                        <PartAutocomplete 
                           value={line.part_number}
-                          suggestions={partAC.suggestions}
-                          open={partAC.open}
-                          loading={partAC.loading}
-                          onInputChange={(val) => { 
-                            updateLine(i, "part_number", val); 
-                            if (val.length >= 1) {
-                              partAC.handleInputChange(val);
-                            } else {
-                              partAC.setOpen(false);
-                              partAC.setSuggestions([]);
-                            }
+                          onSelect={(part) => { 
+                            updateLine(i, "part_number", part.part_number); 
+                            updateLine(i, "description", part.name || ""); 
+                            updateLine(i, "supplier_sku", part.supplier_sku || ""); 
+                            updateLine(i, "unit_cost", part.unit_cost || 0);
                           }}
-                          onSelect={(item) => { 
-                            updateLine(i, "part_number", item.part_number); 
-                            updateLine(i, "description", item.name || ""); 
-                            updateLine(i, "supplier_sku", item.supplier_sku || ""); 
-                            updateLine(i, "unit_cost", item.unit_cost || 0);
-                            partAC.setOpen(false);
-                            partAC.setSuggestions([]);
-                          }}
-                          onShowAll={() => partAC.handleShowAll()}
+                          onChange={(val) => updateLine(i, "part_number", val)}
                           placeholder="Part #"
                           className="rounded-sm h-8 text-xs font-mono w-full"
                         />
