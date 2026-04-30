@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
+import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber } from "@/hooks/useDocNumber";
 
@@ -27,7 +28,6 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
   const [saving, setSaving] = useState(false);
   const customerAC = useAutocomplete("Customer", "name");
   const companyAC = useAutocomplete("Customer", "company");
-  const partAC = useAutocomplete("Part", "part_number");
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -198,14 +198,25 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                 {form.items.map((line, i) => (
                   <tr key={i} className="border-b border-border/50">
                     <td className="px-2 py-1.5">
-                      <Autocomplete
+                      <PartAutocomplete
                         value={line.part_number}
-                        suggestions={partAC.suggestions}
-                        open={partAC.open}
-                        loading={partAC.loading}
-                        onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                        onSelect={(item) => { updateLine(i, "part_number", item.part_number); updateLine(i, "description", item.name); updateLine(i, "unit_price", item.sell_price || 0); partAC.handleSelectSuggestion(item); }}
-                        placeholder="SKU"
+                        onSelect={(part) => {
+                          const items = form.items.map((line, idx) => {
+                            if (idx !== i) return line;
+                            const updated = {
+                              ...line,
+                              part_number: part.part_number,
+                              description: part.description || part.name || "",
+                              unit_price: part.sell_price || 0,
+                              quantity: 1
+                            };
+                            updated.total = (updated.quantity || 0) * (updated.unit_price || 0);
+                            return updated;
+                          });
+                          recalc(items);
+                        }}
+                        onChange={(val) => updateLine(i, "part_number", val)}
+                        placeholder="Part #"
                         className="rounded-sm h-8 text-xs font-mono"
                       />
                     </td>

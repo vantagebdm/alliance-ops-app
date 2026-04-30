@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
+import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber } from "@/hooks/useDocNumber";
 
@@ -18,7 +19,6 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
   const [saving, setSaving] = useState(false);
   const customerAC = useAutocomplete("Customer", "name");
   const companyAC = useAutocomplete("Customer", "company");
-  const partAC = useAutocomplete("Part", "part_number");
 
   const update = (key, value) => setForm(f => ({ ...f, [key]: value }));
 
@@ -158,14 +158,11 @@ export default function EnquiryForm({ onClose, onSaved, initial }) {
               </div>
               <div>
                 <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/60 mb-1 block">Part Number</label>
-                <Autocomplete
+                <PartAutocomplete
                   value={form.part_number}
-                  suggestions={partAC.suggestions}
-                  open={partAC.open}
-                  loading={partAC.loading}
-                  onInputChange={(val) => { update("part_number", val); partAC.handleInputChange(val); }}
-                  onSelect={(item) => { update("part_number", item.part_number); partAC.handleSelectSuggestion(item); }}
-                  placeholder="Search part..."
+                  onSelect={(part) => { update("part_number", part.part_number); }}
+                  onChange={(val) => update("part_number", val)}
+                  placeholder="Part #"
                   className="rounded-sm"
                 />
               </div>
