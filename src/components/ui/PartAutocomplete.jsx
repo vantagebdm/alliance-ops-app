@@ -49,8 +49,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   };
 
   const handleSelect = (item) => {
-    const displayValue = `${item.part_number}${item.app_part_number ? ` / ${item.app_part_number}` : ""}`;
-    onChange(displayValue);
+    onChange(item.part_number);
     onSelect(item);
     setSuggestions([]);
     setOpen(false);
