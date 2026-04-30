@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter, Send, X, Eye, FileText, ChevronDown } from "lucide-react";
+import { Plus, Filter, Send, X, Eye, FileText, ChevronDown, Edit } from "lucide-react";
 import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import QuickInvoiceForm from "@/components/QuickAdd/forms/QuickInvoiceForm";
+import InvoiceEditForm from "@/components/invoices/InvoiceEditForm";
 
 function ResendModal({ invoice, onClose }) {
   const [email, setEmail] = useState(invoice.billing_email || "");
@@ -73,7 +74,7 @@ function ResendModal({ invoice, onClose }) {
   );
 }
 
-function InvoiceActions({ row, onResend, onViewPdf }) {
+function InvoiceActions({ row, onResend, onViewPdf, onEdit }) {
   const [open, setOpen] = useState(false);
 
   const handleViewPdf = async (e) => {
@@ -94,6 +95,12 @@ function InvoiceActions({ row, onResend, onViewPdf }) {
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
           <div className="absolute right-0 bottom-full mb-1 z-20 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl min-w-[170px] overflow-hidden">
+            <button
+              onClick={(e) => { e.stopPropagation(); setOpen(false); onEdit(row); }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wider text-white/70 hover:bg-primary/10 hover:text-primary transition-colors text-left"
+            >
+              <Edit className="w-3.5 h-3.5" /> Edit
+            </button>
             <button
               onClick={(e) => { e.stopPropagation(); setOpen(false); onResend(row, "view"); }}
               className="w-full flex items-center gap-2 px-3 py-2 text-xs font-heading uppercase tracking-wider text-white/70 hover:bg-primary/10 hover:text-primary transition-colors text-left"
@@ -133,6 +140,7 @@ export default function Invoices() {
   const [resendInvoice, setResendInvoice] = useState(null);
   const [viewingPdf, setViewingPdf] = useState(null);
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [editingInvoice, setEditingInvoice] = useState(null);
   const navigate = useNavigate();
 
   const load = useCallback(() => {
@@ -173,7 +181,7 @@ export default function Invoices() {
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
     {
       key: "_actions", label: "", render: (_, row) => (
-        <InvoiceActions row={row} onResend={handleAction} onViewPdf={handleViewPdf} />
+        <InvoiceActions row={row} onResend={handleAction} onViewPdf={handleViewPdf} onEdit={setEditingInvoice} />
       )
     },
   ];
@@ -243,6 +251,14 @@ export default function Invoices() {
         <QuickInvoiceForm
           onClose={() => setShowForm(false)}
           onSaved={() => { setShowForm(false); load(); }}
+        />
+      )}
+
+      {editingInvoice && (
+        <InvoiceEditForm
+          invoice={editingInvoice}
+          onClose={() => setEditingInvoice(null)}
+          onSaved={() => { setEditingInvoice(null); load(); }}
         />
       )}
     </div>
