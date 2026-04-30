@@ -204,7 +204,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                         open={partAC.open}
                         loading={partAC.loading}
                         onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                        onSelect={(item) => { updateLine(i, "part_number", item.part_number); updateLine(i, "description", item.name); partAC.handleSelectSuggestion(item); }}
+                        onSelect={(item) => { updateLine(i, "part_number", item.part_number); updateLine(i, "description", item.name); updateLine(i, "unit_price", item.sell_price || 0); partAC.handleSelectSuggestion(item); }}
                         placeholder="SKU"
                         className="rounded-sm h-8 text-xs font-mono"
                       />
