@@ -195,11 +195,11 @@ export default function POForm({ onClose, onSaved, initial }) {
             <table className="w-full text-sm">
               <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
                 <tr>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-36">Part #</th>
-                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">Supplier SKU</th>
+                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">Part #</th>
+                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-40">Supplier SKU</th>
                    <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-16">Qty</th>
-                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Unit Cost</th>
+                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Unit Cost</th>
                    <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-24">Total</th>
                    <th className="w-10" />
                 </tr>
