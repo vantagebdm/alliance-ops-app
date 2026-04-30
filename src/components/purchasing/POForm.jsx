@@ -229,7 +229,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                            value={line.description || ""} 
                            onChange={e => updateLine(i, "description", e.target.value)}
                            placeholder="Description" 
-                           className="h-8 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground" 
+                           className="h-8 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors" 
                          />
                        </td>
                       <td className="px-2 py-1.5 w-16 border-r border-border/50">
