@@ -8,6 +8,7 @@ import moment from "moment";
 import DocumentNumberingSettings from "@/components/admin/DocumentNumberingSettings";
 import PartNumberingSettings from "@/components/admin/PartNumberingSettings";
 import PDFRegenerationTool from "@/components/admin/PDFRegenerationTool";
+import TestInvoicePDFGenerator from "@/components/admin/TestInvoicePDFGenerator";
 import { Link } from "react-router-dom";
 
 export default function Admin() {
@@ -81,6 +82,15 @@ export default function Admin() {
             <h2 className="font-heading text-lg font-bold uppercase tracking-wider">Part Numbering Settings</h2>
           </div>
           <PartNumberingSettings />
+        </div>
+
+        {/* Test Invoice PDF */}
+        <div>
+          <div className="flex items-center gap-3 mb-4">
+            <FileText className="w-5 h-5 text-primary" />
+            <h2 className="font-heading text-lg font-bold uppercase tracking-wider">Test Invoice PDF</h2>
+          </div>
+          <TestInvoicePDFGenerator />
         </div>
 
         {/* PDF Regeneration Tool */}
