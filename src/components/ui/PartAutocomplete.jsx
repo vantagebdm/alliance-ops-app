@@ -6,6 +6,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   const [suggestions, setSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [displayValue, setDisplayValue] = useState("");
   const inputRef = useRef(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
 
@@ -55,6 +56,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
 
   const handleSelect = (item) => {
     onSelect(item);
+    setDisplayValue(`${item.app_part_number} | ${item.supplier_sku} | ${item.description || item.name}`);
     setSuggestions([]);
     setOpen(false);
   };
@@ -64,8 +66,8 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
       <input
         ref={inputRef}
         type="text"
-        value={value}
-        onChange={(e) => handleInputChange(e.target.value)}
+        value={displayValue || value}
+        onChange={(e) => { setDisplayValue(e.target.value); handleInputChange(e.target.value); }}
         onFocus={() => {
           if (!value) {
             base44.entities.Part.list(null, 500).then(results => {
