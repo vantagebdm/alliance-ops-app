@@ -49,6 +49,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   };
 
   const handleSelect = (item) => {
+    console.log('Part selected:', item);
     onChange(item.supplier_sku || item.part_number);
     onSelect(item);
     setSuggestions([]);

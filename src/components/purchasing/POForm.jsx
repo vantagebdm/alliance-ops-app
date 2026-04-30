@@ -214,6 +214,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                         <PartAutocomplete 
                           value={line.part_number}
                           onSelect={(part) => { 
+                            console.log('onSelect called with:', part);
                             updateLine(i, "part_number", part.supplier_sku || part.part_number); 
                             updateLine(i, "description", part.name || ""); 
                             updateLine(i, "supplier_sku", part.supplier_sku || ""); 
