@@ -12,36 +12,39 @@ export function generateInvoicePDF(invoice) {
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pageW, 297, "F");
 
-  // ── HEADER BAR (black) ──────────────────────────────────────────────
-  const headerH = 32;
-  doc.setFillColor(0, 0, 0);
-  doc.rect(0, 0, pageW, headerH, "F");
-
-  // Logo — left side of header
+  // ── LOGO — top left, above header bar ────────────────────────────────
   const logoUrl = getLogo("invoice_logo") || getLogo("company_logo");
+  const logoH = 22;
+  const logoW = 36;
+  const logoTopPad = 6;
   if (logoUrl) {
     try {
-      doc.addImage(logoUrl, "PNG", margin, 4, 44, 24, undefined, "FAST");
+      doc.addImage(logoUrl, "PNG", margin, logoTopPad, logoW, logoH, undefined, "FAST");
     } catch (_) {}
   }
 
-  // "INVOICE" title — centre of header
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
-  doc.setFont("helvetica", "bold");
-  const titleX = logoUrl ? margin + 52 : margin;
-  doc.text("INVOICE", titleX, 20);
+  // ── HEADER BAR (black) — sits below logo area ────────────────────────
+  const logoAreaH = logoTopPad + logoH + 4; // space for logo above bar
+  const headerH = 14;
+  const headerTop = logoAreaH;
+  doc.setFillColor(0, 0, 0);
+  doc.rect(0, headerTop, pageW, headerH, "F");
 
-  // Invoice number — right of header
+  // "INVOICE" title — left of header bar
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont("helvetica", "bold");
+  doc.text("INVOICE", margin, headerTop + 9.5);
+
+  // Invoice number — right of header bar
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(210, 210, 210);
-  doc.text(`Invoice #${invoice.invoice_number || ""}`, pageW - margin, 14, { align: "right" });
+  doc.text(`Invoice #${invoice.invoice_number || ""}`, pageW - margin, headerTop + 9.5, { align: "right" });
 
-  // ── COMPANY CONTACT BLOCK (top right, below header line) ────────────
-  // Sits to the right of the customer info block
-  const compBoxX = 120;
-  const compBoxY = headerH + 4;
+  // ── COMPANY CONTACT BLOCK (top right, above header — aligned with logo) ─
+  const compBoxX = 110;
+  const compBoxY = logoTopPad;
   const compBoxW = pageW - compBoxX - margin;
 
   doc.setFontSize(8);
@@ -86,7 +89,7 @@ export function generateInvoicePDF(invoice) {
   }
 
   // ── CUSTOMER INFO BLOCK (left side) ──────────────────────────────────
-  let y = headerH + 8;
+  let y = headerTop + headerH + 8;
   const invoiceDate = invoice.invoice_date || (invoice.created_date ? invoice.created_date.split("T")[0] : "");
   const infoRows = [
     ["Customer:", invoice.customer_name || ""],
