@@ -5,35 +5,88 @@ import { getCompanyProfile } from "@/lib/companyDetails";
 export function generateInvoicePDF(invoice) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
-  const margin = 18;
-  let y = 20;
+  const margin = 14;
   const company = getCompanyProfile();
 
   // White background
   doc.setFillColor(255, 255, 255);
   doc.rect(0, 0, pageW, 297, "F");
 
-  // Header bar - black (#000000)
+  // ── HEADER BAR (black) ──────────────────────────────────────────────
+  const headerH = 32;
   doc.setFillColor(0, 0, 0);
-  doc.rect(0, 0, pageW, 28, "F");
+  doc.rect(0, 0, pageW, headerH, "F");
 
-  // Logo (invoice logo preferred, fallback to company logo)
+  // Logo — left side of header
   const logoUrl = getLogo("invoice_logo") || getLogo("company_logo");
   if (logoUrl) {
-    try { doc.addImage(logoUrl, "PNG", margin, 4, 40, 20, undefined, "FAST"); } catch (_) {}
+    try {
+      doc.addImage(logoUrl, "PNG", margin, 4, 44, 24, undefined, "FAST");
+    } catch (_) {}
   }
 
+  // "INVOICE" title — centre of header
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
+  doc.setFontSize(22);
   doc.setFont("helvetica", "bold");
-  doc.text("INVOICE", logoUrl ? margin + 44 : margin, 17);
-  doc.setTextColor(200, 200, 200);
+  const titleX = logoUrl ? margin + 52 : margin;
+  doc.text("INVOICE", titleX, 20);
+
+  // Invoice number — right of header
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.text(`Invoice #${invoice.invoice_number || ""}`, pageW - margin, 17, { align: "right" });
-  y = 38;
+  doc.setTextColor(210, 210, 210);
+  doc.text(`Invoice #${invoice.invoice_number || ""}`, pageW - margin, 14, { align: "right" });
 
-  // Info block (left side)
+  // ── COMPANY CONTACT BLOCK (top right, below header line) ────────────
+  // Sits to the right of the customer info block
+  const compBoxX = 120;
+  const compBoxY = headerH + 4;
+  const compBoxW = pageW - compBoxX - margin;
+
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(30, 30, 30);
+  let cbY = compBoxY + 4;
+
+  const compName = company.trading_name || company.legal_name || "";
+  doc.text(compName, compBoxX + compBoxW / 2, cbY, { align: "center" });
+  cbY += 4;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(7.5);
+  doc.setTextColor(60, 60, 60);
+
+  if (company.reg_address) {
+    const addrLines = doc.splitTextToSize(company.reg_address, compBoxW);
+    addrLines.forEach(line => {
+      doc.text(line, compBoxX + compBoxW / 2, cbY, { align: "center" });
+      cbY += 3.6;
+    });
+  }
+
+  if (company.phone) {
+    doc.text(`Ph: ${company.phone}`, compBoxX + compBoxW / 2, cbY, { align: "center" });
+    cbY += 3.6;
+  }
+
+  if (company.email) {
+    doc.text(`Email: ${company.email}`, compBoxX + compBoxW / 2, cbY, { align: "center" });
+    cbY += 3.6;
+  }
+
+  if (company.website) {
+    doc.text(company.website, compBoxX + compBoxW / 2, cbY, { align: "center" });
+    cbY += 3.6;
+  }
+
+  if (company.abn) {
+    doc.setFont("helvetica", "bold");
+    doc.text(`ABN: ${company.abn}`, compBoxX + compBoxW / 2, cbY, { align: "center" });
+  }
+
+  // ── CUSTOMER INFO BLOCK (left side) ──────────────────────────────────
+  let y = headerH + 8;
   const infoRows = [
     ["Customer:", invoice.customer_name || ""],
     invoice.company ? ["Company:", invoice.company] : null,
@@ -44,62 +97,19 @@ export function generateInvoicePDF(invoice) {
 
   doc.setFontSize(9);
   infoRows.forEach(([label, val]) => {
-    doc.setTextColor(100, 100, 100);
     doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
     doc.text(label, margin, y);
-    doc.setTextColor(30, 30, 30);
     doc.setFont("helvetica", "normal");
-    doc.text(String(val), margin + 34, y);
+    doc.setTextColor(30, 30, 30);
+    doc.text(String(val), margin + 32, y);
     y += 7;
   });
 
-  // Company contact details box (right side)
-  const boxX = 130;
-  const boxY = 38;
-  const boxW = 70;
-  const boxH = 42;
-  
-  // Draw green border box
-  doc.setDrawColor(34, 197, 94);
-  doc.setLineWidth(1.5);
-  doc.rect(boxX, boxY, boxW, boxH);
-  
-  // Add company details inside the box
-  if (company) {
-    let boxYPos = boxY + 4;
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(0, 0, 0);
-    doc.text(company.trading_name || company.legal_name || "", boxX + 2, boxYPos);
-    
-    boxYPos += 5;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
-    
-    if (company.address_1) {
-      const addrLines = doc.splitTextToSize(`${company.address_1}${company.address_2 ? ', ' + company.address_2 : ''}`, boxW - 4);
-      doc.text(addrLines, boxX + 2, boxYPos);
-      boxYPos += addrLines.length * 3.5 + 1;
-    }
-    
-    if (company.phone) {
-      doc.text(`Ph: ${company.phone}`, boxX + 2, boxYPos);
-      boxYPos += 3.5;
-    }
-    
-    if (company.email) {
-      doc.text(`Email: ${company.email}`, boxX + 2, boxYPos);
-      boxYPos += 3.5;
-    }
-    
-    if (company.abn) {
-      doc.text(`ABN: ${company.abn}`, boxX + 2, boxYPos);
-    }
-  }
+  // Push y below the taller of info block or company block
+  y = Math.max(y, cbY + 4) + 6;
 
-  y += 6;
-
-  // Table header
+  // ── TABLE HEADER ──────────────────────────────────────────────────────
   doc.setFillColor(0, 0, 0);
   doc.rect(margin, y, pageW - margin * 2, 9, "F");
   doc.setTextColor(255, 255, 255);
@@ -113,7 +123,7 @@ export function generateInvoicePDF(invoice) {
   doc.text("Total", pageW - margin - 2, y + 6, { align: "right" });
   y += 11;
 
-  // Table rows
+  // ── TABLE ROWS ────────────────────────────────────────────────────────
   doc.setFont("helvetica", "normal");
   (invoice.items || []).forEach((item, idx) => {
     if (idx % 2 === 0) {
@@ -135,12 +145,12 @@ export function generateInvoicePDF(invoice) {
 
   y += 6;
 
-  // Divider line
+  // Divider
   doc.setDrawColor(200, 200, 200);
   doc.line(margin, y, pageW - margin, y);
   y += 4;
 
-  // Totals
+  // ── TOTALS ────────────────────────────────────────────────────────────
   const totalsX = pageW - margin - 65;
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
@@ -161,7 +171,7 @@ export function generateInvoicePDF(invoice) {
   doc.line(totalsX, y, pageW - margin, y);
   y += 6;
 
-  // Total row - black background
+  // Total due — black background
   doc.setFillColor(0, 0, 0);
   doc.rect(totalsX - 4, y - 4, pageW - margin - totalsX + 4 + 4, 10, "F");
   doc.setFontSize(10);
@@ -176,18 +186,22 @@ export function generateInvoicePDF(invoice) {
     doc.setFont("helvetica", "italic");
     doc.setTextColor(100, 100, 100);
     doc.text(`Notes: ${invoice.customer_notes}`, margin, y);
+    y += 8;
   }
 
-  // Footer
+  // ── FOOTER ────────────────────────────────────────────────────────────
   doc.setFillColor(240, 240, 240);
   doc.rect(0, 282, pageW, 15, "F");
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.setTextColor(100, 100, 100);
-  doc.text(company.trading_name || company.legal_name, margin, 286);
-  doc.text(`${company.bank_name} | BSB: ${company.bank_bsb} | Account: ${company.bank_account}`, margin, 290);
-  doc.text(company.phone, pageW - margin, 286, { align: "right" });
-  doc.text(company.email, pageW - margin, 290, { align: "right" });
+
+  const footerLine1 = `${company.trading_name || company.legal_name} | ABN: ${company.abn}`;
+  const footerLine2 = `${company.bank_name} | BSB: ${company.bank_bsb} | Acct: ${company.bank_account} | ${company.bank_account_name}`;
+  doc.text(footerLine1, pageW / 2, 286, { align: "center" });
+  doc.text(footerLine2, pageW / 2, 290, { align: "center" });
+  doc.text(company.phone || "", margin, 294);
+  doc.text(company.email || "", pageW - margin, 294, { align: "right" });
 
   return doc.output("blob");
 }
@@ -200,9 +214,10 @@ export async function generateAndUploadInvoicePDF(invoice, base44) {
 }
 
 export function buildInvoiceEmailBody(invoice, pdfUrl) {
+  const company = getCompanyProfile();
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;color:#111111;padding:0;border-radius:6px;border:1px solid #e0e0e0;">
-  <div style="background:#282828;padding:24px 28px;border-radius:6px 6px 0 0;">
+  <div style="background:#000000;padding:24px 28px;border-radius:6px 6px 0 0;">
     <h2 style="color:#ffffff;font-size:22px;margin:0 0 4px 0;">INVOICE</h2>
     <p style="color:#cccccc;margin:0;">Invoice #${invoice.invoice_number || ""}</p>
   </div>
@@ -212,11 +227,14 @@ export function buildInvoiceEmailBody(invoice, pdfUrl) {
       ${invoice.company ? `<tr><td style="color:#666;padding:5px 0;">Company:</td><td style="color:#111;">${invoice.company}</td></tr>` : ""}
       <tr><td style="color:#666;padding:5px 0;">Invoice Date:</td><td style="color:#111;">${invoice.invoice_date || ""}</td></tr>
       <tr><td style="color:#666;padding:5px 0;">Due Date:</td><td style="color:#b45309;font-weight:bold;">${invoice.due_date || ""}</td></tr>
-      <tr><td style="color:#666;padding:5px 0;">Total Due:</td><td style="color:#282828;font-weight:bold;font-size:18px;">$${Number(invoice.total || 0).toFixed(2)}</td></tr>
+      <tr><td style="color:#666;padding:5px 0;">Total Due:</td><td style="color:#000000;font-weight:bold;font-size:18px;">$${Number(invoice.total || 0).toFixed(2)}</td></tr>
     </table>
     <p style="color:#444;font-size:13px;">Please find your invoice attached as a PDF to this email.</p>
     ${invoice.customer_notes ? `<p style="font-size:12px;color:#888;margin-top:16px;border-top:1px solid #eee;padding-top:12px;">${invoice.customer_notes}</p>` : ""}
-    <p style="font-size:11px;color:#aaa;margin-top:24px;border-top:1px solid #eee;padding-top:12px;">This is an automated invoice email. Please do not reply directly to this message.</p>
+    <p style="font-size:11px;color:#aaa;margin-top:24px;border-top:1px solid #eee;padding-top:12px;">
+      ${company.trading_name || company.legal_name} | ABN: ${company.abn}<br/>
+      ${company.phone} | ${company.email}
+    </p>
   </div>
 </div>`;
 }
