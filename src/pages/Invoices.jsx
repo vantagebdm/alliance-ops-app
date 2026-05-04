@@ -74,6 +74,60 @@ function ResendModal({ invoice, onClose }) {
   );
 }
 
+const STATUS_CYCLE = ["draft", "sent", "paid", "overdue", "cancelled"];
+
+function InvoiceStatusButton({ invoice, onUpdated }) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const setStatus = async (status) => {
+    setOpen(false);
+    setSaving(true);
+    await base44.entities.Invoice.update(invoice.id, { status });
+    setSaving(false);
+    onUpdated();
+  };
+
+  const colorMap = {
+    draft: "bg-amber-500/20 text-amber-400 border-amber-500/40",
+    sent: "bg-blue-500/20 text-blue-400 border-blue-500/40",
+    paid: "bg-green-500/20 text-green-400 border-green-500/40",
+    overdue: "bg-red-500/20 text-red-400 border-red-500/40",
+    cancelled: "bg-gray-500/20 text-gray-400 border-gray-500/40",
+  };
+
+  const current = invoice.status || "draft";
+  const color = colorMap[current] || colorMap.draft;
+
+  return (
+    <div className="relative" onClick={e => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        disabled={saving}
+        className={`px-2.5 py-1 text-[10px] font-heading font-bold uppercase tracking-wider rounded-sm border transition-colors ${color} hover:opacity-80`}
+      >
+        {saving ? "..." : current}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[110px]">
+            {STATUS_CYCLE.map(s => (
+              <button
+                key={s}
+                onClick={() => setStatus(s)}
+                className={`w-full text-left px-3 py-1.5 text-[11px] font-heading uppercase tracking-wider transition-colors hover:bg-primary/10 ${s === current ? "text-primary" : "text-white/60"}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 function InvoiceActions({ row, onResend, onViewPdf, onEdit }) {
   const [open, setOpen] = useState(false);
 
@@ -174,7 +228,7 @@ export default function Invoices() {
     { key: "invoice_number", label: "Invoice #", render: (v) => <span className="font-mono font-semibold">{v || "—"}</span> },
     { key: "customer_name", label: "Customer" },
     { key: "company", label: "Company" },
-    { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
+    { key: "status", label: "Status", render: (v, row) => <InvoiceStatusButton invoice={row} onUpdated={load} /> },
     { key: "total", label: "Total", render: (v) => `$${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}` },
     { key: "due_date", label: "Due Date", render: (v) => v ? moment(v).format("DD/MM/YY") : "—" },
     { key: "payment_method", label: "Payment", render: (v) => <span className="text-xs uppercase">{(v || "").replace("_", " ")}</span> },
