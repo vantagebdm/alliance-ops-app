@@ -44,7 +44,7 @@ function GRStatusButton({ receipt, onUpdated }) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[140px]">
+          <div className="absolute right-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[140px]">
             {GR_STATUS_CYCLE.map(s => (
               <button
                 key={s}
