@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, FileDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import POForm from "../components/purchasing/POForm";
+import { generateAndUploadPurchaseOrderPDF } from "@/lib/documentPdf";
 import moment from "moment";
 
 export default function Purchasing() {
@@ -15,11 +16,25 @@ export default function Purchasing() {
   const [showForm, setShowForm] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
 
+  const [generatingPdf, setGeneratingPdf] = useState(null);
+
   const load = async () => {
     setLoading(true);
     const data = await base44.entities.PurchaseOrder.list("-created_date", 100);
     setOrders(data);
     setLoading(false);
+  };
+
+  const handlePrintPO = async (po) => {
+    setGeneratingPdf(po.id);
+    try {
+      const url = await generateAndUploadPurchaseOrderPDF(po, base44);
+      window.open(url, "_blank");
+    } catch (err) {
+      alert("Error generating PDF: " + err.message);
+    } finally {
+      setGeneratingPdf(null);
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -42,6 +57,16 @@ export default function Purchasing() {
       return <span className={late ? "text-red-400 font-semibold" : "text-white/80"}>{moment(v).format("DD/MM/YY")}</span>;
     }},
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
+    { key: "id", label: "", render: (v, row) => (
+      <button
+        onClick={(e) => { e.stopPropagation(); handlePrintPO(row); }}
+        disabled={generatingPdf === v}
+        className="text-muted-foreground hover:text-primary transition-colors"
+        title="Download PDF"
+      >
+        {generatingPdf === v ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
+      </button>
+    )},
   ];
 
   const FILTERS = [
