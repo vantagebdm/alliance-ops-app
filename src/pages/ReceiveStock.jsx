@@ -58,7 +58,7 @@ function GRStatusButton({ receipt, onUpdated }) {
         <>
           <div className="fixed inset-0 z-[100]" onClick={() => setOpen(false)} />
           <div
-            className="fixed z-[101] bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[150px]"
+            className="fixed z-[101] bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-y-auto max-h-64 min-w-[150px]"
             style={{ top: menuPos.top, right: `calc(100vw - ${menuPos.left}px)` }}
           >
             {GR_STATUS_CYCLE.map(s => (
