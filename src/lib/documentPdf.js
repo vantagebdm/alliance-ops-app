@@ -85,11 +85,11 @@ export function generateQuotePDF(quote) {
 
   doc.setFontSize(9);
   infoRows.forEach(([label, val]) => {
-    doc.setTextColor(...TEXT_GRAY);
     doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
     doc.text(label, margin, y);
-    doc.setTextColor(...TEXT_DARK);
     doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
     doc.text(String(val), margin + 34, y);
     y += 7;
   });
@@ -184,11 +184,11 @@ export function generateSalesOrderPDF(order) {
 
   doc.setFontSize(9);
   infoRows.forEach(([label, val]) => {
-    doc.setTextColor(...TEXT_GRAY);
     doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
     doc.text(label, margin, y);
-    doc.setTextColor(...TEXT_DARK);
     doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
     doc.text(String(val), margin + 34, y);
     y += 7;
   });
@@ -282,11 +282,11 @@ export function generatePurchaseOrderPDF(po) {
 
   doc.setFontSize(9);
   infoRows.forEach(([label, val]) => {
-    doc.setTextColor(...TEXT_GRAY);
     doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
     doc.text(label, margin, y);
-    doc.setTextColor(...TEXT_DARK);
     doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
     doc.text(String(val), margin + 34, y);
     y += 7;
   });
@@ -385,11 +385,11 @@ export function generateDispatchPDF(dispatch) {
 
   doc.setFontSize(9);
   infoRows.forEach(([label, val]) => {
-    doc.setTextColor(...TEXT_GRAY);
     doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
     doc.text(label, margin, y);
-    doc.setTextColor(...TEXT_DARK);
     doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
     doc.text(String(val), margin + 34, y);
     y += 7;
   });
