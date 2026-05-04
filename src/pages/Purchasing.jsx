@@ -45,10 +45,64 @@ export default function Purchasing() {
     o.expected_date && moment(o.expected_date).isBefore(moment()) && !["received", "cancelled"].includes(o.status)
   );
 
-  const columns = [
+  const PO_STATUS_CYCLE = ["draft", "sent", "confirmed", "partial", "received", "cancelled"];
+const PO_STATUS_COLORS = {
+  draft: "bg-amber-500/20 text-amber-400 border-amber-500/40",
+  sent: "bg-blue-500/20 text-blue-400 border-blue-500/40",
+  confirmed: "bg-primary/20 text-primary border-primary/40",
+  partial: "bg-orange-500/20 text-orange-400 border-orange-500/40",
+  received: "bg-green-500/20 text-green-400 border-green-500/40",
+  cancelled: "bg-gray-500/20 text-gray-400 border-gray-500/40",
+};
+
+function POStatusButton({ po, onUpdated }) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const current = po.status || "draft";
+
+  const setStatus = async (status) => {
+    setOpen(false);
+    setSaving(true);
+    await base44.entities.PurchaseOrder.update(po.id, { status });
+    setSaving(false);
+    onUpdated();
+  };
+
+  const color = PO_STATUS_COLORS[current] || PO_STATUS_COLORS.draft;
+
+  return (
+    <div className="relative" onClick={e => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        disabled={saving}
+        className={`px-2.5 py-1 text-[10px] font-heading font-bold uppercase tracking-wider rounded-sm border transition-colors ${color} hover:opacity-80`}
+      >
+        {saving ? "..." : current}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[110px]">
+            {PO_STATUS_CYCLE.map(s => (
+              <button
+                key={s}
+                onClick={() => setStatus(s)}
+                className={`w-full text-left px-3 py-1.5 text-[11px] font-heading uppercase tracking-wider transition-colors hover:bg-primary/10 ${s === current ? "text-primary" : "text-white/60"}`}
+              >
+                {s}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+const columns = [
     { key: "po_number", label: "PO #", render: (v) => <span className="font-mono font-bold text-primary text-xs">{v || "—"}</span> },
     { key: "supplier_name", label: "Supplier", render: (v) => <span className="font-medium">{v}</span> },
-    { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
+    { key: "status", label: "Status", render: (v, row) => <POStatusButton po={row} onUpdated={load} /> },
     { key: "total", label: "Total", render: (v) => <span className="font-semibold">${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}</span> },
     { key: "items", label: "Lines", render: (v) => <span className="text-white/40 text-xs">{(v || []).length} items</span> },
     { key: "expected_date", label: "Expected", render: (v) => {
