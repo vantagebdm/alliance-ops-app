@@ -30,25 +30,38 @@ function addFooter(doc, pageW) {
 
 function addHeader(doc, pageW, title, docNumber, logoUrl) {
   const margin = 18;
-  
-  // Header bar - black
-  doc.setFillColor(...HEADER_COLOR);
-  doc.rect(0, 0, pageW, 28, "F");
-  
-  // Logo
+
+  // White area for logo above the black banner
+  const logoAreaH = logoUrl ? 30 : 0;
+
+  // Logo — centred above the banner
   if (logoUrl) {
-    try { doc.addImage(logoUrl, "PNG", margin, 4, 40, 20, undefined, "FAST"); } catch (_) {}
+    const logoH = 22;
+    const logoW = 50;
+    try {
+      doc.addImage(logoUrl, "PNG", (pageW - logoW) / 2, 4, logoW, logoH, undefined, "FAST");
+    } catch (_) {}
   }
-  
+
+  // Black header banner — sits below logo area
+  const bannerTop = logoAreaH;
+  const bannerH = 14;
+  doc.setFillColor(...HEADER_COLOR);
+  doc.rect(0, bannerTop, pageW, bannerH, "F");
+
+  // Title — left of banner
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(20);
+  doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text(title, logoUrl ? margin + 44 : margin, 17);
-  
+  doc.text(title, margin, bannerTop + 9.5);
+
+  // Doc number — right of banner
   doc.setTextColor(TEXT_LIGHT[0], TEXT_LIGHT[1], TEXT_LIGHT[2]);
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.text(docNumber, pageW - margin, 17, { align: "right" });
+  doc.text(docNumber, pageW - margin, bannerTop + 9.5, { align: "right" });
+
+  return bannerTop + bannerH; // return content start Y
 }
 
 export function generateQuotePDF(quote) {
@@ -61,8 +74,7 @@ export function generateQuotePDF(quote) {
   doc.rect(0, 0, pageW, 297, "F");
 
   const logoUrl = getLogo("quote_logo") || getLogo("company_logo");
-  addHeader(doc, pageW, "QUOTE", `Quote #${quote.quote_number || ""}`, logoUrl);
-  y = 38;
+  y = addHeader(doc, pageW, "QUOTE", `Quote #${quote.quote_number || ""}`, logoUrl) + 10;
 
   const infoRows = [
     ["Customer:", quote.customer_name || ""],
@@ -160,8 +172,7 @@ export function generateSalesOrderPDF(order) {
   doc.rect(0, 0, pageW, 297, "F");
 
   const logoUrl = getLogo("order_logo") || getLogo("company_logo");
-  addHeader(doc, pageW, "SALES ORDER", `Order #${order.order_number || ""}`, logoUrl);
-  y = 38;
+  y = addHeader(doc, pageW, "SALES ORDER", `Order #${order.order_number || ""}`, logoUrl) + 10;
 
   const infoRows = [
     ["Customer:", order.customer_name || ""],
@@ -260,8 +271,7 @@ export function generatePurchaseOrderPDF(po) {
   doc.rect(0, 0, pageW, 297, "F");
 
   const logoUrl = getLogo("po_logo") || getLogo("company_logo");
-  addHeader(doc, pageW, "PURCHASE ORDER", `PO #${po.po_number || ""}`, logoUrl);
-  y = 38;
+  y = addHeader(doc, pageW, "PURCHASE ORDER", `PO #${po.po_number || ""}`, logoUrl) + 10;
 
   const infoRows = [
     ["Supplier:", po.supplier_name || ""],
@@ -359,8 +369,7 @@ export function generateDispatchPDF(dispatch) {
   doc.rect(0, 0, pageW, 297, "F");
 
   const logoUrl = getLogo("dispatch_logo") || getLogo("company_logo");
-  addHeader(doc, pageW, "DISPATCH DOCKET", `Dispatch #${dispatch.dispatch_number || ""}`, logoUrl);
-  y = 38;
+  y = addHeader(doc, pageW, "DISPATCH DOCKET", `Dispatch #${dispatch.dispatch_number || ""}`, logoUrl) + 10;
 
   const infoRows = [
     ["Customer:", dispatch.customer_name || ""],
