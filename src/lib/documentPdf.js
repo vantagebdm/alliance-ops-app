@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { getLogo } from "@/lib/companyLogos";
+import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
 
 const HEADER_COLOR = [0, 0, 0]; // Black (#000000)
@@ -349,7 +349,102 @@ export function generatePurchaseOrderPDF(po) {
   return doc.output("blob");
 }
 
+export function generateDispatchPDF(dispatch) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageW = 210;
+  const margin = 18;
+  let y = 20;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, pageW, 297, "F");
+
+  const logoUrl = getLogo("dispatch_logo") || getLogo("company_logo");
+  addHeader(doc, pageW, "DISPATCH DOCKET", `Dispatch #${dispatch.dispatch_number || ""}`, logoUrl);
+  y = 38;
+
+  const infoRows = [
+    ["Customer:", dispatch.customer_name || ""],
+    dispatch.order_number ? ["Order #:", dispatch.order_number] : null,
+    dispatch.customer_po_number ? ["Customer PO:", dispatch.customer_po_number] : null,
+    ["Dispatch Date:", dispatch.dispatch_date || ""],
+    ["Method:", dispatch.method || ""],
+    ["Priority:", dispatch.priority || ""],
+    dispatch.delivery_address ? ["Delivery To:", dispatch.delivery_address] : null,
+    dispatch.freight_company ? ["Freight Co:", dispatch.freight_company] : null,
+    dispatch.consignment_number ? ["Consignment:", dispatch.consignment_number] : null,
+  ].filter(Boolean);
+
+  doc.setFontSize(9);
+  infoRows.forEach(([label, val]) => {
+    doc.setTextColor(...TEXT_GRAY);
+    doc.setFont("helvetica", "bold");
+    doc.text(label, margin, y);
+    doc.setTextColor(...TEXT_DARK);
+    doc.setFont("helvetica", "normal");
+    doc.text(String(val), margin + 34, y);
+    y += 7;
+  });
+  y += 6;
+
+  // Table header
+  doc.setFillColor(...HEADER_COLOR);
+  doc.rect(margin, y, pageW - margin * 2, 9, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text("Part #", margin + 2, y + 6);
+  doc.text("Description", margin + 35, y + 6);
+  doc.text("Ordered", margin + 105, y + 6, { align: "right" });
+  doc.text("Dispatched", margin + 130, y + 6, { align: "right" });
+  doc.text("Backorder", pageW - margin - 2, y + 6, { align: "right" });
+  y += 11;
+
+  doc.setFont("helvetica", "normal");
+  (dispatch.items || []).forEach((item, idx) => {
+    if (idx % 2 === 0) {
+      doc.setFillColor(...BG_LIGHT);
+      doc.rect(margin, y - 1, pageW - margin * 2, 8, "F");
+    }
+    doc.setTextColor(...TEXT_DARK);
+    doc.setFontSize(8);
+    doc.text(String(item.part_number || ""), margin + 2, y + 4.5);
+    const desc = doc.splitTextToSize(String(item.description || ""), 68);
+    doc.text(desc[0], margin + 35, y + 4.5);
+    doc.text(String(Number(item.ordered_qty || 0)), margin + 105, y + 4.5, { align: "right" });
+    doc.text(String(Number(item.dispatch_qty || 0)), margin + 130, y + 4.5, { align: "right" });
+    const bo = Number(item.remaining_qty || 0);
+    doc.setTextColor(bo > 0 ? 180 : 80, bo > 0 ? 100 : 120, bo > 0 ? 0 : 80);
+    doc.text(bo > 0 ? `BO: ${bo}` : "—", pageW - margin - 2, y + 4.5, { align: "right" });
+    doc.setTextColor(...TEXT_DARK);
+    y += 8;
+    if (y > 260) { doc.addPage(); y = 20; }
+  });
+
+  y += 8;
+  if (dispatch.customer_notes) {
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "italic");
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Notes: ${dispatch.customer_notes}`, margin, y);
+    y += 8;
+  }
+
+  // Signature line
+  y += 4;
+  doc.setDrawColor(180, 180, 180);
+  doc.line(margin, y, margin + 70, y);
+  doc.setFontSize(7);
+  doc.setTextColor(150, 150, 150);
+  doc.text("Received by (signature)", margin, y + 4);
+  doc.line(margin + 90, y, margin + 160, y);
+  doc.text("Date received", margin + 90, y + 4);
+
+  addFooter(doc, pageW);
+  return doc.output("blob");
+}
+
 export async function generateAndUploadQuotePDF(quote, base44) {
+  await syncLogosFromDB();
   const blob = generateQuotePDF(quote);
   const file = new File([blob], `Quote-${quote.quote_number || "QUOTE"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -357,6 +452,7 @@ export async function generateAndUploadQuotePDF(quote, base44) {
 }
 
 export async function generateAndUploadSalesOrderPDF(order, base44) {
+  await syncLogosFromDB();
   const blob = generateSalesOrderPDF(order);
   const file = new File([blob], `Order-${order.order_number || "ORDER"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
@@ -364,8 +460,17 @@ export async function generateAndUploadSalesOrderPDF(order, base44) {
 }
 
 export async function generateAndUploadPurchaseOrderPDF(po, base44) {
+  await syncLogosFromDB();
   const blob = generatePurchaseOrderPDF(po);
   const file = new File([blob], `PO-${po.po_number || "PO"}.pdf`, { type: "application/pdf" });
+  const { file_url } = await base44.integrations.Core.UploadFile({ file });
+  return file_url;
+}
+
+export async function generateAndUploadDispatchPDF(dispatch, base44) {
+  await syncLogosFromDB();
+  const blob = generateDispatchPDF(dispatch);
+  const file = new File([blob], `Dispatch-${dispatch.dispatch_number || "DSP"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
   return file_url;
 }

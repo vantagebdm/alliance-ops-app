@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, FileDown, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DispatchForm from "@/components/dispatch/DispatchForm";
+import { generateAndUploadDispatchPDF } from "@/lib/documentPdf";
 import moment from "moment";
 
 const FILTERS = [
@@ -35,6 +36,19 @@ export default function DispatchPage() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
+  const [generatingPdf, setGeneratingPdf] = useState(null);
+
+  const handlePrintDocket = async (dispatch) => {
+    setGeneratingPdf(dispatch.id);
+    try {
+      const url = await generateAndUploadDispatchPDF(dispatch, base44);
+      window.open(url, "_blank");
+    } catch (err) {
+      alert("Error generating docket: " + err.message);
+    } finally {
+      setGeneratingPdf(null);
+    }
+  };
 
   const load = () => {
     base44.entities.Dispatch.list("-created_date", 200).then(d => {
@@ -63,6 +77,16 @@ export default function DispatchPage() {
     { key: "status", label: "Status", render: (v) => <StatusBadge status={v} /> },
     { key: "dispatch_date", label: "Date", render: (v) => v ? moment(v).format("DD/MM/YY") : "—" },
     { key: "items", label: "Lines", render: (v) => <span className="text-xs text-white/40">{(v || []).length}</span> },
+    { key: "id", label: "", render: (v, row) => (
+      <button
+        onClick={(e) => { e.stopPropagation(); handlePrintDocket(row); }}
+        disabled={generatingPdf === v}
+        className="text-muted-foreground hover:text-primary transition-colors"
+        title="Print Docket"
+      >
+        {generatingPdf === v ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileDown className="w-3.5 h-3.5" />}
+      </button>
+    )},
   ];
 
   return (
