@@ -1,5 +1,5 @@
 import { jsPDF } from "jspdf";
-import { getLogo } from "@/lib/companyLogos";
+import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
 
 export function generateInvoicePDF(invoice) {
@@ -208,6 +208,7 @@ export function generateInvoicePDF(invoice) {
 }
 
 export async function generateAndUploadInvoicePDF(invoice, base44) {
+  await syncLogosFromDB();
   const blob = generateInvoicePDF(invoice);
   const file = new File([blob], `Invoice-${invoice.invoice_number || "INV"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });

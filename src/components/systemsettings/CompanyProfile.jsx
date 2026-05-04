@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Save, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { base44 } from "@/api/base44Client";
-import { getAllLogos, setLogo, removeLogo } from "@/lib/companyLogos";
+import { getAllLogos, setLogo, removeLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile, saveCompanyProfile } from "@/lib/companyDetails";
 
 const Field = ({ label, required, error, children }) => (
@@ -27,6 +27,10 @@ export default function CompanyProfile() {
   const [errors, setErrors] = useState({});
   const [saved, setSaved] = useState(false);
   const [logos, setLogos] = useState(() => getAllLogos());
+
+  useEffect(() => {
+    syncLogosFromDB().then(synced => setLogos(synced));
+  }, []);
   const [uploading, setUploading] = useState({ company_logo: false, invoice_logo: false });
   const companyLogoRef = useRef();
   const invoiceLogoRef = useRef();
