@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { postInvoiceToLedger } from "@/lib/accountingLedger";
+import { previewDocNumber, generateDocNumber } from "@/hooks/useDocNumber";
 import { X, AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -41,7 +42,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
   const [basis, setBasis] = useState("dispatched");
   const [lines, setLines] = useState([]);
   const [form, setForm] = useState({
-    invoice_number: `INV-${Date.now().toString(36).toUpperCase()}`,
+    invoice_number: "",
     invoice_date: today,
     due_date: calcDueDate(order.payment_terms),
     reference: "",
@@ -57,6 +58,13 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
   const [existingInvoices, setExistingInvoices] = useState([]);
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // Load preview invoice number on mount
+  useEffect(() => {
+    previewDocNumber("invoice").then(num => {
+      if (num) setForm(f => ({ ...f, invoice_number: num }));
+    }).catch(() => {});
+  }, []);
 
   // Load existing invoices for this order to compute already-invoiced quantities
   useEffect(() => {
@@ -161,6 +169,10 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
     if (err) { alert(err); return; }
     setSaving(true);
     try {
+      // Generate the real sequential invoice number at save time
+      const invoiceNumber = await generateDocNumber("invoice");
+      setForm(f => ({ ...f, invoice_number: invoiceNumber }));
+
       const invoiceItems = activeLines
         .filter(l => l._charge ? true : l.invoice_qty > 0)
         .map(l => ({
@@ -176,6 +188,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
 
       const invoiceData = {
         ...form,
+        invoice_number: invoiceNumber,
         invoice_source: "sales_order",
         order_id: order.id,
         order_number: order.order_number,
