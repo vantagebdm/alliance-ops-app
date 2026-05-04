@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { base44 } from "@/api/base44Client";
 import { Plus, Search, Eye, Package, Clock, CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 import PageHeader from "@/components/ui/PageHeader";
@@ -21,8 +22,19 @@ const GR_STATUS_CYCLE = ["draft", "in_progress", "posted", "partially_received",
 function GRStatusButton({ receipt, onUpdated }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [menuPos, setMenuPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef(null);
   const current = receipt.status || "draft";
   const sc = STATUS_CONFIG[current] || STATUS_CONFIG.draft;
+
+  const handleOpen = (e) => {
+    e.stopPropagation();
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setMenuPos({ top: rect.bottom + 4, left: rect.right });
+    }
+    setOpen(o => !o);
+  };
 
   const setStatus = async (status) => {
     setOpen(false);
@@ -33,18 +45,22 @@ function GRStatusButton({ receipt, onUpdated }) {
   };
 
   return (
-    <div className="relative" onClick={e => e.stopPropagation()}>
+    <div onClick={e => e.stopPropagation()}>
       <button
-        onClick={() => setOpen(o => !o)}
+        ref={btnRef}
+        onClick={handleOpen}
         disabled={saving}
         className={`px-2 py-0.5 rounded-sm text-[10px] font-heading font-bold uppercase border border-transparent transition-colors hover:opacity-80 ${sc.color}`}
       >
         {saving ? "..." : sc.label}
       </button>
-      {open && (
+      {open && createPortal(
         <>
-          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[140px]">
+          <div className="fixed inset-0 z-[100]" onClick={() => setOpen(false)} />
+          <div
+            className="fixed z-[101] bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[150px]"
+            style={{ top: menuPos.top, right: `calc(100vw - ${menuPos.left}px)` }}
+          >
             {GR_STATUS_CYCLE.map(s => (
               <button
                 key={s}
@@ -55,7 +71,8 @@ function GRStatusButton({ receipt, onUpdated }) {
               </button>
             ))}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );
