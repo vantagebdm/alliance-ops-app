@@ -87,10 +87,11 @@ export function generateInvoicePDF(invoice) {
 
   // ── CUSTOMER INFO BLOCK (left side) ──────────────────────────────────
   let y = headerH + 8;
+  const invoiceDate = invoice.invoice_date || (invoice.created_date ? invoice.created_date.split("T")[0] : "");
   const infoRows = [
     ["Customer:", invoice.customer_name || ""],
     invoice.company ? ["Company:", invoice.company] : null,
-    ["Invoice Date:", invoice.invoice_date || ""],
+    ["Invoice Date:", invoiceDate],
     ["Due Date:", invoice.due_date || ""],
     invoice.customer_po_number ? ["PO Number:", invoice.customer_po_number] : null,
   ].filter(Boolean);
