@@ -16,6 +16,51 @@ const STATUS_CONFIG = {
   cancelled: { label: "Cancelled", color: "bg-white/5 text-white/30 line-through" },
 };
 
+const GR_STATUS_CYCLE = ["draft", "in_progress", "posted", "partially_received", "fully_received", "variance_review", "quarantined", "cancelled"];
+
+function GRStatusButton({ receipt, onUpdated }) {
+  const [open, setOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const current = receipt.status || "draft";
+  const sc = STATUS_CONFIG[current] || STATUS_CONFIG.draft;
+
+  const setStatus = async (status) => {
+    setOpen(false);
+    setSaving(true);
+    await base44.entities.GoodsReceipt.update(receipt.id, { status });
+    setSaving(false);
+    onUpdated();
+  };
+
+  return (
+    <div className="relative" onClick={e => e.stopPropagation()}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        disabled={saving}
+        className={`px-2 py-0.5 rounded-sm text-[10px] font-heading font-bold uppercase border border-transparent transition-colors hover:opacity-80 ${sc.color}`}
+      >
+        {saving ? "..." : sc.label}
+      </button>
+      {open && (
+        <>
+          <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[140px]">
+            {GR_STATUS_CYCLE.map(s => (
+              <button
+                key={s}
+                onClick={() => setStatus(s)}
+                className={`w-full text-left px-3 py-1.5 text-[11px] font-heading uppercase tracking-wider transition-colors hover:bg-primary/10 ${s === current ? "text-primary" : "text-white/60"}`}
+              >
+                {STATUS_CONFIG[s]?.label || s}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
 const RECEIPT_TYPE_LABELS = {
   po_receipt: "PO Receipt",
   manual: "Manual",
@@ -270,7 +315,7 @@ export default function ReceiveStock() {
                       <td className="px-3 py-2.5 text-center">{(r.lines || []).filter(l => l.qty_received_now > 0).length}</td>
                       <td className="px-3 py-2.5 font-bold text-white">${(r.receipt_total || 0).toFixed(2)}</td>
                       <td className="px-3 py-2.5">
-                        <span className={`px-2 py-0.5 rounded-sm text-[10px] font-heading font-bold uppercase ${sc.color}`}>{sc.label}</span>
+                        <GRStatusButton receipt={r} onUpdated={load} />
                       </td>
                       <td className="px-3 py-2.5">
                         <button
