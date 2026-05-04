@@ -3,6 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Download, Eye, Loader2 } from "lucide-react";
 import { generateInvoicePDF } from "@/lib/invoicePdf";
+import { syncLogosFromDB } from "@/lib/companyLogos";
 
 const SAMPLE_INVOICE = {
   invoice_number: "INV-2026-001",
@@ -58,6 +59,7 @@ export default function TestInvoicePDFGenerator() {
   const handleGeneratePDF = async () => {
     setGenerating(true);
     try {
+      await syncLogosFromDB();
       const blob = generateInvoicePDF(SAMPLE_INVOICE);
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
@@ -71,6 +73,7 @@ export default function TestInvoicePDFGenerator() {
   const handleDownloadPDF = async () => {
     setDownloading(true);
     try {
+      await syncLogosFromDB();
       const blob = generateInvoicePDF(SAMPLE_INVOICE);
       const file = new File([blob], `Test-Invoice-${SAMPLE_INVOICE.invoice_number}.pdf`, { type: "application/pdf" });
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
