@@ -96,7 +96,8 @@ export function generateInvoicePDF(invoice) {
     invoice.company ? ["Company:", invoice.company] : null,
     ["Invoice Date:", invoiceDate],
     ["Due Date:", invoice.due_date || ""],
-    invoice.customer_po_number ? ["PO Number:", invoice.customer_po_number] : null,
+    (invoice.customer_po_number || invoice.po_number) ? ["Customer PO:", invoice.customer_po_number || invoice.po_number] : null,
+    invoice.sales_order_reference ? ["Order Ref:", invoice.sales_order_reference] : null,
   ].filter(Boolean);
 
   doc.setFontSize(9);
@@ -232,6 +233,8 @@ export function buildInvoiceEmailBody(invoice, pdfUrl) {
       ${invoice.company ? `<tr><td style="color:#666;padding:5px 0;">Company:</td><td style="color:#111;">${invoice.company}</td></tr>` : ""}
       <tr><td style="color:#666;padding:5px 0;">Invoice Date:</td><td style="color:#111;">${invoice.invoice_date || ""}</td></tr>
       <tr><td style="color:#666;padding:5px 0;">Due Date:</td><td style="color:#b45309;font-weight:bold;">${invoice.due_date || ""}</td></tr>
+      ${(invoice.customer_po_number || invoice.po_number) ? `<tr><td style="color:#666;padding:5px 0;">Customer PO:</td><td style="color:#111;font-weight:bold;">${invoice.customer_po_number || invoice.po_number}</td></tr>` : ""}
+      ${invoice.sales_order_reference ? `<tr><td style="color:#666;padding:5px 0;">Order Ref:</td><td style="color:#111;">${invoice.sales_order_reference}</td></tr>` : ""}
       <tr><td style="color:#666;padding:5px 0;">Total Due:</td><td style="color:#000000;font-weight:bold;font-size:18px;">$${Number(invoice.total || 0).toFixed(2)}</td></tr>
     </table>
     <p style="color:#444;font-size:13px;">Please find your invoice attached as a PDF to this email.</p>
