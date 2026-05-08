@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter } from "lucide-react";
+import { Plus, Filter, Eye, Edit3, Mail, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
@@ -8,6 +8,9 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import QuoteForm from "../components/quotes/QuoteForm";
 import QuoteDetail from "../components/quotes/QuoteDetail";
 import moment from "moment";
+import { generateQuotePDF, generateAndUploadQuotePDF } from "@/lib/documentPdf";
+import { syncLogosFromDB } from "@/lib/companyLogos";
+import { getCompanyProfile } from "@/lib/companyDetails";
 
 export default function Quotes() {
   const [quotes, setQuotes] = useState([]);
@@ -16,6 +19,60 @@ export default function Quotes() {
   const [showForm, setShowForm] = useState(false);
   const [selected, setSelected] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
+  const [sendingId, setSendingId] = useState(null);
+  const [downloadingId, setDownloadingId] = useState(null);
+
+  const handleDownloadPDF = async (e, quote) => {
+    e.stopPropagation();
+    setDownloadingId(quote.id);
+    await syncLogosFromDB();
+    const blob = generateQuotePDF(quote);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Quote-${quote.quote_number || "QUOTE"}.pdf`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setDownloadingId(null);
+  };
+
+  const handleSendEmail = async (e, quote) => {
+    e.stopPropagation();
+    if (!quote.customer_email) {
+      alert("No customer email on this quote. Please edit the quote to add one.");
+      return;
+    }
+    setSendingId(quote.id);
+    const pdfUrl = await generateAndUploadQuotePDF(quote, base44);
+    const company = getCompanyProfile();
+    const body = `
+<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;color:#111;padding:0;border-radius:6px;border:1px solid #e0e0e0;">
+  <div style="background:#000;padding:24px 28px;border-radius:6px 6px 0 0;">
+    <h2 style="color:#fff;font-size:22px;margin:0 0 4px 0;">QUOTATION</h2>
+    <p style="color:#ccc;margin:0;">Quote #${quote.quote_number || ""}</p>
+  </div>
+  <div style="padding:24px 28px;">
+    <p>Dear ${quote.customer_name || "Customer"},</p>
+    <p>Please find your quotation attached. This quote is valid until <strong>${quote.valid_until ? moment(quote.valid_until).format("DD MMM YYYY") : "—"}</strong>.</p>
+    <table style="width:100%;font-size:14px;margin:16px 0;border-collapse:collapse;">
+      <tr><td style="color:#666;padding:5px 0;width:140px;">Quote #:</td><td style="color:#111;font-weight:bold;">${quote.quote_number || ""}</td></tr>
+      <tr><td style="color:#666;padding:5px 0;">Total:</td><td style="color:#111;font-weight:bold;font-size:18px;">$${Number(quote.total || 0).toFixed(2)}</td></tr>
+    </table>
+    <p style="font-size:11px;color:#aaa;margin-top:24px;border-top:1px solid #eee;padding-top:12px;">
+      ${company.trading_name || company.legal_name} | ABN: ${company.abn}<br/>
+      ${company.phone} | ${company.email}
+    </p>
+  </div>
+</div>`;
+    await base44.integrations.Core.SendEmail({
+      to: quote.customer_email,
+      subject: `Quotation ${quote.quote_number || ""} from ${company.trading_name || company.legal_name}`,
+      body,
+    });
+    await base44.entities.Quote.update(quote.id, { status: "sent" });
+    setSendingId(null);
+    load();
+  };
 
   const load = async () => {
     setLoading(true);
@@ -45,6 +102,40 @@ export default function Quotes() {
     }},
     { key: "created_date", label: "Created", render: (v) => <span className="text-white/80">{moment(v).format("DD/MM/YY")}</span> },
     { key: "items", label: "Lines", render: (v) => <span className="text-white/40 text-xs">{(v || []).length} items</span> },
+    { key: "id", label: "", render: (v, row) => (
+      <div className="flex items-center gap-1 justify-end" onClick={e => e.stopPropagation()}>
+        <button
+          onClick={(e) => { e.stopPropagation(); setSelected(row); }}
+          title="View"
+          className="p-1.5 rounded-sm text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <Eye className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={(e) => { e.stopPropagation(); setEditTarget(row); }}
+          title="Edit"
+          className="p-1.5 rounded-sm text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+        >
+          <Edit3 className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={(e) => handleSendEmail(e, row)}
+          title="Send Email"
+          disabled={sendingId === row.id}
+          className="p-1.5 rounded-sm text-white/40 hover:text-blue-400 hover:bg-blue-500/10 transition-colors disabled:opacity-40"
+        >
+          <Mail className="w-3.5 h-3.5" />
+        </button>
+        <button
+          onClick={(e) => handleDownloadPDF(e, row)}
+          title="Download PDF"
+          disabled={downloadingId === row.id}
+          className="p-1.5 rounded-sm text-white/40 hover:text-primary hover:bg-primary/10 transition-colors disabled:opacity-40"
+        >
+          <Download className="w-3.5 h-3.5" />
+        </button>
+      </div>
+    )},
   ];
 
   const FILTERS = [
