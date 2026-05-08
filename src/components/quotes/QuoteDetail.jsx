@@ -8,6 +8,25 @@ import moment from "moment";
 
 export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
   const [status, setStatus] = useState(quote.status);
+  const [items, setItems] = useState(quote.items || []);
+
+  // Enrich items with app_part_number if missing
+  useState(() => {
+    const needsLookup = (quote.items || []).some(i => !i.app_part_number && i.part_number);
+    if (!needsLookup) return;
+    base44.entities.Part.list(null, 1000).then(parts => {
+      const enriched = (quote.items || []).map(item => {
+        if (item.app_part_number) return item;
+        const match = parts.find(p =>
+          p.part_number === item.part_number ||
+          p.supplier_sku === item.part_number ||
+          p.app_part_number === item.part_number
+        );
+        return match ? { ...item, app_part_number: match.app_part_number || item.part_number } : item;
+      });
+      setItems(enriched);
+    });
+  });
 
   const handleStatusChange = async (val) => {
     setStatus(val);
@@ -80,7 +99,7 @@ export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
                 </tr>
               </thead>
               <tbody>
-                {(quote.items || []).map((line, i) => (
+                {items.map((line, i) => (
                   <tr key={i} className="border-b border-border/40">
                     <td className="px-4 py-3 font-mono text-xs text-primary">{line.app_part_number || line.part_number || "—"}</td>
                     <td className="px-4 py-3 text-foreground">{line.description}</td>
