@@ -10,7 +10,7 @@ import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber } from "@/hooks/useDocNumber";
 
-const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
+const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
 export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }) {
   const [form, setForm] = useState(initial || {
@@ -199,12 +199,13 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                   <tr key={i} className="border-b border-border/50">
                     <td className="px-2 py-1.5">
                       <PartAutocomplete
-                        value={line.part_number}
+                        value={line.app_part_number || line.part_number}
                         onSelect={(part) => {
                           const items = form.items.map((line, idx) => {
                             if (idx !== i) return line;
                             const updated = {
                               ...line,
+                              app_part_number: part.app_part_number || part.part_number,
                               part_number: part.part_number,
                               description: part.description || part.name || "",
                               unit_price: part.sell_price || 0,
@@ -215,7 +216,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                           });
                           recalc(items);
                         }}
-                        onChange={(val) => updateLine(i, "part_number", val)}
+                        onChange={(val) => updateLine(i, "app_part_number", val)}
                         placeholder="Part #"
                         className="rounded-sm h-8 text-xs font-mono"
                       />

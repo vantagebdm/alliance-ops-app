@@ -116,7 +116,7 @@ export function generateQuotePDF(quote) {
     }
     doc.setTextColor(...TEXT_DARK);
     doc.setFontSize(8);
-    doc.text(String(item.part_number || ""), margin + 2, y + 4.5);
+    doc.text(String(item.app_part_number || item.part_number || ""), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });
@@ -215,7 +215,7 @@ export function generateSalesOrderPDF(order) {
     }
     doc.setTextColor(...TEXT_DARK);
     doc.setFontSize(8);
-    doc.text(String(item.part_number || ""), margin + 2, y + 4.5);
+    doc.text(String(item.app_part_number || item.part_number || ""), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });

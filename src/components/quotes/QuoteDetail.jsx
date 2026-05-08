@@ -82,7 +82,7 @@ export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
               <tbody>
                 {(quote.items || []).map((line, i) => (
                   <tr key={i} className="border-b border-border/40">
-                    <td className="px-4 py-3 font-mono text-xs text-primary">{line.part_number || "—"}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-primary">{line.app_part_number || line.part_number || "—"}</td>
                     <td className="px-4 py-3 text-foreground">{line.description}</td>
                     <td className="px-4 py-3 text-right">{line.quantity}</td>
                     <td className="px-4 py-3 text-right">${(line.unit_price || 0).toFixed(2)}</td>
