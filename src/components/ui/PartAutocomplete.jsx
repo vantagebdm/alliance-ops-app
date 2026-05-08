@@ -56,7 +56,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
 
   const handleSelect = (item) => {
     onSelect(item);
-    setDisplayValue(item.supplier_sku || "");
+    setDisplayValue(item.app_part_number || item.part_number || "");
     setSuggestions([]);
     setOpen(false);
   };
@@ -91,7 +91,8 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
                 onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
                 className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors border-b border-border/30 last:border-b-0"
               >
-                <span className="font-mono font-semibold text-primary">{item.supplier_sku}</span>
+                <div className="font-mono font-semibold text-primary">{item.app_part_number || item.part_number}</div>
+              <div className="text-xs text-muted-foreground truncate">{item.name}{item.supplier_sku ? ` · ${item.supplier_sku}` : ""}</div>
               </button>
             ))
           ) : (

@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 
-const newLine = () => ({ part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
+const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
 export default function QuickQuoteForm({ onClose, onSaved }) {
   const [form, setForm] = useState({
@@ -183,13 +183,23 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
                   <tr key={i} className="border-b border-border/50">
                     <td className="px-2 py-1.5">
                       <Autocomplete
-                        value={line.part_number}
+                        value={line.app_part_number || line.part_number}
                         suggestions={partAC.suggestions}
                         open={partAC.open}
                         loading={partAC.loading}
-                        onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                        onSelect={(item) => { updateLine(i, "part_number", item.part_number); updateLine(i, "description", item.name); partAC.handleSelectSuggestion(item); }}
-                        placeholder="SKU"
+                        onInputChange={(val) => { updateLine(i, "app_part_number", val); partAC.handleInputChange(val); }}
+                        onSelect={(item) => {
+                          const items = form.items.map((line, idx) => {
+                            if (idx !== i) return line;
+                            const updated = { ...line, app_part_number: item.app_part_number || item.part_number, part_number: item.part_number, description: item.name || "", unit_price: item.sell_price || 0 };
+                            updated.total = (updated.quantity || 1) * (updated.unit_price || 0);
+                            return updated;
+                          });
+                          const subtotal = items.reduce((s, l) => s + (Number(l.total) || 0), 0);
+                          setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
+                          partAC.handleSelectSuggestion(item);
+                        }}
+                        placeholder="Part #"
                         className="rounded-sm h-8 text-xs font-mono"
                       />
                     </td>
