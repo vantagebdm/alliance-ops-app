@@ -452,9 +452,26 @@ export function generateDispatchPDF(dispatch) {
   return doc.output("blob");
 }
 
+async function enrichQuoteItems(quote, base44) {
+  const needsLookup = (quote.items || []).some(i => !i.app_part_number && i.part_number);
+  if (!needsLookup) return quote;
+  const parts = await base44.entities.Part.list(null, 1000);
+  const enrichedItems = (quote.items || []).map(item => {
+    if (item.app_part_number) return item;
+    const match = parts.find(p =>
+      p.part_number === item.part_number ||
+      p.supplier_sku === item.part_number ||
+      p.app_part_number === item.part_number
+    );
+    return match ? { ...item, app_part_number: match.app_part_number || item.part_number } : item;
+  });
+  return { ...quote, items: enrichedItems };
+}
+
 export async function generateAndUploadQuotePDF(quote, base44) {
   await syncLogosFromDB();
-  const blob = generateQuotePDF(quote);
+  const enrichedQuote = await enrichQuoteItems(quote, base44);
+  const blob = generateQuotePDF(enrichedQuote);
   const file = new File([blob], `Quote-${quote.quote_number || "QUOTE"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
   return file_url;

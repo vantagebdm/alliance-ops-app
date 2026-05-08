@@ -26,7 +26,19 @@ export default function Quotes() {
     e.stopPropagation();
     setDownloadingId(quote.id);
     await syncLogosFromDB();
-    const blob = generateQuotePDF(quote);
+    // Enrich items with app_part_number for legacy quotes
+    let enrichedQuote = quote;
+    const needsLookup = (quote.items || []).some(i => !i.app_part_number && i.part_number);
+    if (needsLookup) {
+      const parts = await base44.entities.Part.list(null, 1000);
+      const enrichedItems = (quote.items || []).map(item => {
+        if (item.app_part_number) return item;
+        const match = parts.find(p => p.part_number === item.part_number || p.supplier_sku === item.part_number);
+        return match ? { ...item, app_part_number: match.app_part_number || item.part_number } : item;
+      });
+      enrichedQuote = { ...quote, items: enrichedItems };
+    }
+    const blob = generateQuotePDF(enrichedQuote);
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
