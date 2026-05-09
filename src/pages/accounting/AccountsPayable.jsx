@@ -71,6 +71,11 @@ export default function AccountsPayable() {
     await load();
   };
 
+  const unmarkPaid = async (bill) => {
+    await base44.entities.SupplierBill.update(bill.id, { status: "approved", amount_paid: 0, balance_due: bill.total });
+    await load();
+  };
+
   const filtered = bills.filter(b => {
     const matchSearch = !search || b.supplier_name.toLowerCase().includes(search.toLowerCase()) || (b.bill_number || "").includes(search);
     const matchStatus = filterStatus === "all" || b.status === filterStatus;
@@ -141,6 +146,7 @@ export default function AccountsPayable() {
                     <div className="flex gap-1">
                       {b.status === "draft" && <button onClick={() => approve(b)} className="text-[9px] font-heading uppercase tracking-wider text-primary hover:text-primary/70">Approve</button>}
                       {b.status === "approved" && <button onClick={() => markPaid(b)} className="text-[9px] font-heading uppercase tracking-wider text-primary hover:text-primary/70">Mark Paid</button>}
+                      {b.status === "paid" && <button onClick={() => unmarkPaid(b)} className="text-[9px] font-heading uppercase tracking-wider text-amber-400 hover:text-amber-300">Undo Paid</button>}
                     </div>
                   </td>
                 </tr>
