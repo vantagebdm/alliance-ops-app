@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import BillDetailModal from "@/components/accounting/BillDetailModal";
+import BillPDFUploader from "@/components/accounting/BillPDFUploader";
 
 const STATUS_STYLES = {
   draft: "bg-gray-500/10 text-gray-400 border-gray-500/30",
@@ -29,6 +30,7 @@ export default function AccountsPayable() {
   const [lines, setLines] = useState([{ description: "", quantity: 1, unit_price: 0, gst_treatment: "taxable", gst_amount: 0, total: 0 }]);
   const [saving, setSaving] = useState(false);
   const [selected, setSelected] = useState(null);
+  const [showPDFUploader, setShowPDFUploader] = useState(false);
 
   const load = async () => {
     const list = await base44.entities.SupplierBill.list("-bill_date");
@@ -84,9 +86,14 @@ export default function AccountsPayable() {
           <h2 className="font-heading text-base font-bold text-foreground uppercase tracking-wider">Accounts Payable</h2>
           <p className="text-xs text-muted-foreground">{bills.length} bills — <span className="text-amber-400 font-bold">{fmt(totalOwing)} outstanding</span></p>
         </div>
-        <Button size="sm" onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
-          <Plus className="w-4 h-4 mr-1" /> Enter Supplier Bill
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => setShowPDFUploader(true)} className="rounded-sm font-heading font-semibold uppercase text-xs tracking-wider border-dashed border-primary/50 text-primary hover:bg-primary/10">
+            <Upload className="w-4 h-4 mr-1" /> Upload PDF Bills
+          </Button>
+          <Button size="sm" onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
+            <Plus className="w-4 h-4 mr-1" /> Enter Supplier Bill
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-3 flex-wrap">
@@ -145,6 +152,13 @@ export default function AccountsPayable() {
 
       {selected && (
         <BillDetailModal bill={selected} onClose={() => { setSelected(null); load(); }} onSaved={() => { setSelected(null); load(); }} />
+      )}
+
+      {showPDFUploader && (
+        <BillPDFUploader
+          onBillsCreated={() => load()}
+          onClose={() => setShowPDFUploader(false)}
+        />
       )}
 
       {/* New Bill Modal */}
