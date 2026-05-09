@@ -7,15 +7,27 @@ import { base44 } from "@/api/base44Client";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+let _defaultBankAccountId = null;
+async function getDefaultBankAccountId() {
+  if (_defaultBankAccountId) return _defaultBankAccountId;
+  const accounts = await base44.entities.BankAccount.list(null, 1);
+  if (accounts.length) {
+    _defaultBankAccountId = accounts[0].id;
+  }
+  return _defaultBankAccountId || "unassigned";
+}
+
 /**
  * Post an invoice to Accounts Receivable ledger.
  * Called when an invoice is created (status: sent, paid, draft).
  */
 export async function postInvoiceToLedger(invoice) {
   if (!invoice || !invoice.total) return;
+  const bank_account_id = await getDefaultBankAccountId();
 
   // Post as a credit (money coming in / owed to us)
   await base44.entities.BankTransaction.create({
+    bank_account_id,
     date: invoice.invoice_date || today(),
     description: `Invoice ${invoice.invoice_number} — ${invoice.customer_name}`,
     reference: invoice.invoice_number,
@@ -39,8 +51,10 @@ export async function postInvoiceToLedger(invoice) {
  */
 export async function postInvoicePaymentToLedger(invoice, amountPaid) {
   if (!amountPaid || amountPaid <= 0) return;
+  const bank_account_id = await getDefaultBankAccountId();
 
   await base44.entities.BankTransaction.create({
+    bank_account_id,
     date: today(),
     description: `Payment received — ${invoice.customer_name} (${invoice.invoice_number})`,
     reference: invoice.invoice_number,
@@ -64,8 +78,10 @@ export async function postInvoicePaymentToLedger(invoice, amountPaid) {
  */
 export async function postBillToLedger(bill) {
   if (!bill || !bill.total) return;
+  const bank_account_id = await getDefaultBankAccountId();
 
   await base44.entities.BankTransaction.create({
+    bank_account_id,
     date: bill.bill_date || today(),
     description: `Supplier Bill — ${bill.supplier_name}${bill.supplier_invoice_number ? ` (${bill.supplier_invoice_number})` : ""}`,
     reference: bill.bill_number || bill.supplier_invoice_number || "",
@@ -89,8 +105,10 @@ export async function postBillToLedger(bill) {
  */
 export async function postBillPaymentToLedger(bill) {
   if (!bill || !bill.total) return;
+  const bank_account_id = await getDefaultBankAccountId();
 
   await base44.entities.BankTransaction.create({
+    bank_account_id,
     date: today(),
     description: `Bill paid — ${bill.supplier_name}${bill.supplier_invoice_number ? ` (${bill.supplier_invoice_number})` : ""}`,
     reference: bill.bill_number || bill.supplier_invoice_number || "",
