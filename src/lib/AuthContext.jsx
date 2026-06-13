@@ -5,15 +5,19 @@ import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
 
+const PUBLIC_ROUTES = ['/workshop-parts-order'];
+
 export const AuthProvider = ({ children }) => {
+  const isPublicRoute = PUBLIC_ROUTES.some(r => window.location.pathname.startsWith(r));
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(!isPublicRoute);
+  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(!isPublicRoute);
   const [authError, setAuthError] = useState(null);
   const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
 
   useEffect(() => {
+    if (isPublicRoute) return;
     checkAppState();
   }, []);
 
