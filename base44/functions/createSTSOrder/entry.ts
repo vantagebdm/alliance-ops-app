@@ -4,8 +4,8 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json();
     const {
-      name, company, job_number, urgency,
-      asset_type, fleet_number, make, model, client_owner,
+      name, company, job_number, po_inv_number, urgency,
+      asset_type, fleet_number, rego, vin_serial, make, model, client_owner,
       lines, image_urls, acknowledged
     } = body;
 
@@ -28,8 +28,11 @@ Deno.serve(async (req) => {
     const noteLines = [
       `Submitted by: ${name}`,
       `Job Number: ${job_number}`,
+      po_inv_number ? `STS PO/Invoice: ${po_inv_number}` : null,
       asset_type ? `Asset Type: ${asset_type}` : null,
       fleet_number ? `Fleet/Asset No: ${fleet_number}` : null,
+      rego ? `Rego: ${rego}` : null,
+      vin_serial ? `VIN/Serial: ${vin_serial}` : null,
       make ? `Make: ${make}` : null,
       model ? `Model: ${model}` : null,
       client_owner ? `Client/Owner: ${client_owner}` : null,
@@ -57,6 +60,7 @@ Deno.serve(async (req) => {
       asset_make: make || '',
       asset_model: model || '',
       client_owner: client_owner || '',
+      reference: po_inv_number || '',
       order_source: 'sts_portal',
       image_urls: image_urls || [],
       acknowledged: !!acknowledged,
@@ -67,8 +71,8 @@ Deno.serve(async (req) => {
       order_number: orderNumber,
       order_id: order.id,
       submitted_at: now.toISOString(),
-      name, company, job_number, urgency,
-      asset_type, fleet_number, make, model, client_owner,
+      name, company, job_number, po_inv_number, urgency,
+      asset_type, fleet_number, rego, vin_serial, make, model, client_owner,
       lines: lines?.filter(l => l.description?.trim()),
       image_urls: image_urls || [],
     });

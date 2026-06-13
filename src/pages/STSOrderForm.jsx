@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Plus, Trash2, Upload, X, Lock, CheckCircle2, Loader2, Download, Printer, ImageIcon } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 
-const COMPANIES = ['STS Service Desk', 'NHM'];
+const COMPANIES = ['STS Service Desk'];
 const URGENCY_LEVELS = [
   { value: 'normal', label: '🟢  Normal' },
   { value: 'urgent', label: '🟡  Urgent' },
@@ -148,12 +148,15 @@ function OrderConfirmation({ order }) {
     row('Submitted By', order.name);
     row('Company', order.company);
     row('Job Number', order.job_number);
+    row('STS PO / Invoice No.', order.po_inv_number);
     row('Urgency', urgencyLabel[order.urgency] || order.urgency);
 
     y += 4;
     sectionTitle('ASSET DETAILS');
     row('Asset Type', order.asset_type);
     row('Fleet / Asset No.', order.fleet_number);
+    row('Registration (Rego)', order.rego);
+    row('VIN / Serial Number', order.vin_serial);
     row('Make', order.make);
     row('Model', order.model);
     row('Client / Owner', order.client_owner);
@@ -232,9 +235,12 @@ function OrderConfirmation({ order }) {
               { label: 'Submitted By', value: order.name },
               { label: 'Company', value: order.company },
               { label: 'Job Number', value: order.job_number },
+              { label: 'STS PO / Invoice No.', value: order.po_inv_number },
               { label: 'Urgency', value: urgencyLabel[order.urgency], extra: urgencyColor[order.urgency] },
               { label: 'Asset Type', value: order.asset_type },
               { label: 'Fleet / Asset No.', value: order.fleet_number },
+              { label: 'Rego', value: order.rego },
+              { label: 'VIN / Serial', value: order.vin_serial },
               { label: 'Make', value: order.make },
               { label: 'Model', value: order.model },
               { label: 'Client / Owner', value: order.client_owner, span: true },
@@ -309,9 +315,12 @@ export default function STSOrderForm() {
     name: '',
     company: 'STS Service Desk',
     job_number: '',
+    po_inv_number: '',
     urgency: 'normal',
     asset_type: '',
     fleet_number: '',
+    rego: '',
+    vin_serial: '',
     make: '',
     model: '',
     client_owner: '',
@@ -401,6 +410,9 @@ export default function STSOrderForm() {
               <Field label="Job Number" required error={errors.job_number}>
                 <Input value={form.job_number} onChange={e => set('job_number', e.target.value)} placeholder="e.g. JOB-2024-001" />
               </Field>
+              <Field label="STS PO / Invoice Number">
+                <Input value={form.po_inv_number} onChange={e => set('po_inv_number', e.target.value)} placeholder="e.g. PO-00123 or INV-00456" />
+              </Field>
               <Field label="Urgency Level" required>
                 <Select value={form.urgency} onValueChange={v => set('urgency', v)}>
                   <SelectTrigger><SelectValue /></SelectTrigger>
@@ -431,6 +443,12 @@ export default function STSOrderForm() {
               </Field>
               <Field label="Model">
                 <Input value={form.model} onChange={e => set('model', e.target.value)} placeholder="e.g. 320D" />
+              </Field>
+              <Field label="Registration (Rego)">
+                <Input value={form.rego} onChange={e => set('rego', e.target.value)} placeholder="e.g. 1ABC234" />
+              </Field>
+              <Field label="VIN / Serial Number">
+                <Input value={form.vin_serial} onChange={e => set('vin_serial', e.target.value)} placeholder="e.g. 1HGBH41JXMN109186" />
               </Field>
               <Field label="Client / Owner" colSpan="sm:col-span-2">
                 <Input value={form.client_owner} onChange={e => set('client_owner', e.target.value)} placeholder="e.g. ABC Mining Pty Ltd" />
