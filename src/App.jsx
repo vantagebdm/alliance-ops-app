@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, useRoutes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
@@ -97,7 +97,6 @@ const AuthenticatedApp = () => {
         <Route path="/admin/part-numbering" element={<PartNumbering />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
-      <Route path="/workshop-parts-order" element={<STSOrderForm />} />
     </Routes>
   );
 };
@@ -111,7 +110,10 @@ function App() {
         <ThemeProvider>
           <QueryClientProvider client={queryClientInstance}>
             <Router>
-              <AuthenticatedApp />
+              <Routes>
+                <Route path="/workshop-parts-order" element={<STSOrderForm />} />
+                <Route path="*" element={<AuthenticatedApp />} />
+              </Routes>
             </Router>
             <Toaster />
           </QueryClientProvider>
