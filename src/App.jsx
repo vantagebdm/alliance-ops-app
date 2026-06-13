@@ -97,7 +97,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/part-numbering" element={<PartNumbering />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
-      <Route path="/sts-order" element={<STSOrderForm />} />
+      <Route path="/workshop-parts-order" element={<STSOrderForm />} />
     </Routes>
   );
 };
