@@ -34,6 +34,7 @@ import DocumentNumbering from './pages/DocumentNumbering';
 import PartNumbering from './pages/PartNumbering';
 import { PermissionProvider } from '@/lib/PermissionContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
+import STSOrderForm from './pages/STSOrderForm';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -96,6 +97,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/part-numbering" element={<PartNumbering />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
+      <Route path="/sts-order" element={<STSOrderForm />} />
     </Routes>
   );
 };

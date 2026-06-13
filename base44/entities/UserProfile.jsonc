@@ -1,0 +1,141 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "mobile": {
+      "type": "string"
+    },
+    "job_title": {
+      "type": "string"
+    },
+    "department": {
+      "type": "string"
+    },
+    "employment_type": {
+      "type": "string",
+      "enum": [
+        "full_time",
+        "part_time",
+        "casual",
+        "contractor"
+      ],
+      "default": "full_time"
+    },
+    "role_name": {
+      "type": "string",
+      "default": "Sales Representative"
+    },
+    "default_warehouse": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "expiry_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "profile_image_url": {
+      "type": "string"
+    },
+    "account_status": {
+      "type": "string",
+      "enum": [
+        "invited",
+        "active",
+        "suspended",
+        "disabled",
+        "archived"
+      ],
+      "default": "invited"
+    },
+    "mfa_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "last_login": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "custom_permissions": {
+      "type": "object"
+    },
+    "approval_limits": {
+      "type": "object"
+    },
+    "warehouse_access": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "supplier_access": {
+      "type": "string",
+      "enum": [
+        "all",
+        "restricted"
+      ],
+      "default": "all"
+    },
+    "customer_access": {
+      "type": "string",
+      "enum": [
+        "all",
+        "restricted"
+      ],
+      "default": "all"
+    },
+    "hide_cost_price": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_sell_margins": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_bank_balances": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_payroll_info": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_bas_gst": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_supplier_bank": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_customer_credit": {
+      "type": "boolean",
+      "default": false
+    },
+    "hide_financial_reports": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "email",
+    "first_name",
+    "last_name"
+  ]
+}

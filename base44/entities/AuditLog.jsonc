@@ -1,0 +1,47 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "user_name": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string"
+    },
+    "module": {
+      "type": "string"
+    },
+    "record_id": {
+      "type": "string"
+    },
+    "record_label": {
+      "type": "string"
+    },
+    "old_value": {
+      "type": "string"
+    },
+    "new_value": {
+      "type": "string"
+    },
+    "ip_placeholder": {
+      "type": "string"
+    },
+    "is_sensitive": {
+      "type": "boolean",
+      "default": false
+    },
+    "approval_status": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "action",
+    "module"
+  ]
+}

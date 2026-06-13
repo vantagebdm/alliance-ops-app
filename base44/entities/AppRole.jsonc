@@ -1,0 +1,65 @@
+{
+  "name": "AppRole",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "color": {
+      "type": "string",
+      "default": "#22c55e"
+    },
+    "is_system": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_active": {
+      "type": "boolean",
+      "default": true
+    },
+    "permissions": {
+      "type": "object"
+    },
+    "approval_limits": {
+      "type": "object",
+      "properties": {
+        "purchase_order": {
+          "type": "number"
+        },
+        "supplier_bill": {
+          "type": "number"
+        },
+        "sales_discount_pct": {
+          "type": "number"
+        },
+        "credit_note": {
+          "type": "number"
+        },
+        "stock_adjustment": {
+          "type": "number"
+        },
+        "customer_credit_limit": {
+          "type": "number"
+        },
+        "supplier_payment": {
+          "type": "number"
+        },
+        "payroll": {
+          "type": "boolean"
+        },
+        "journal": {
+          "type": "number"
+        },
+        "bas_lodgement": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
