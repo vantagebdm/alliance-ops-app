@@ -45,7 +45,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
         String(item.name || "").toLowerCase().includes(val.toLowerCase()) ||
         String(item.brand || "").toLowerCase().includes(val.toLowerCase())
       );
-      setSuggestions(filtered.slice(0, 15));
+      setSuggestions(filtered.slice(0, 6));
       setOpen(filtered.length > 0);
     } catch (e) {
       setSuggestions([]);
@@ -76,7 +76,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
         onFocus={() => {
           if (!value) {
             base44.entities.Part.list(null, 500).then(results => {
-              setSuggestions(results.slice(0, 15));
+              setSuggestions(results.slice(0, 6));
               setOpen(true);
             });
           }
@@ -91,7 +91,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
             style={{ zIndex: 9999 }}
             onClick={handleDismiss}
           />
-          <div style={dropdownStyle} className="bg-card border border-border rounded-md shadow-2xl overflow-y-auto max-h-44">
+          <div style={dropdownStyle} className="bg-card border border-border rounded-md shadow-2xl overflow-y-auto max-h-36">
             {loading ? (
               <div className="px-3 py-2 text-sm text-muted-foreground">Loading...</div>
             ) : suggestions.length > 0 ? (
