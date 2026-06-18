@@ -20,7 +20,7 @@ export default function Purchasing() {
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.PurchaseOrder.list("-created_date", 100);
+    const data = await base44.entities.PurchaseOrder.list("-created_date");
     setOrders(data);
     setLoading(false);
   };

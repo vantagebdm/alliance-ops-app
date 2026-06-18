@@ -199,7 +199,7 @@ export default function Invoices() {
 
   const load = useCallback(() => {
     setLoading(true);
-    return base44.entities.Invoice.list("-created_date", 100).then(d => {
+    return base44.entities.Invoice.list("-created_date").then(d => {
       setInvoices(d);
       setLoading(false);
     });
