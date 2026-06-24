@@ -160,6 +160,8 @@ export default function Quotes() {
     { value: "quote_request", label: `New Quote Requests` },
   ];
 
+  const newRequestCount = quotes.filter(q => q.status === "quote_request").length;
+
   return (
     <div>
       <PageHeader
@@ -178,6 +180,11 @@ export default function Quotes() {
             <button key={f.value} onClick={() => setFilter(f.value)}
               className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"}`}>
               {f.label}
+              {f.value === "quote_request" && newRequestCount > 0 && (
+                <span className="ml-1.5 inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 bg-red-500 text-white text-[10px] font-bold rounded-full animate-pulse">
+                  {newRequestCount}
+                </span>
+              )}
             </button>
           ))}
         </div>
