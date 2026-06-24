@@ -157,6 +157,7 @@ export default function Quotes() {
     { value: "accepted", label: "Accepted" },
     { value: "rejected", label: "Rejected" },
     { value: "expired", label: "Expired" },
+    { value: "quote_request", label: `New Quote Requests` },
   ];
 
   return (

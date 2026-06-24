@@ -35,6 +35,7 @@ import PartNumbering from './pages/PartNumbering';
 import { PermissionProvider } from '@/lib/PermissionContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import STSOrderForm from './pages/STSOrderForm';
+import PartsQuoteRequest from './pages/PartsQuoteRequest';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -112,6 +113,7 @@ function App() {
             <Router>
               <Routes>
                 <Route path="/workshop-parts-order" element={<STSOrderForm />} />
+                <Route path="/parts-quote-request" element={<PartsQuoteRequest />} />
                 <Route path="*" element={<AuthenticatedApp />} />
               </Routes>
             </Router>

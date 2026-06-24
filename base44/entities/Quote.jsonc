@@ -14,6 +14,10 @@
     "customer_email": {
       "type": "string"
     },
+    "customer_phone": {
+      "type": "string",
+      "description": "Contact phone number for quote requests"
+    },
     "company": {
       "type": "string"
     },
@@ -24,7 +28,8 @@
         "sent",
         "accepted",
         "rejected",
-        "expired"
+        "expired",
+        "quote_request"
       ],
       "default": "draft"
     },
@@ -69,6 +74,71 @@
     },
     "notes": {
       "type": "string"
+    },
+    "submitted_by_name": {
+      "type": "string",
+      "description": "Name of person who submitted the quote request via portal"
+    },
+    "urgency": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "urgent",
+        "breakdown"
+      ],
+      "default": "normal"
+    },
+    "job_number": {
+      "type": "string",
+      "description": "Job/work order number"
+    },
+    "po_inv_number": {
+      "type": "string",
+      "description": "PO or Invoice reference number"
+    },
+    "asset_type": {
+      "type": "string",
+      "description": "Type of asset"
+    },
+    "asset_fleet_number": {
+      "type": "string",
+      "description": "Asset or fleet number"
+    },
+    "asset_make": {
+      "type": "string",
+      "description": "Asset manufacturer/make"
+    },
+    "asset_model": {
+      "type": "string",
+      "description": "Asset model"
+    },
+    "rego": {
+      "type": "string",
+      "description": "Vehicle registration"
+    },
+    "vin_serial": {
+      "type": "string",
+      "description": "VIN or serial number"
+    },
+    "client_owner": {
+      "type": "string",
+      "description": "Client or owner of the asset"
+    },
+    "image_urls": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Reference images uploaded with the quote request"
+    },
+    "acknowledged": {
+      "type": "boolean",
+      "default": false,
+      "description": "Parts accuracy acknowledgement"
+    },
+    "request_source": {
+      "type": "string",
+      "description": "Source of the quote request e.g. portal, internal"
     }
   },
   "required": [
