@@ -27,14 +27,36 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { event, data } = body;
 
-    // Only process STS Service Desk orders
-    if (!data || data.company !== 'STS Service Desk') {
-      return Response.json({ skipped: true, reason: 'Not an STS Service Desk order' });
+    const base44 = createClientFromRequest(req);
+    const order = data || {};
+
+    // Always create an in-app notification for the bell — works for ALL new sales orders
+    const isUrgentOrder = order.priority === 'urgent' || order.priority === 'breakdown';
+    try {
+      await base44.asServiceRole.entities.Notification.create({
+        type: 'order_new',
+        category: 'order',
+        priority: order.priority === 'breakdown' ? 'critical' : isUrgentOrder ? 'urgent' : 'normal',
+        title: `New Sales Order ${order.order_number || ''}`.trim(),
+        description: `Order from ${order.customer_name || order.company || 'Unknown'}${order.job_number ? ' · Job ' + order.job_number : ''}${(order.items && order.items.length) ? ' · ' + order.items.length + ' line(s)' : ''}`,
+        entity_type: 'SalesOrder',
+        entity_id: order.id || '',
+        entity_ref: order.order_number || '',
+        customer_name: order.customer_name || order.company || '',
+        is_read: false,
+        is_dismissed: false,
+        is_pinned: false,
+        escalated: false,
+        action_url: '/orders',
+      });
+    } catch (notifErr) {
+      // Non-fatal — continue to email step
     }
 
-    const base44 = createClientFromRequest(req);
-
-    const order = data;
+    // Only email for STS Service Desk orders
+    if (!data || data.company !== 'STS Service Desk') {
+      return Response.json({ notification_created: true, skipped: true, reason: 'Not an STS Service Desk order' });
+    }
     const urgencyLabel = { normal: 'Normal', urgent: 'URGENT', breakdown: 'BREAKDOWN / EMERGENCY' };
     const urgency = urgencyLabel[order.priority] || order.priority || 'Normal';
     const isUrgent = order.priority === 'urgent' || order.priority === 'breakdown';
