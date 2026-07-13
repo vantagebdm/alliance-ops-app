@@ -187,7 +187,10 @@ export default function PlatformDevelopment() {
           request={selected}
           user={user}
           onClose={() => setSelected(null)}
-          onUpdated={(updated) => setSelected(updated)}
+          onUpdated={(updated) => {
+            setSelected(updated);
+            setRequests(prev => prev.map(r => r.id === updated.id ? updated : r));
+          }}
           onEdit={() => { setEditTarget(selected); }}
         />
       )}
