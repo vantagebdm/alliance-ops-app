@@ -46,7 +46,7 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
-  // Paste image handler — listens on the modal container so right-click paste works
+  // Paste image handler — works for right-click paste and Ctrl+V
   const handlePaste = async (e) => {
     const items = e.clipboardData?.items;
     if (!items) return;
@@ -62,6 +62,27 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
       await uploadFiles(files);
     }
   };
+
+  // Also listen at document level so Ctrl+V works anywhere in the modal
+  useEffect(() => {
+    const docHandler = async (e) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      const files = [];
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          const file = item.getAsFile();
+          if (file) files.push(file);
+        }
+      }
+      if (files.length) {
+        e.preventDefault();
+        await uploadFiles(files);
+      }
+    };
+    document.addEventListener("paste", docHandler);
+    return () => document.removeEventListener("paste", docHandler);
+  }, []);
 
   const uploadFiles = async (files) => {
     if (!files.length) return;
@@ -232,10 +253,17 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
           <div>
             <Label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">Attachments</Label>
             <div
+              contentEditable
+              suppressContentEditableWarning
               tabIndex={0}
-              className={`border border-dashed border-border rounded-lg p-4 transition-colors cursor-pointer focus:outline-none focus:border-primary focus:bg-primary/5 ${pasteHint ? "border-primary bg-primary/5" : ""}`}
+              className={`border border-dashed border-border rounded-lg p-4 transition-colors cursor-text focus:outline-none focus:border-primary focus:bg-primary/5 ${pasteHint ? "border-primary bg-primary/5" : ""}`}
               onPaste={handlePaste}
-              onClick={() => imgRef.current?.click()}
+              onKeyDown={e => {
+                // Allow only paste (Ctrl/Cmd+V); block all other typing
+                if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "v") {
+                  e.preventDefault();
+                }
+              }}
               onDragOver={e => { e.preventDefault(); setPasteHint(true); }}
               onDragLeave={() => setPasteHint(false)}
               onDrop={e => { e.preventDefault(); setPasteHint(false); uploadFiles(Array.from(e.dataTransfer.files)); }}
@@ -251,7 +279,7 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
                 </Button>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground px-2">
                   <Clipboard className="w-3.5 h-3.5" />
-                  <span>Click, paste (Ctrl+V), or drag images here</span>
+                  <span>Right-click → Paste, Ctrl+V, or drag images here</span>
                 </div>
               </div>
               <input ref={imgRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageSelect} />
