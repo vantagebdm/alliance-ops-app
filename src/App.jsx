@@ -32,6 +32,7 @@ import DataManagement from './pages/DataManagement';
 import SystemSettings from './pages/SystemSettings';
 import DocumentNumbering from './pages/DocumentNumbering';
 import PartNumbering from './pages/PartNumbering';
+import PlatformDevelopment from './pages/PlatformDevelopment';
 import { PermissionProvider } from '@/lib/PermissionContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import STSOrderForm from './pages/STSOrderForm';
@@ -96,6 +97,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/system-settings" element={<SystemSettings />} />
         <Route path="/admin/document-numbering" element={<DocumentNumbering />} />
         <Route path="/admin/part-numbering" element={<PartNumbering />} />
+        <Route path="/platform-development" element={<PlatformDevelopment />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
