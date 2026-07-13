@@ -46,26 +46,22 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
-  // Paste image handler
-  useEffect(() => {
-    const handlePaste = async (e) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      const files = [];
-      for (const item of items) {
-        if (item.type.startsWith("image/")) {
-          const file = item.getAsFile();
-          if (file) files.push(file);
-        }
+  // Paste image handler — listens on the modal container so right-click paste works
+  const handlePaste = async (e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    const files = [];
+    for (const item of items) {
+      if (item.type.startsWith("image/")) {
+        const file = item.getAsFile();
+        if (file) files.push(file);
       }
-      if (files.length) {
-        e.preventDefault();
-        await uploadFiles(files);
-      }
-    };
-    window.addEventListener("paste", handlePaste);
-    return () => window.removeEventListener("paste", handlePaste);
-  }, []);
+    }
+    if (files.length) {
+      e.preventDefault();
+      await uploadFiles(files);
+    }
+  };
 
   const uploadFiles = async (files) => {
     if (!files.length) return;
@@ -129,7 +125,7 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4 overflow-y-auto" onPaste={handlePaste}>
       <div className="w-full max-w-2xl bg-card border border-border rounded-xl my-8">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-6 py-4 sticky top-0 bg-card rounded-t-xl z-10">
@@ -236,7 +232,10 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
           <div>
             <Label className="text-xs text-muted-foreground uppercase tracking-wider mb-2 block">Attachments</Label>
             <div
-              className={`border border-dashed border-border rounded-lg p-4 transition-colors ${pasteHint ? "border-primary bg-primary/5" : ""}`}
+              tabIndex={0}
+              className={`border border-dashed border-border rounded-lg p-4 transition-colors cursor-pointer focus:outline-none focus:border-primary focus:bg-primary/5 ${pasteHint ? "border-primary bg-primary/5" : ""}`}
+              onPaste={handlePaste}
+              onClick={() => imgRef.current?.click()}
               onDragOver={e => { e.preventDefault(); setPasteHint(true); }}
               onDragLeave={() => setPasteHint(false)}
               onDrop={e => { e.preventDefault(); setPasteHint(false); uploadFiles(Array.from(e.dataTransfer.files)); }}
@@ -252,7 +251,7 @@ export default function DevRequestForm({ initial, user, onClose, onSaved }) {
                 </Button>
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground px-2">
                   <Clipboard className="w-3.5 h-3.5" />
-                  <span>Or paste / drag images here</span>
+                  <span>Click, paste (Ctrl+V), or drag images here</span>
                 </div>
               </div>
               <input ref={imgRef} type="file" multiple accept="image/*" className="hidden" onChange={handleImageSelect} />
