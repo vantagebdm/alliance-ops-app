@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import Autocomplete from "@/components/ui/Autocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
+import { generateDocNumber } from "@/hooks/useDocNumber";
 
 const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
@@ -55,9 +56,10 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
   const save = async () => {
     setSaving(true);
     try {
+      const quoteNumber = await generateDocNumber("quote");
       const data = {
         ...form,
-        quote_number: `QT-${Date.now().toString(36).toUpperCase()}`,
+        quote_number: quoteNumber,
       };
       await base44.entities.Quote.create(data);
       onSaved?.();

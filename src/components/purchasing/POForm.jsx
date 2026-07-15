@@ -63,7 +63,7 @@ export default function POForm({ onClose, onSaved, initial }) {
     const data = { ...form, po_type: poType };
     if (!data.po_number) {
       const subtype = poType === "parts" ? "parts" : "company_expense";
-      data.po_number = await generateDocNumber("purchase_order", subtype);
+      data.po_number = await generateDocNumber("purchase_order", subtype, previewPO || null);
     }
     if (initial?.id) {
       await base44.entities.PurchaseOrder.update(initial.id, data);

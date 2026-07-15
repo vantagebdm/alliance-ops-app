@@ -283,8 +283,8 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
     setSaving(true);
     try {
       const status = action === "draft" ? "draft" : action === "paid" ? "paid" : "sent";
-      // Always generate a real sequential number for new invoices; keep existing number when editing
-      const invoiceNumber = invoice?.id ? form.invoice_number : await generateDocNumber("invoice");
+      // Use the preview number already shown to the user; keeps it consistent from draft through finalisation
+      const invoiceNumber = invoice?.id ? form.invoice_number : await generateDocNumber("invoice", null, form.invoice_number);
       const data = {
         ...form,
         invoice_number: invoiceNumber,

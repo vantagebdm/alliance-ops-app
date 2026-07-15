@@ -169,8 +169,8 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
     if (err) { alert(err); return; }
     setSaving(true);
     try {
-      // Generate the real sequential invoice number at save time
-      const invoiceNumber = await generateDocNumber("invoice");
+      // Use the preview number already shown to the user (with duplicate check)
+      const invoiceNumber = await generateDocNumber("invoice", null, form.invoice_number);
       setForm(f => ({ ...f, invoice_number: invoiceNumber }));
 
       const invoiceItems = activeLines
