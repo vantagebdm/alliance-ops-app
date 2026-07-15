@@ -10,7 +10,7 @@ import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber } from "@/hooks/useDocNumber";
 
-const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
+const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0, eta_days: "", eta_comment: "" });
 
 export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }) {
   const [form, setForm] = useState(initial || {
@@ -190,6 +190,8 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20">Qty</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">Unit Price</th>
+                  <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20">ETA (days)</th>
+                  <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">ETA Comment</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Total</th>
                   <th className="w-10" />
                 </tr>
@@ -232,6 +234,14 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                     <td className="px-2 py-1.5">
                       <Input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
                         className="rounded-sm h-8 text-xs text-right" />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input type="number" min="0" value={line.eta_days} onChange={e => updateLine(i, "eta_days", e.target.value === "" ? "" : Number(e.target.value))}
+                        placeholder="—" className="rounded-sm h-8 text-xs text-right" />
+                    </td>
+                    <td className="px-2 py-1.5">
+                      <Input value={line.eta_comment} onChange={e => updateLine(i, "eta_comment", e.target.value)}
+                        placeholder="e.g. ex east" className="rounded-sm h-8 text-xs" />
                     </td>
                     <td className="px-3 py-1.5 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
                     <td className="px-2 py-1.5">

@@ -52,6 +52,14 @@
           },
           "total": {
             "type": "number"
+          },
+          "eta_days": {
+            "type": "number",
+            "description": "Estimated time of arrival in days"
+          },
+          "eta_comment": {
+            "type": "string",
+            "description": "ETA comment e.g. 'ex east', 'ex west'"
           }
         }
       }

@@ -123,6 +123,23 @@ export function generateQuotePDF(quote) {
     doc.text(`$${Number(item.unit_price || 0).toFixed(2)}`, margin + 122, y + 4.5, { align: "right" });
     doc.text(`$${Number(item.total || 0).toFixed(2)}`, pageW - margin - 2, y + 4.5, { align: "right" });
     y += 8;
+
+    // ETA line under the item if provided
+    if (item.eta_days || item.eta_comment) {
+      const etaParts = [];
+      if (item.eta_days) etaParts.push(`ETA: ${item.eta_days} days`);
+      if (item.eta_comment) etaParts.push(item.eta_comment);
+      const etaText = etaParts.join(" — ");
+      doc.setFontSize(7);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(120, 120, 120);
+      doc.text(etaText, margin + 30, y + 3);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(...TEXT_DARK);
+      doc.setFontSize(8);
+      y += 5;
+    }
+
     if (y > 260) { doc.addPage(); y = 20; }
   });
 

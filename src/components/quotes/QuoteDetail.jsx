@@ -101,11 +101,20 @@ export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
               <tbody>
                 {items.map((line, i) => (
                   <tr key={i} className="border-b border-border/40">
-                    <td className="px-4 py-3 font-mono text-xs text-primary">{line.app_part_number || line.part_number || "—"}</td>
-                    <td className="px-4 py-3 text-foreground">{line.description}</td>
-                    <td className="px-4 py-3 text-right">{line.quantity}</td>
-                    <td className="px-4 py-3 text-right">${(line.unit_price || 0).toFixed(2)}</td>
-                    <td className="px-4 py-3 text-right font-semibold">${(line.total || 0).toFixed(2)}</td>
+                    <td className="px-4 py-3 font-mono text-xs text-primary align-top">{line.app_part_number || line.part_number || "—"}</td>
+                    <td className="px-4 py-3 text-foreground">
+                      {line.description}
+                      {(line.eta_days || line.eta_comment) && (
+                        <div className="mt-1 text-xs text-amber-400 flex items-center gap-2">
+                          {line.eta_days && <span className="font-semibold">ETA: {line.eta_days} days</span>}
+                          {line.eta_days && line.eta_comment && <span className="text-white/20">·</span>}
+                          {line.eta_comment && <span>{line.eta_comment}</span>}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right align-top">{line.quantity}</td>
+                    <td className="px-4 py-3 text-right align-top">${(line.unit_price || 0).toFixed(2)}</td>
+                    <td className="px-4 py-3 text-right font-semibold align-top">${(line.total || 0).toFixed(2)}</td>
                   </tr>
                 ))}
               </tbody>
