@@ -10,6 +10,7 @@ import TabTradeRefs from "./profile/TabTradeRefs";
 import TabDocuments from "./profile/TabDocuments";
 import TabActivity from "./profile/TabActivity";
 import TabHistory from "./profile/TabHistory";
+import TabPurchaseHistory from "./profile/TabPurchaseHistory";
 import CustomerActionHandler from "./actions/CustomerActionHandler";
 
 const TABS = [
@@ -22,6 +23,7 @@ const TABS = [
   { key: "documents",  label: "Documents" },
   { key: "activity",   label: "Activity" },
   { key: "history",    label: "Orders & Invoices" },
+  { key: "purchases",  label: "Purchase History" },
 ];
 
 export default function CustomerDetail({ customer: initialCustomer, onClose, onUpdated }) {
@@ -99,6 +101,7 @@ export default function CustomerDetail({ customer: initialCustomer, onClose, onU
           {tab === "documents" && <TabDocuments  customer={customer} />}
           {tab === "activity"  && <TabActivity   customer={customer} />}
           {tab === "history"   && <TabHistory    customer={customer} />}
+          {tab === "purchases" && <TabPurchaseHistory customer={customer} />}
         </div>
       </div>
     </div>
