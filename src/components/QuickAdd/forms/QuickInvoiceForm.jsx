@@ -283,12 +283,14 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
     setSaving(true);
     try {
       const status = action === "draft" ? "draft" : action === "paid" ? "paid" : "sent";
+      const paidDate = action === "paid" ? today : null;
       // Use the preview number already shown to the user; keeps it consistent from draft through finalisation
       const invoiceNumber = invoice?.id ? form.invoice_number : await generateDocNumber("invoice", null, form.invoice_number);
       const data = {
         ...form,
         invoice_number: invoiceNumber,
         status,
+        paid_date: paidDate,
         subtotal,
         gst: gstAmount,
         total: totalAmount,
@@ -300,6 +302,13 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
         await base44.entities.Invoice.update(invoice.id, data);
       } else {
         await base44.entities.Invoice.create(data);
+      }
+
+      // Auto-regenerate PDF when marked as paid
+      if (action === "paid") {
+        try {
+          await generateAndUploadInvoicePDF({ ...data, invoice_number: invoiceNumber, status, paid_date: paidDate }, base44);
+        } catch (_) {}
       }
 
       // Send email with PDF when action is "email"

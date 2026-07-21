@@ -79,11 +79,27 @@ const STATUS_CYCLE = ["draft", "sent", "paid", "overdue", "cancelled"];
 function InvoiceStatusButton({ invoice, onUpdated }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [paidDate, setPaidDate] = useState(moment().format("YYYY-MM-DD"));
 
   const setStatus = async (status) => {
     setOpen(false);
     setSaving(true);
-    await base44.entities.Invoice.update(invoice.id, { status });
+    const updateData = { status };
+    if (status === "paid" && !invoice.paid_date) {
+      updateData.paid_date = paidDate;
+    }
+    if (status !== "paid") {
+      updateData.paid_date = null;
+    }
+    await base44.entities.Invoice.update(invoice.id, updateData);
+
+    // Auto-regenerate PDF when marked paid
+    if (status === "paid") {
+      try {
+        const updatedInvoice = { ...invoice, ...updateData };
+        await generateAndUploadInvoicePDF(updatedInvoice, base44);
+      } catch (_) {}
+    }
     setSaving(false);
     onUpdated();
   };
@@ -111,16 +127,40 @@ function InvoiceStatusButton({ invoice, onUpdated }) {
       {open && (
         <>
           <div className="fixed inset-0 z-10" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[110px]">
-            {STATUS_CYCLE.map(s => (
-              <button
-                key={s}
-                onClick={() => setStatus(s)}
-                className={`w-full text-left px-3 py-1.5 text-[11px] font-heading uppercase tracking-wider transition-colors hover:bg-primary/10 ${s === current ? "text-primary" : "text-white/60"}`}
-              >
-                {s}
-              </button>
-            ))}
+          <div className="absolute left-0 top-full mt-1 z-50 bg-[hsl(0,0%,15%)] border border-border rounded-sm shadow-xl overflow-hidden min-w-[160px]">
+            {STATUS_CYCLE.map(s => {
+              if (s === "paid" && current !== "paid") {
+                return (
+                  <div key="paid" className="border-t border-border">
+                    <div className="px-3 py-1.5">
+                      <label className="block text-[9px] font-heading uppercase tracking-wider text-white/40 mb-1">Paid Date</label>
+                      <input
+                        type="date"
+                        value={paidDate}
+                        onClick={e => e.stopPropagation()}
+                        onChange={e => setPaidDate(e.target.value)}
+                        className="w-full h-7 px-1.5 text-[11px] bg-[hsl(0,0%,10%)] border border-border rounded-sm text-white"
+                      />
+                    </div>
+                    <button
+                      onClick={() => setStatus("paid")}
+                      className="w-full text-left px-3 py-1.5 text-[11px] font-heading uppercase tracking-wider text-green-400 hover:bg-green-500/10 transition-colors"
+                    >
+                      ✓ Confirm Paid
+                    </button>
+                  </div>
+                );
+              }
+              return (
+                <button
+                  key={s}
+                  onClick={() => setStatus(s)}
+                  className={`w-full text-left px-3 py-1.5 text-[11px] font-heading uppercase tracking-wider transition-colors hover:bg-primary/10 ${s === current ? "text-primary" : "text-white/60"}`}
+                >
+                  {s}
+                </button>
+              );
+            })}
           </div>
         </>
       )}
@@ -231,6 +271,7 @@ export default function Invoices() {
     { key: "status", label: "Status", render: (v, row) => <InvoiceStatusButton invoice={row} onUpdated={load} /> },
     { key: "total", label: "Total", render: (v) => `$${(v || 0).toLocaleString("en-AU", { minimumFractionDigits: 2 })}` },
     { key: "due_date", label: "Due Date", render: (v) => v ? moment(v).format("DD/MM/YY") : "—" },
+    { key: "paid_date", label: "Paid Date", render: (v) => v ? <span className="text-green-400">{moment(v).format("DD/MM/YY")}</span> : "—" },
     { key: "payment_method", label: "Payment", render: (v) => <span className="text-xs uppercase">{(v || "").replace("_", " ")}</span> },
     { key: "created_date", label: "Created", render: (v) => moment(v).format("DD/MM/YY") },
     {

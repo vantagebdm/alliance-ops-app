@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { postInvoiceToLedger } from "@/lib/accountingLedger";
 import { previewDocNumber, generateDocNumber } from "@/hooks/useDocNumber";
+import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
 import { X, AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -185,6 +186,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
         }));
 
       const invoiceStatus = action === "draft" ? "draft" : action === "paid" ? "paid" : "sent";
+      const paidDate = action === "paid" ? today : null;
 
       const invoiceData = {
         ...form,
@@ -202,10 +204,18 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
         gst: gstAmount,
         total: totalAmount,
         status: invoiceStatus,
+        paid_date: paidDate,
         payment_method: "bank_transfer",
       };
 
       const invoice = await base44.entities.Invoice.create(invoiceData);
+
+      // Auto-regenerate PDF when marked as paid
+      if (action === "paid") {
+        try {
+          await generateAndUploadInvoicePDF({ ...invoiceData, paid_date: paidDate }, base44);
+        } catch (_) {}
+      }
 
       // Post to accounting ledger
       await postInvoiceToLedger(invoice);

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select";
 import { X } from "lucide-react";
 import moment from "moment";
+import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
 
 const STATUSES = ["draft", "sent", "paid", "overdue", "cancelled"];
 const PAYMENT_METHODS = ["bank_transfer", "credit_card", "cash", "cheque"];

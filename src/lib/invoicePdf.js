@@ -88,6 +88,25 @@ export function generateInvoicePDF(invoice) {
     doc.text(`ABN: ${company.abn}`, compBoxX + compBoxW / 2, cbY, { align: "center" });
   }
 
+  // ── PAID STAMP (if paid) ─────────────────────────────────────────────
+  if (invoice.status === "paid") {
+    doc.saveGraphicsState();
+    doc.setTextColor(0, 150, 0);
+    doc.setDrawColor(0, 150, 0);
+    doc.setLineWidth(1.5);
+    const stampX = pageW - 55;
+    const stampY = headerTop + headerH + 6;
+    doc.setFontSize(28);
+    doc.setFont("helvetica", "bold");
+    doc.text("PAID", stampX, stampY + 8, { align: "center" });
+    doc.setFontSize(9);
+    if (invoice.paid_date) {
+      doc.setFont("helvetica", "normal");
+      doc.text(`Paid on ${invoice.paid_date}`, stampX, stampY + 13, { align: "center" });
+    }
+    doc.restoreGraphicsState();
+  }
+
   // ── CUSTOMER INFO BLOCK (left side) ──────────────────────────────────
   let y = headerTop + headerH + 8;
   const invoiceDate = invoice.invoice_date || (invoice.created_date ? invoice.created_date.split("T")[0] : "");
@@ -96,6 +115,8 @@ export function generateInvoicePDF(invoice) {
     invoice.company ? ["Company:", invoice.company] : null,
     ["Invoice Date:", invoiceDate],
     ["Due Date:", invoice.due_date || ""],
+    invoice.status === "paid" && invoice.paid_date ? ["Paid Date:", invoice.paid_date] : null,
+    ["Status:", (invoice.status || "draft").toUpperCase()],
     (invoice.customer_po_number || invoice.po_number) ? ["Customer PO:", invoice.customer_po_number || invoice.po_number] : null,
     invoice.sales_order_reference ? ["Order Ref:", invoice.sales_order_reference] : null,
   ].filter(Boolean);
