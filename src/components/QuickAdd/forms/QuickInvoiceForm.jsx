@@ -131,8 +131,9 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
   const [dispatchResults, setDispatchResults] = useState([]);
   const [accountWarning, setAccountWarning] = useState(null);
 
-  // Pre-populate invoice number with the next prefix on mount
+  // Pre-populate invoice number with the next prefix on mount — ONLY for new invoices
   useEffect(() => {
+    if (invoice?.id) return; // Never overwrite an existing invoice's number
     previewDocNumber("invoice").then(num => {
       if (num) u("invoice_number", num);
     });
@@ -548,7 +549,14 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
               <div className="p-4 grid grid-cols-2 gap-3">
                 <div>
                   <FieldLabel required>Invoice Number</FieldLabel>
-                  <Input value={form.invoice_number} onChange={e => u("invoice_number", e.target.value)} className="rounded-sm font-mono" />
+                  <Input
+                    value={form.invoice_number}
+                    onChange={e => u("invoice_number", e.target.value)}
+                    className="rounded-sm font-mono"
+                    readOnly={!!invoice?.id}
+                    disabled={!!invoice?.id}
+                  />
+                  {invoice?.id && <p className="text-[10px] text-muted-foreground mt-1">Locked — number cannot be changed after creation</p>}
                 </div>
                 <div>
                   <FieldLabel>Reference</FieldLabel>

@@ -49,8 +49,11 @@ export default function InvoiceEditForm({ invoice, onClose, onSaved }) {
               </label>
               <Input
                 value={data.invoice_number || ""}
-                onChange={(e) => setData({ ...data, invoice_number: e.target.value })}
+                readOnly
+                disabled
+                className="font-mono"
               />
+              <p className="text-[10px] text-muted-foreground mt-1">Locked — number cannot be changed after creation</p>
             </div>
 
             <div>
