@@ -1,14 +1,18 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, X, Package, Users, FileText, ShoppingCart, Truck } from "lucide-react";
+import { Search, X, Package, Users, FileText, ShoppingCart, Truck, Receipt, ClipboardList, Building2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
 
 const SEARCH_CATEGORIES = [
-  { key: "parts", label: "PARTS", icon: Package, entity: "Part", fields: ["part_number", "name"], path: "/parts" },
-  { key: "customers", label: "CUSTOMERS", icon: Users, entity: "Customer", fields: ["name", "company"], path: "/customers" },
-  { key: "enquiries", label: "ENQUIRIES", icon: FileText, entity: "Enquiry", fields: ["enquiry_number", "customer_name"], path: "/enquiries" },
+  { key: "parts", label: "PARTS", icon: Package, entity: "Part", fields: ["part_number", "name", "supplier_sku", "oem_number"], path: "/parts" },
+  { key: "invoices", label: "INVOICES", icon: Receipt, entity: "Invoice", fields: ["invoice_number", "customer_name"], path: "/invoices" },
   { key: "orders", label: "ORDERS", icon: ShoppingCart, entity: "SalesOrder", fields: ["order_number", "customer_name"], path: "/orders" },
+  { key: "quotes", label: "QUOTES", icon: FileText, entity: "Quote", fields: ["quote_number", "customer_name"], path: "/quotes" },
+  { key: "enquiries", label: "ENQUIRIES", icon: ClipboardList, entity: "Enquiry", fields: ["enquiry_number", "customer_name"], path: "/enquiries" },
+  { key: "pos", label: "PURCHASE ORDERS", icon: Truck, entity: "PurchaseOrder", fields: ["po_number", "supplier_name"], path: "/purchasing" },
+  { key: "customers", label: "CUSTOMERS", icon: Users, entity: "Customer", fields: ["name", "company"], path: "/customers" },
+  { key: "suppliers", label: "SUPPLIERS", icon: Building2, entity: "Supplier", fields: ["name", "supplier_code"], path: "/suppliers" },
 ];
 
 export default function GlobalSearch() {
@@ -29,16 +33,31 @@ export default function GlobalSearch() {
 
   const doSearch = useCallback(
     debounce(async (q) => {
-      if (!q || q.length < 2) { setResults({}); return; }
+      if (!q || q.length < 1) { setResults({}); return; }
       setLoading(true);
       const res = {};
       for (const cat of SEARCH_CATEGORIES) {
         try {
-          const items = await base44.entities[cat.entity].list("-created_date", 50);
-          const lq = q.toLowerCase();
-          res[cat.key] = items.filter(item =>
-            cat.fields.some(f => item[f] && item[f].toLowerCase().includes(lq))
-          ).slice(0, 5);
+          // Use server-side $contains for partial/predictive matching across all fields
+          const allItems = [];
+          for (const field of cat.fields) {
+            try {
+              const items = await base44.entities[cat.entity].filter(
+                { [field]: { $contains: q } },
+                "-created_date",
+                10
+              );
+              allItems.push(...items);
+            } catch (_) {}
+          }
+          // Deduplicate by id and slice to 5
+          const seen = new Set();
+          const deduped = allItems.filter(item => {
+            if (seen.has(item.id)) return false;
+            seen.add(item.id);
+            return true;
+          });
+          res[cat.key] = deduped.slice(0, 5);
         } catch {
           res[cat.key] = [];
         }
@@ -65,8 +84,8 @@ export default function GlobalSearch() {
           type="text"
           value={query}
           onChange={handleChange}
-          onFocus={() => query.length >= 2 && setOpen(true)}
-          placeholder="Search parts, customers, orders..."
+          onFocus={() => query.length >= 1 && setOpen(true)}
+          placeholder="Search invoices, orders, parts, customers..."
           className="bg-transparent text-white text-sm placeholder:text-white/30 focus:outline-none w-full font-body"
         />
         {query && (
@@ -76,7 +95,7 @@ export default function GlobalSearch() {
         )}
       </div>
 
-      {open && query.length >= 2 && (
+      {open && query.length >= 1 && (
         <div className="absolute top-full mt-1 left-0 right-0 bg-[hsl(0,0%,8%)] border border-[hsl(0,0%,18%)] rounded-sm shadow-2xl overflow-hidden z-50 max-h-[400px] overflow-y-auto">
           {loading && (
             <div className="p-4 text-center text-white/40 text-sm">Searching...</div>
