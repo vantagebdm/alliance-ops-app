@@ -115,7 +115,9 @@ export default function CategoryReportModal({ onClose }) {
         part.reorder_qty || 0,
         (part.max_stock_level || 0) - (part.stock_quantity || 0)
       );
-      const suggestedQty = qtySold > 0 ? Math.max(qtySold, reorderQty) : reorderQty;
+      const suggestedQty = qtySold > 0
+        ? Math.max(qtySold, reorderQty, 1)
+        : Math.max(reorderQty, part.stock_quantity <= (part.min_stock_level || 0) ? 1 : 0);
       supplierGroups[supplier].parts.push({
         part,
         qtySold,
@@ -147,13 +149,12 @@ export default function CategoryReportModal({ onClose }) {
       const poNumber = await generateDocNumber("purchase_order", "parts");
 
       const lines = group.parts
-        .filter((p) => p.suggestedQty > 0)
         .map((p) => ({
-          part_number: p.part.part_number || "",
+          part_number: p.part.part_number || p.part.app_part_number || "",
           description: p.part.name || "",
-          quantity: p.suggestedQty,
+          quantity: Math.max(p.suggestedQty, 1),
           unit_cost: p.unitCost,
-          total: Math.round(p.suggestedQty * p.unitCost * 100) / 100,
+          total: Math.round(Math.max(p.suggestedQty, 1) * p.unitCost * 100) / 100,
         }));
 
       const subtotal = lines.reduce((s, l) => s + l.total, 0);
