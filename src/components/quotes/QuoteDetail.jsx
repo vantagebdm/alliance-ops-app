@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
+import ConvertToPOModal from "./ConvertToPOModal";
 
 export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
   const [status, setStatus] = useState(quote.status);
   const [items, setItems] = useState(quote.items || []);
+  const [showConvertPO, setShowConvertPO] = useState(false);
 
   // Enrich items with app_part_number if missing
   useState(() => {
@@ -150,11 +152,23 @@ export default function QuoteDetail({ quote, onClose, onUpdated, onEdit }) {
             <Button variant="outline" onClick={onEdit} className="rounded-sm font-heading text-xs uppercase tracking-wider">
               <Edit3 className="w-4 h-4 mr-1" /> Edit
             </Button>
-            <Button className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
-              <ShoppingCart className="w-4 h-4 mr-1" /> Convert to Order
+            <Button onClick={() => setShowConvertPO(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+              <ShoppingCart className="w-4 h-4 mr-1" /> Convert to Purchase Order
             </Button>
           </div>
         </div>
+
+        {showConvertPO && (
+          <ConvertToPOModal
+            quote={{ ...quote, items }}
+            onClose={() => setShowConvertPO(false)}
+            onConverted={() => {
+              setShowConvertPO(false);
+              onUpdated && onUpdated();
+              onClose && onClose();
+            }}
+          />
+        )}
       </div>
     </div>
   );
