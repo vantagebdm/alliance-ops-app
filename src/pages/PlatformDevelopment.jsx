@@ -170,7 +170,13 @@ export default function PlatformDevelopment() {
             <p className="text-xs text-muted-foreground mt-1">Click "New Request" to submit your first request.</p>
           </div>
         ) : (
-          <DataTable columns={columns} data={filtered} onRowClick={setSelected} emptyMessage="No requests found." />
+          <DataTable
+            columns={columns}
+            data={filtered}
+            onRowClick={setSelected}
+            emptyMessage="No requests found."
+            rowClassName={(row) => row.has_unread_comments ? "bg-red-500/10 hover:bg-red-500/15" : ""}
+          />
         )}
       </div>
 
