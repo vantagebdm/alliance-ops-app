@@ -40,6 +40,10 @@ const STATUS_STYLES = {
   expired: "bg-red-500/10 text-red-400 border border-red-500/30",
   out_of_stock: "bg-red-500/10 text-red-400 border border-red-500/30",
   problem: "bg-red-500/10 text-red-400 border border-red-500/30",
+  open: "bg-red-500/10 text-red-400 border border-red-500/30",
+  // DevRequest statuses
+  resolved: "bg-green-500/10 text-green-400 border border-green-500/30",
+  awaiting_response: "bg-amber-500/10 text-amber-400 border border-amber-500/30",
   // Supplier specific
   preferred: "bg-primary/10 text-primary border border-primary/30",
   under_review: "bg-blue-500/10 text-blue-400 border border-blue-500/30",
