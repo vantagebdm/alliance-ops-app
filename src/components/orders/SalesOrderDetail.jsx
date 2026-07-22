@@ -4,6 +4,7 @@ import { X, Edit3, Truck, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import StatusBadge from "@/components/ui/StatusBadge";
+import SalesOrderNotes from "@/components/orders/SalesOrderNotes";
 import moment from "moment";
 
 const STATUSES = ["pending","confirmed","processing","ready","dispatched","delivered","cancelled"];
@@ -114,6 +115,8 @@ export default function SalesOrderDetail({ order, onClose, onUpdated, onEdit, on
               </div>
             </div>
           </div>
+
+          <SalesOrderNotes order={order} onUpdated={onUpdated} />
 
           {order.notes && (
             <div className="bg-muted/50 rounded-sm p-3 text-sm text-foreground/70 border-l-2 border-primary/40">

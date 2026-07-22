@@ -80,6 +80,29 @@
     "notes": {
       "type": "string"
     },
+    "notes_log": {
+      "type": "array",
+      "description": "Timestamped notes and updates recorded by users",
+      "items": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string",
+            "description": "Name of the user who wrote the note"
+          },
+          "author_id": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
     "priority": {
       "type": "string",
       "enum": [
