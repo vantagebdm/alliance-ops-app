@@ -175,7 +175,7 @@ export default function PlatformDevelopment() {
             data={filtered}
             onRowClick={setSelected}
             emptyMessage="No requests found."
-            rowClassName={(row) => row.has_unread_comments ? "bg-red-500/10 hover:bg-red-500/15" : ""}
+            rowClassName={(row) => row.has_unread_comments ? "bg-red-500/5 border-y-2 border-red-500 [&:first-child]:border-l-2 [&:last-child]:border-r-2" : ""}
           />
         )}
       </div>

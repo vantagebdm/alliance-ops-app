@@ -74,7 +74,7 @@ export default function DataTable({ columns, data, onRowClick, emptyMessage = "N
                 `}
               >
                 {columns.map(col => (
-                  <td key={col.key} className="px-4 py-3 text-sm font-body text-white/80">
+                  <td key={col.key} className={`px-4 py-3 text-sm font-body text-white/80 ${rowClassName ? rowClassName(row) : ""}`}>
                     {col.render ? col.render(row[col.key], row) : (row[col.key] ?? "—")}
                   </td>
                 ))}
