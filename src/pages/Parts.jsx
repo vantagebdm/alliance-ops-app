@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Search, Filter, AlertTriangle, ChevronLeft, FileUp } from "lucide-react";
+import { Plus, Search, Filter, AlertTriangle, ChevronLeft, FileUp, FileBarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/ui/PageHeader";
@@ -11,12 +11,14 @@ import PartDetail from "../components/parts/PartDetail";
 import EquipmentTypeSelector, { EQUIPMENT_TYPES } from "../components/parts/EquipmentTypeSelector";
 import { PART_CATEGORIES, CATEGORY_COLORS, CATEGORY_LABEL } from "@/lib/categories";
 import QuoteImporter from "../components/parts/QuoteImporter";
+import CategoryReportModal from "../components/parts/CategoryReportModal";
 
 export default function Parts() {
   const [parts, setParts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [showImporter, setShowImporter] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [selected, setSelected] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
   const [search, setSearch] = useState("");
@@ -116,22 +118,26 @@ export default function Parts() {
           subtitle={`${parts.length} parts in catalogue`}
           actions={
             <div className="flex items-center gap-2">
+              <Button onClick={() => setShowReport(true)} variant="outline" className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10">
+                <FileBarChart className="w-4 h-4 mr-1" /> Category Report
+              </Button>
               <Button onClick={() => setShowImporter(true)} variant="outline" className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10">
                 <FileUp className="w-4 h-4 mr-1" /> Import Quote
               </Button>
               <Button onClick={() => setShowForm(true)} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
                 <Plus className="w-4 h-4 mr-1" /> Add Part
               </Button>
-            </div>
-          }
-        />
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
-          </div>
-        ) : (
-          <EquipmentTypeSelector onSelect={setEquipmentType} counts={equipmentCounts} />
-        )}
+              </div>
+              }
+              />
+              {loading ? (
+              <div className="flex justify-center py-16">
+              <div className="w-8 h-8 border-4 border-border border-t-primary rounded-full animate-spin" />
+              </div>
+              ) : (
+              <EquipmentTypeSelector onSelect={setEquipmentType} counts={equipmentCounts} />
+              )}
+              {showReport && <CategoryReportModal onClose={() => setShowReport(false)} />}
         {showForm && (
           <PartForm onClose={() => setShowForm(false)} onSaved={() => { setShowForm(false); load(); }} />
         )}
@@ -156,6 +162,9 @@ export default function Parts() {
               className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10"
             >
               <ChevronLeft className="w-4 h-4 mr-1" /> Change Type
+            </Button>
+            <Button onClick={() => setShowReport(true)} variant="outline" className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10">
+              <FileBarChart className="w-4 h-4 mr-1" /> Category Report
             </Button>
             <Button onClick={() => setShowImporter(true)} variant="outline" className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10">
               <FileUp className="w-4 h-4 mr-1" /> Import Quote
@@ -231,6 +240,8 @@ export default function Parts() {
       {showImporter && (
         <QuoteImporter onClose={() => setShowImporter(false)} onSaved={() => { setShowImporter(false); load(); }} />
       )}
+
+      {showReport && <CategoryReportModal onClose={() => setShowReport(false)} />}
 
       {selected && !editTarget && (
         <PartDetail
