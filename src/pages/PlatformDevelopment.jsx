@@ -75,7 +75,7 @@ export default function PlatformDevelopment() {
       key: "comments", label: "Discussion",
       render: (v, row) => (
         <div className="flex items-center gap-1.5">
-          {row.has_unread_comments && (
+          {row.has_unread_comments && row.status !== "resolved" && row.status !== "closed" && (
             <span className="inline-flex items-center justify-center" title="New comment">
               <Bell className="w-3.5 h-3.5 text-red-500 animate-bounce" fill="currentColor" />
             </span>
@@ -176,15 +176,11 @@ export default function PlatformDevelopment() {
             onRowClick={setSelected}
             emptyMessage="No requests found."
             rowClassName={(row) => {
-              if (!row.has_unread_comments) return "";
               const colors = {
                 open: "border-red-500 bg-red-500/5",
-                in_progress: "border-amber-500 bg-amber-500/5",
-                awaiting_response: "border-orange-500 bg-orange-500/5",
                 resolved: "border-green-500 bg-green-500/5",
-                closed: "border-gray-500 bg-gray-500/5",
               };
-              const c = colors[row.status] || colors.open;
+              const c = colors[row.status] || "border-orange-500 bg-orange-500/5";
               return `${c} border-y-2 [&:first-child]:border-l-2 [&:last-child]:border-r-2`;
             }}
           />
