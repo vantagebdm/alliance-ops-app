@@ -179,6 +179,7 @@ export default function PlatformDevelopment() {
               const colors = {
                 open: "border-red-500 bg-red-500/5",
                 resolved: "border-green-500 bg-green-500/5",
+                closed: "border-gray-500 bg-gray-500/5",
               };
               const c = colors[row.status] || "border-orange-500 bg-orange-500/5";
               return `${c} border-y-2 [&:first-child]:border-l-2 [&:last-child]:border-r-2`;
