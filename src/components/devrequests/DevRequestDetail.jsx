@@ -129,7 +129,9 @@ export default function DevRequestDetail({ request, user, onClose, onUpdated, on
   // Mark comments as read when the detail is opened
   useEffect(() => {
     if (request.has_unread_comments) {
-      base44.entities.DevRequest.update(request.id, { has_unread_comments: false }).catch(() => {});
+      base44.entities.DevRequest.update(request.id, { has_unread_comments: false })
+        .then(() => onUpdated({ ...request, has_unread_comments: false }))
+        .catch(() => {});
     }
   }, [request.id]);
 
@@ -138,8 +140,12 @@ export default function DevRequestDetail({ request, user, onClose, onUpdated, on
     setStatusSaving(true);
     setError("");
     try {
-      await base44.entities.DevRequest.update(request.id, { status: newStatus });
-      onUpdated({ ...request, status: newStatus });
+      const updates = { status: newStatus };
+      if (newStatus === "resolved" || newStatus === "closed") {
+        updates.has_unread_comments = false;
+      }
+      await base44.entities.DevRequest.update(request.id, updates);
+      onUpdated({ ...request, ...updates });
     } catch (err) {
       setError(`Failed to update status: ${err.message}`);
     }
