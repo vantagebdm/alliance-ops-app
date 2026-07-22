@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Filter, Eye, Loader2, Code2 } from "lucide-react";
+import { Plus, Filter, Eye, Loader2, Code2, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import PageHeader from "@/components/ui/PageHeader";
 import DataTable from "@/components/ui/DataTable";
@@ -73,7 +73,16 @@ export default function PlatformDevelopment() {
     },
     {
       key: "comments", label: "Discussion",
-      render: (v) => <span className="text-white/40 text-xs">{(v || []).length} comments</span>
+      render: (v, row) => (
+        <div className="flex items-center gap-1.5">
+          {row.has_unread_comments && (
+            <span className="inline-flex items-center justify-center" title="New comment">
+              <Bell className="w-3.5 h-3.5 text-red-500 animate-bounce" fill="currentColor" />
+            </span>
+          )}
+          <span className="text-white/40 text-xs">{(v || []).length} comments</span>
+        </div>
+      )
     },
     {
       key: "id", label: "",

@@ -3,7 +3,7 @@ import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { X, Edit3, Send, FileText, ImageIcon, CheckCircle2, HelpCircle, MessageCircle, Loader2, Upload, Clipboard } from "lucide-react";
+import { X, Edit3, Send, FileText, ImageIcon, CheckCircle2, HelpCircle, MessageCircle, Loader2, Upload, Clipboard, Bell } from "lucide-react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import moment from "moment";
 
@@ -117,14 +117,21 @@ export default function DevRequestDetail({ request, user, onClose, onUpdated, on
         content: commentText.trim(),
       };
       const updatedComments = [...(request.comments || []), newComment];
-      await base44.entities.DevRequest.update(request.id, { comments: updatedComments });
+      await base44.entities.DevRequest.update(request.id, { comments: updatedComments, has_unread_comments: true });
       setCommentText("");
-      onUpdated({ ...request, comments: updatedComments });
+      onUpdated({ ...request, comments: updatedComments, has_unread_comments: true });
     } catch (err) {
       setError(`Failed to post comment: ${err.message}`);
     }
     setPosting(false);
   };
+
+  // Mark comments as read when the detail is opened
+  useEffect(() => {
+    if (request.has_unread_comments) {
+      base44.entities.DevRequest.update(request.id, { has_unread_comments: false }).catch(() => {});
+    }
+  }, [request.id]);
 
   const changeStatus = async (newStatus) => {
     if (statusSaving || newStatus === request.status) return;
@@ -304,8 +311,14 @@ export default function DevRequestDetail({ request, user, onClose, onUpdated, on
 
           {/* Comments / Questions / Answers */}
           <div>
-            <p className="text-xs text-primary font-heading uppercase tracking-widest mb-3 pb-1 border-b border-border">
+            <p className="text-xs text-primary font-heading uppercase tracking-widest mb-3 pb-1 border-b border-border flex items-center gap-2">
               Discussion ({(request.comments || []).length})
+              {request.has_unread_comments && (
+                <span className="inline-flex items-center gap-1 text-red-500">
+                  <Bell className="w-4 h-4 animate-bounce" fill="currentColor" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">New Comment</span>
+                </span>
+              )}
             </p>
 
             {/* Existing comments */}

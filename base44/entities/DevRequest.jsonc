@@ -124,6 +124,11 @@
         }
       }
     },
+    "has_unread_comments": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when a new comment has been added and not yet viewed"
+    },
     "assigned_to": {
       "type": "string"
     }
