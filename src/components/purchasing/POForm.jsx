@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, Fragment } from "react";
 import { base44 } from "@/api/base44Client";
-import { X, Plus, Trash2 } from "lucide-react";
+import { X, Plus, Trash2, Building2, Tag, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -10,7 +10,7 @@ import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 
-const newLine = () => ({ part_number: "", description: "", supplier_sku: "", quantity: 1, unit_cost: 0, total: 0 });
+const newLine = () => ({ part_number: "", description: "", supplier_sku: "", quantity: 1, unit_cost: 0, total: 0, company_note: "", line_reference: "" });
 
 export default function POForm({ onClose, onSaved, initial }) {
   const [form, setForm] = useState({
@@ -35,8 +35,18 @@ export default function POForm({ onClose, onSaved, initial }) {
 
   // Track which line's autocomplete is active to sync state
   const [activeLineIndex, setActiveLineIndex] = useState(null);
+  // Track which lines have expanded note/reference fields
+  const [expandedLines, setExpandedLines] = useState(new Set());
 
   const u = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const toggleExpand = (i) => {
+    setExpandedLines(prev => {
+      const next = new Set(prev);
+      if (next.has(i)) next.delete(i); else next.add(i);
+      return next;
+    });
+  };
 
   const updateLine = (i, k, v) => {
     const items = form.items.map((line, idx) => {
@@ -204,16 +214,18 @@ export default function POForm({ onClose, onSaved, initial }) {
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-24 border-r border-border">Qty</th>
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-24 border-r border-border">Unit Cost</th>
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-24">Total</th>
+                     <th className="w-20 border-l border-border" />
                      <th className="w-10" />
                   </tr>
                </thead>
                <tbody>
                  {form.items.map((line, i) => (
-                     <tr key={i} className="border-b border-border/50">
+                   <Fragment key={i}>
+                     <tr className="border-b border-border/50">
                        <td className="px-4 py-1 w-48 border-r border-border/50">
-                        <PartAutocomplete 
+                        <PartAutocomplete
                           value={line.supplier_sku || line.part_number}
-                          onSelect={(part) => { 
+                          onSelect={(part) => {
                             const items = form.items.map((line, idx) => {
                               if (idx !== i) return line;
                               const updated = {
@@ -236,11 +248,11 @@ export default function POForm({ onClose, onSaved, initial }) {
                         />
                       </td>
                       <td className="px-4 py-1 flex-1 border-r border-border/50">
-                         <input 
-                           value={line.description || ""} 
+                         <input
+                           value={line.description || ""}
                            onChange={e => updateLine(i, "description", e.target.value)}
-                           placeholder="Description" 
-                           className="h-7 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors" 
+                           placeholder="Description"
+                           className="h-7 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring transition-colors"
                          />
                        </td>
                       <td className="px-4 py-1 w-24 border-r border-border/50">
@@ -252,12 +264,70 @@ export default function POForm({ onClose, onSaved, initial }) {
                           className="rounded-sm h-7 text-xs text-right" />
                       </td>
                       <td className="px-4 py-1 w-24 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
+                      <td className="px-1 py-1 w-20 border-l border-border/50">
+                        <div className="flex items-center justify-center gap-0.5">
+                          <button
+                            type="button"
+                            onClick={() => toggleExpand(i)}
+                            title="Company note"
+                            className={`p-1 rounded-sm transition-colors ${line.company_note ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                          >
+                            <Building2 className="w-3 h-3" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => toggleExpand(i)}
+                            title="Reference"
+                            className={`p-1 rounded-sm transition-colors ${line.line_reference ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
+                          >
+                            <Tag className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </td>
                       <td className="px-2 py-1 w-10 flex items-center justify-center">
                         <button onClick={() => removeLine(i)} className="text-muted-foreground hover:text-red-500 p-0.5">
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </td>
                     </tr>
+                    {expandedLines.has(i) && (
+                      <tr className="border-b border-border/50 bg-[hsl(0,0%,9%)]">
+                        <td colSpan={7} className="px-4 py-2">
+                          <div className="flex gap-3 items-end">
+                            <div className="flex-1">
+                              <label className="font-heading text-[9px] uppercase tracking-wider text-foreground/50 mb-1 flex items-center gap-1">
+                                <Building2 className="w-3 h-3" /> Company Note
+                              </label>
+                              <input
+                                value={line.company_note || ""}
+                                onChange={e => updateLine(i, "company_note", e.target.value)}
+                                placeholder="Company name purchasing for…"
+                                className="h-8 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <label className="font-heading text-[9px] uppercase tracking-wider text-foreground/50 mb-1 flex items-center gap-1">
+                                <Tag className="w-3 h-3" /> Reference
+                              </label>
+                              <input
+                                value={line.line_reference || ""}
+                                onChange={e => updateLine(i, "line_reference", e.target.value)}
+                                placeholder="PO, invoice number, or client ID…"
+                                className="h-8 text-xs w-full bg-[hsl(0,0%,10%)] border border-input rounded-sm px-2 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                              />
+                            </div>
+                            <button
+                              onClick={() => toggleExpand(i)}
+                              className="text-muted-foreground hover:text-foreground p-2 rounded-sm hover:bg-muted"
+                              title="Collapse"
+                            >
+                              <ChevronUp className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                   </Fragment>
                   ))}
                </tbody>
              </table>

@@ -74,6 +74,8 @@ export default function ReceiveStockForm({ onClose, onSaved, initialPO }) {
       part_number: item.part_number || "",
       description: item.description || "",
       supplier_part_number: "",
+      company_note: item.company_note || "",
+      line_reference: item.line_reference || "",
       ordered_qty: item.quantity || 0,
       previously_received_qty: 0,
       outstanding_qty: item.quantity || 0,

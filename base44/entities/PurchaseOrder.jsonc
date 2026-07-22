@@ -42,6 +42,14 @@
           },
           "total": {
             "type": "number"
+          },
+          "company_note": {
+            "type": "string",
+            "description": "Company name the part is being purchased for"
+          },
+          "line_reference": {
+            "type": "string",
+            "description": "PO, invoice number, or client ID for receipting context"
           }
         }
       }

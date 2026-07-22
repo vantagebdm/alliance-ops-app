@@ -149,6 +149,20 @@ export default function ReceiptLines({ lines, onChange, defaultWarehouse }) {
                   <td className="px-2 py-2">
                     <div className="truncate text-[11px]">{line.description}</div>
                     {line.supplier_part_number && <div className="text-muted-foreground text-[9px] truncate">Sup: {line.supplier_part_number}</div>}
+                    {(line.company_note || line.line_reference) && (
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {line.company_note && (
+                          <span className="inline-flex items-center gap-0.5 bg-primary/10 text-primary text-[8px] font-heading uppercase tracking-wide px-1 py-0.5 rounded-sm">
+                            {line.company_note}
+                          </span>
+                        )}
+                        {line.line_reference && (
+                          <span className="inline-flex items-center gap-0.5 bg-blue-500/10 text-blue-400 text-[8px] font-heading uppercase tracking-wide px-1 py-0.5 rounded-sm">
+                            Ref: {line.line_reference}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </td>
                   <td className="px-2 py-2 text-center">{line.ordered_qty || 0}</td>
                   <td className="px-2 py-2 text-center text-muted-foreground">{line.previously_received_qty || 0}</td>
