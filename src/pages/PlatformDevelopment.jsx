@@ -7,6 +7,7 @@ import DataTable from "@/components/ui/DataTable";
 import StatusBadge from "@/components/ui/StatusBadge";
 import DevRequestForm from "@/components/devrequests/DevRequestForm";
 import DevRequestDetail from "@/components/devrequests/DevRequestDetail";
+import BDMRolloutsPortal from "@/components/devrequests/BDMRolloutsPortal";
 import moment from "moment";
 
 const REQUEST_TYPE_LABELS = {
@@ -26,6 +27,7 @@ export default function PlatformDevelopment() {
   const [selected, setSelected] = useState(null);
   const [editTarget, setEditTarget] = useState(null);
   const [user, setUser] = useState(null);
+  const [portal, setPortal] = useState("dev");
 
   const load = async () => {
     setLoading(true);
@@ -123,68 +125,94 @@ export default function PlatformDevelopment() {
         }
       />
       <div className="p-6 space-y-4">
-        {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div className="bg-card border border-border rounded-lg p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Requests</p>
-            <p className="text-2xl font-heading font-bold text-foreground mt-1">{requests.length}</p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Active</p>
-            <p className="text-2xl font-heading font-bold text-primary mt-1">{openCount}</p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Resolved</p>
-            <p className="text-2xl font-heading font-bold text-green-400 mt-1">{requests.filter(r => r.status === "resolved").length}</p>
-          </div>
-          <div className="bg-card border border-border rounded-lg p-4">
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Issues / Bugs</p>
-            <p className="text-2xl font-heading font-bold text-red-400 mt-1">{requests.filter(r => r.is_issue).length}</p>
-          </div>
+        {/* Portal Tabs */}
+        <div className="flex items-center gap-2 border-b border-border pb-3">
+          <button
+            onClick={() => setPortal("dev")}
+            className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
+              portal === "dev" ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
+            }`}
+          >
+            Platform Development
+          </button>
+          <button
+            onClick={() => setPortal("bdm")}
+            className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
+              portal === "bdm" ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
+            }`}
+          >
+            BDM Rollouts &amp; Deliverables
+          </button>
         </div>
 
-        {/* Filters */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <Filter className="w-4 h-4 text-muted-foreground" />
-          {FILTERS.map(f => (
-            <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
-                filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
-
-        {loading ? (
-          <div className="flex justify-center py-16">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="bg-card border border-border rounded-lg p-12 text-center">
-            <Code2 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-            <p className="text-muted-foreground">No development requests yet.</p>
-            <p className="text-xs text-muted-foreground mt-1">Click "New Request" to submit your first request.</p>
-          </div>
+        {portal === "bdm" ? (
+          <BDMRolloutsPortal />
         ) : (
-          <DataTable
-            columns={columns}
-            data={filtered}
-            onRowClick={setSelected}
-            emptyMessage="No requests found."
-            rowClassName={(row) => {
-              const colors = {
-                open: "border-red-500 bg-red-500/5",
-                resolved: "border-green-500 bg-green-500/5",
-                closed: "border-gray-500 bg-gray-500/5",
-              };
-              const c = colors[row.status] || "border-orange-500 bg-orange-500/5";
-              return `${c} border-y-2 [&:first-child]:border-l-2 [&:last-child]:border-r-2`;
-            }}
-          />
+          <div className="space-y-4">
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="bg-card border border-border rounded-lg p-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Total Requests</p>
+                <p className="text-2xl font-heading font-bold text-foreground mt-1">{requests.length}</p>
+              </div>
+              <div className="bg-card border border-border rounded-lg p-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Active</p>
+                <p className="text-2xl font-heading font-bold text-primary mt-1">{openCount}</p>
+              </div>
+              <div className="bg-card border border-border rounded-lg p-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Resolved</p>
+                <p className="text-2xl font-heading font-bold text-green-400 mt-1">{requests.filter(r => r.status === "resolved").length}</p>
+              </div>
+              <div className="bg-card border border-border rounded-lg p-4">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Issues / Bugs</p>
+                <p className="text-2xl font-heading font-bold text-red-400 mt-1">{requests.filter(r => r.is_issue).length}</p>
+              </div>
+            </div>
+
+            {/* Filters */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Filter className="w-4 h-4 text-muted-foreground" />
+              {FILTERS.map(f => (
+                <button
+                  key={f.value}
+                  onClick={() => setFilter(f.value)}
+                  className={`px-3 py-1.5 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
+                    filter === f.value ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+
+            {loading ? (
+              <div className="flex justify-center py-16">
+                <Loader2 className="w-8 h-8 text-primary animate-spin" />
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="bg-card border border-border rounded-lg p-12 text-center">
+                <Code2 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground">No development requests yet.</p>
+                <p className="text-xs text-muted-foreground mt-1">Click "New Request" to submit your first request.</p>
+              </div>
+            ) : (
+              <DataTable
+                columns={columns}
+                data={filtered}
+                onRowClick={setSelected}
+                emptyMessage="No requests found."
+                rowClassName={(row) => {
+                  const colors = {
+                    open: "border-red-500 bg-red-500/5",
+                    resolved: "border-green-500 bg-green-500/5",
+                    closed: "border-gray-500 bg-gray-500/5",
+                  };
+                  const c = colors[row.status] || "border-orange-500 bg-orange-500/5";
+                  return `${c} border-y-2 [&:first-child]:border-l-2 [&:last-child]:border-r-2`;
+                }}
+              />
+            )}
+          </div>
         )}
       </div>
 
