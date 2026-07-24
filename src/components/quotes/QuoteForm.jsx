@@ -63,16 +63,29 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
 
   const save = async () => {
     setSaving(true);
-    const data = { ...form };
-    if (!data.quote_number) data.quote_number = await generateDocNumber("quote");
-    if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
-    if (initial?.id) {
-      await base44.entities.Quote.update(initial.id, data);
-    } else {
-      await base44.entities.Quote.create(data);
+    try {
+      const data = {
+        ...form,
+        valid_until: form.valid_until || undefined,
+        items: form.items.map(l => ({
+          ...l,
+          eta_days: l.eta_days === "" ? undefined : l.eta_days,
+          quantity: Number(l.quantity) || 0,
+          unit_price: Number(l.unit_price) || 0,
+          total: Number(l.total) || 0,
+        })),
+      };
+      if (!data.quote_number) data.quote_number = await generateDocNumber("quote");
+      if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
+      if (initial?.id) {
+        await base44.entities.Quote.update(initial.id, data);
+      } else {
+        await base44.entities.Quote.create(data);
+      }
+      onSaved();
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    onSaved();
   };
 
   return (
