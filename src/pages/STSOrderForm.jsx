@@ -159,6 +159,7 @@ function OrderConfirmation({ order }) {
     row('VIN / Serial Number', order.vin_serial);
     row('Make', order.make);
     row('Model', order.model);
+    row('Year Model', order.year_model);
     row('Client / Owner', order.client_owner);
 
     y += 4;
@@ -243,6 +244,7 @@ function OrderConfirmation({ order }) {
               { label: 'VIN / Serial', value: order.vin_serial },
               { label: 'Make', value: order.make },
               { label: 'Model', value: order.model },
+              { label: 'Year Model', value: order.year_model },
               { label: 'Client / Owner', value: order.client_owner, span: true },
             ].filter(f => f.value).map((f, i) => (
               <div key={i} className={f.span ? 'col-span-2 md:col-span-3' : ''}>
@@ -323,6 +325,7 @@ export default function STSOrderForm() {
     vin_serial: '',
     make: '',
     model: '',
+    year_model: '',
     client_owner: '',
   });
 
@@ -443,6 +446,9 @@ export default function STSOrderForm() {
               </Field>
               <Field label="Model">
                 <Input value={form.model} onChange={e => set('model', e.target.value)} placeholder="e.g. 320D" />
+              </Field>
+              <Field label="Year Model">
+                <Input value={form.year_model} onChange={e => set('year_model', e.target.value)} placeholder="e.g. 2018" />
               </Field>
               <Field label="Registration (Rego)">
                 <Input value={form.rego} onChange={e => set('rego', e.target.value)} placeholder="e.g. 1ABC234" />

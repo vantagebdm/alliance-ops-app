@@ -5,7 +5,7 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const {
       name, company, job_number, po_inv_number, urgency,
-      asset_type, fleet_number, rego, vin_serial, make, model, client_owner,
+      asset_type, fleet_number, rego, vin_serial, make, model, year_model, client_owner,
       lines, image_urls, acknowledged
     } = body;
 
@@ -35,6 +35,7 @@ Deno.serve(async (req) => {
       vin_serial ? `VIN/Serial: ${vin_serial}` : null,
       make ? `Make: ${make}` : null,
       model ? `Model: ${model}` : null,
+      year_model ? `Year Model: ${year_model}` : null,
       client_owner ? `Client/Owner: ${client_owner}` : null,
     ].filter(Boolean).join('\n');
 
@@ -59,6 +60,7 @@ Deno.serve(async (req) => {
       asset_fleet_number: fleet_number || '',
       asset_make: make || '',
       asset_model: model || '',
+      year_model: year_model || '',
       client_owner: client_owner || '',
       reference: po_inv_number || '',
       order_source: 'sts_portal',
@@ -72,7 +74,7 @@ Deno.serve(async (req) => {
       order_id: order.id,
       submitted_at: now.toISOString(),
       name, company, job_number, po_inv_number, urgency,
-      asset_type, fleet_number, rego, vin_serial, make, model, client_owner,
+      asset_type, fleet_number, rego, vin_serial, make, model, year_model, client_owner,
       lines: lines?.filter(l => l.description?.trim()),
       image_urls: image_urls || [],
     });

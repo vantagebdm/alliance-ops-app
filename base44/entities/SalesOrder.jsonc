@@ -136,6 +136,10 @@
       "type": "string",
       "description": "Asset model"
     },
+    "year_model": {
+      "type": "string",
+      "description": "Asset year model"
+    },
     "client_owner": {
       "type": "string",
       "description": "Client or owner of the asset"
