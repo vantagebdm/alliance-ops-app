@@ -4,13 +4,16 @@ import { base44 } from "@/api/base44Client";
 import { Wrench } from "lucide-react";
 
 export default function PartAutocomplete({ value, onSelect, onChange, placeholder, className }) {
-  const [suggestions, setSuggestions] = useState([]);
+  const [allSuggestions, setAllSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [displayValue, setDisplayValue] = useState("");
   const [serviceMode, setServiceMode] = useState(false);
   const inputRef = useRef(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
+
+  // In service mode show all matches (full search); normal mode caps at 6
+  const suggestions = serviceMode ? allSuggestions : allSuggestions.slice(0, 6);
 
   useEffect(() => {
     if (open && inputRef.current) {
@@ -29,7 +32,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
     onChange(val);
     
     if (!val || val.length < 1) {
-      setSuggestions([]);
+      setAllSuggestions([]);
       setOpen(false);
       return;
     }
@@ -47,10 +50,10 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
         String(item.name || "").toLowerCase().includes(val.toLowerCase()) ||
         String(item.brand || "").toLowerCase().includes(val.toLowerCase())
       );
-      setSuggestions(filtered.slice(0, 6));
+      setAllSuggestions(filtered);
       setOpen(filtered.length > 0);
     } catch (e) {
-      setSuggestions([]);
+      setAllSuggestions([]);
       setOpen(false);
     }
     setLoading(false);
@@ -59,12 +62,12 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   const handleSelect = (item) => {
     onSelect(item);
     setDisplayValue(item.app_part_number || item.part_number || "");
-    setSuggestions([]);
+    setAllSuggestions([]);
     setOpen(false);
   };
 
   const handleDismiss = () => {
-    setSuggestions([]);
+    setAllSuggestions([]);
     setOpen(false);
     setServiceMode(false);
   };
@@ -79,7 +82,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
         onFocus={() => {
           if (!value) {
             base44.entities.Part.list(null, 500).then(results => {
-              setSuggestions(results.slice(0, 6));
+              setAllSuggestions(results);
               setOpen(true);
             });
           }

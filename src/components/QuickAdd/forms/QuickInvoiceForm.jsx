@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Autocomplete from "@/components/ui/Autocomplete";
+import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
@@ -617,18 +618,14 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
                           {line._charge ? (
                             <span className="text-[10px] font-heading text-blue-400 uppercase tracking-wider">{line._charge}</span>
                           ) : (
-                            <Autocomplete
+                            <PartAutocomplete
                               value={line.part_number}
-                              suggestions={partAC.suggestions}
-                              open={partAC.open}
-                              loading={partAC.loading}
-                              onInputChange={(val) => { updateLine(i, "part_number", val); partAC.handleInputChange(val); }}
-                              onSelect={(item) => {
-                                const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: item.part_number, description: item.name, unit_price: item.sell_price || 0, total: (l.quantity || 1) * (item.sell_price || 0) } : l);
+                              onSelect={(part) => {
+                                const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: part.part_number, description: part.description || part.name || "", unit_price: part.sell_price || 0, total: (l.quantity || 1) * (part.sell_price || 0) } : l);
                                 recalc(items);
-                                partAC.handleSelectSuggestion(item);
                               }}
-                              placeholder="SKU"
+                              onChange={(val) => updateLine(i, "part_number", val)}
+                              placeholder="Part #"
                               className="rounded-sm text-sm"
                             />
                           )}
