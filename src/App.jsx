@@ -37,6 +37,7 @@ import { PermissionProvider } from '@/lib/PermissionContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import STSOrderForm from './pages/STSOrderForm';
 import PartsQuoteRequest from './pages/PartsQuoteRequest';
+import SupplierApplicationForm from './pages/SupplierApplicationForm';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -116,6 +117,7 @@ function App() {
               <Routes>
                 <Route path="/workshop-parts-order" element={<STSOrderForm />} />
                 <Route path="/parts-quote-request" element={<PartsQuoteRequest />} />
+                <Route path="/supplier-application" element={<SupplierApplicationForm />} />
                 <Route path="*" element={<AuthenticatedApp />} />
               </Routes>
             </Router>

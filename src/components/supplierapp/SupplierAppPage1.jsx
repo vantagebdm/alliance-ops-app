@@ -26,21 +26,21 @@ const SectionTitle = ({ children }) => (
   </div>
 );
 
-export default function SupplierAppPage1() {
+export default function SupplierAppPage1({ logoUrl }) {
   const coName = "Alliance Priority Parts Pty. Ltd.";
   const coAbn = "33 697 061 279";
   const coAcn = "697 061 279";
   const coAddr = "3873 Pemberton Way, Karratha Industrial Estate WA 6714";
   const coEmail = "accounts@alliancepartsgroup.com.au";
   const coWeb = "www.alliancepartsgroup.com.au";
-  const logoUrl = "https://media.base44.com/images/public/69dccee2e4380f803487afa5/d6f3ce989_image.png";
+  const imgSrc = logoUrl || "https://media.base44.com/images/public/69dccee2e4380f803487afa5/d6f3ce989_image.png";
 
   return (
     <div className="pdf-page" style={{ width: 794, background: "white", padding: "28px 36px 28px 36px", fontFamily: "Arial, sans-serif", boxSizing: "border-box" }}>
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 14 }}>
         <div>
-          <img src={logoUrl} alt="APP Logo" style={{ height: 64, objectFit: "contain" }} crossOrigin="anonymous" />
+          <img src={imgSrc} alt="APP Logo" style={{ height: 64, objectFit: "contain" }} />
         </div>
         <div style={{ textAlign: "right", fontSize: 9.5, lineHeight: 1.6, color: GREY_DARK }}>
           <strong style={{ fontSize: 11 }}>{coName}</strong><br />

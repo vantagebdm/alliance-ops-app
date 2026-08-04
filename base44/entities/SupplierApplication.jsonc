@@ -1,0 +1,320 @@
+{
+  "name": "SupplierApplication",
+  "type": "object",
+  "properties": {
+    "application_number": {
+      "type": "string",
+      "description": "Auto-generated reference e.g. SA-2026-001"
+    },
+    "submitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "submitted",
+        "matched",
+        "confirmed",
+        "applied",
+        "rejected"
+      ],
+      "default": "submitted"
+    },
+    "matched_supplier_id": {
+      "type": "string"
+    },
+    "matched_supplier_name": {
+      "type": "string"
+    },
+    "supplier_type": {
+      "type": "string",
+      "enum": [
+        "sole_trader",
+        "partnership",
+        "company",
+        "trust",
+        "other"
+      ],
+      "default": "company"
+    },
+    "name": {
+      "type": "string",
+      "description": "Full legal / company name"
+    },
+    "trading_name": {
+      "type": "string"
+    },
+    "abn": {
+      "type": "string"
+    },
+    "acn": {
+      "type": "string"
+    },
+    "date_established": {
+      "type": "string"
+    },
+    "nature_of_business": {
+      "type": "string"
+    },
+    "address": {
+      "type": "string"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "postcode": {
+      "type": "string"
+    },
+    "country": {
+      "type": "string",
+      "default": "Australia"
+    },
+    "warehouse_address": {
+      "type": "string"
+    },
+    "warehouse_city": {
+      "type": "string"
+    },
+    "warehouse_state": {
+      "type": "string"
+    },
+    "warehouse_postcode": {
+      "type": "string"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "contact_person": {
+      "type": "string"
+    },
+    "contact_position": {
+      "type": "string"
+    },
+    "contact_phone": {
+      "type": "string"
+    },
+    "contact_mobile": {
+      "type": "string"
+    },
+    "contact_email": {
+      "type": "string"
+    },
+    "accounts_contact_name": {
+      "type": "string"
+    },
+    "accounts_phone": {
+      "type": "string"
+    },
+    "accounts_email": {
+      "type": "string"
+    },
+    "statement_email": {
+      "type": "string"
+    },
+    "invoice_email": {
+      "type": "string"
+    },
+    "returns_email": {
+      "type": "string"
+    },
+    "additional_contacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "afterhours_contact": {
+      "type": "string"
+    },
+    "breakdown_contact": {
+      "type": "string"
+    },
+    "business_hours": {
+      "type": "string"
+    },
+    "sales_territory": {
+      "type": "string"
+    },
+    "payment_terms": {
+      "type": "string"
+    },
+    "credit_limit": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string",
+      "default": "AUD"
+    },
+    "gst_registered": {
+      "type": "boolean",
+      "default": true
+    },
+    "account_number": {
+      "type": "string"
+    },
+    "pricing_basis": {
+      "type": "string"
+    },
+    "accepts_credit_card": {
+      "type": "boolean",
+      "default": false
+    },
+    "card_surcharge": {
+      "type": "string"
+    },
+    "rebate_agreement": {
+      "type": "boolean",
+      "default": false
+    },
+    "volume_agreement": {
+      "type": "boolean",
+      "default": false
+    },
+    "discount_notes": {
+      "type": "string"
+    },
+    "special_contract_terms": {
+      "type": "string"
+    },
+    "bank_name": {
+      "type": "string"
+    },
+    "bank_account_name": {
+      "type": "string"
+    },
+    "bank_bsb": {
+      "type": "string"
+    },
+    "bank_account_number": {
+      "type": "string"
+    },
+    "purchase_method": {
+      "type": "string"
+    },
+    "orders_email": {
+      "type": "string"
+    },
+    "portal_url": {
+      "type": "string"
+    },
+    "portal_username": {
+      "type": "string"
+    },
+    "cutoff_time": {
+      "type": "string"
+    },
+    "lead_time_standard": {
+      "type": "number"
+    },
+    "lead_time_express": {
+      "type": "number"
+    },
+    "min_order_value": {
+      "type": "string"
+    },
+    "ships_karratha": {
+      "type": "boolean",
+      "default": false
+    },
+    "ships_pilbara": {
+      "type": "boolean",
+      "default": false
+    },
+    "emergency_supply": {
+      "type": "boolean",
+      "default": false
+    },
+    "price_file_available": {
+      "type": "boolean",
+      "default": false
+    },
+    "freight_account_option": {
+      "type": "string"
+    },
+    "freight_notes": {
+      "type": "string"
+    },
+    "returns_accepted": {
+      "type": "boolean",
+      "default": false
+    },
+    "rma_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "core_exchange": {
+      "type": "boolean",
+      "default": false
+    },
+    "return_window": {
+      "type": "string"
+    },
+    "restocking_fee": {
+      "type": "string"
+    },
+    "returns_contact": {
+      "type": "string"
+    },
+    "warranty_claim_notes": {
+      "type": "string"
+    },
+    "dangerous_goods_notes": {
+      "type": "string"
+    },
+    "categories_supplied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "brands_supplied": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "oem_aftermarket": {
+      "type": "string"
+    },
+    "pricing_notes": {
+      "type": "string"
+    },
+    "declaration_name": {
+      "type": "string"
+    },
+    "declaration_position": {
+      "type": "string"
+    },
+    "declaration_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Search, Star, Filter, X, FileText } from "lucide-react";
+import { Plus, Search, Star, Filter, X, FileText, Link2, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 import PageHeader from "@/components/ui/PageHeader";
 import StatusBadge from "@/components/ui/StatusBadge";
 import SupplierOnboardingForm from "../components/suppliers/SupplierOnboardingForm";
 import SupplierDetail from "../components/suppliers/SupplierDetail";
 import POForm from "../components/purchasing/POForm";
 import SupplierAppPreview from "../components/supplierapp/SupplierAppPreview";
+import SupplierApplicationReview from "../components/suppliers/SupplierApplicationReview";
 
 function StarRating({ value }) {
   if (!value) return <span className="text-white/30 text-xs">—</span>;
@@ -34,11 +36,19 @@ export default function Suppliers() {
   const [showPOForm, setShowPOForm] = useState(false);
   const [poInitial, setPoInitial] = useState(null);
   const [showSupplierApp, setShowSupplierApp] = useState(false);
+  const [applications, setApplications] = useState([]);
+  const [showReview, setShowReview] = useState(false);
+  const [appliedAppId, setAppliedAppId] = useState(null);
+  const { toast } = useToast();
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.Supplier.list("-created_date", 200);
+    const [data, apps] = await Promise.all([
+      base44.entities.Supplier.list("-created_date", 200),
+      base44.entities.SupplierApplication.filter({ status: { $in: ["submitted", "matched"] } }, "-submitted_at", 100),
+    ]);
     setSuppliers(data);
+    setApplications(apps || []);
     setLoading(false);
   };
 
@@ -60,11 +70,28 @@ export default function Suppliers() {
   const handleSaved = (saved) => {
     setShowForm(false);
     setEditTarget(null);
+    if (appliedAppId) {
+      base44.entities.SupplierApplication.update(appliedAppId, { status: "applied" }).catch(() => {});
+      setAppliedAppId(null);
+    }
     load().then(() => {
       if (saved?.id) {
         setSelected(saved);
       }
     });
+  };
+
+  const handleConfirmApplication = (app, prefill) => {
+    setShowReview(false);
+    setAppliedAppId(app.id);
+    setEditTarget(prefill);
+    setShowForm(true);
+  };
+
+  const copyFormLink = () => {
+    const url = `${window.location.origin}/supplier-application`;
+    navigator.clipboard?.writeText(url);
+    toast({ title: "Link copied", description: "Supplier application form link copied to clipboard." });
   };
 
   const handleEdit = () => {
@@ -90,9 +117,13 @@ export default function Suppliers() {
         subtitle={`${suppliers.length} suppliers registered`}
         actions={
           <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={copyFormLink}
+              className="font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
+              <Link2 className="w-4 h-4 mr-1" /> Online Form Link
+            </Button>
             <Button variant="outline" onClick={() => setShowSupplierApp(true)}
               className="font-heading font-semibold uppercase text-xs tracking-wider rounded-sm">
-              <FileText className="w-4 h-4 mr-1" /> Supplier Application Form
+              <FileText className="w-4 h-4 mr-1" /> Application PDF
             </Button>
             <Button onClick={() => { setEditTarget(null); setShowForm(true); }}
               className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
@@ -101,6 +132,29 @@ export default function Suppliers() {
           </div>
         }
       />
+
+      {applications.length > 0 && (
+        <div className="px-6">
+          <button onClick={() => setShowReview(true)}
+            className="w-full flex items-center justify-between gap-3 p-3 rounded-sm border border-primary/40 bg-primary/10 hover:bg-primary/15 transition-colors text-left">
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <Bell className="w-5 h-5 text-primary" />
+              <span className="absolute -top-1.5 -right-1.5 bg-primary text-black text-[9px] font-bold rounded-full w-4 h-4 flex items-center justify-center font-heading">{applications.length}</span>
+            </div>
+            <div>
+              <div className="font-heading text-xs uppercase tracking-wider text-primary font-bold">
+                {applications.length} Supplier Application{applications.length !== 1 ? "s" : ""} Pending
+              </div>
+              <div className="text-[11px] text-white/50">
+                {applications.filter(a => a.status === "matched").length} matched to On Hold accounts · {applications.filter(a => a.status !== "matched").length} awaiting setup
+              </div>
+            </div>
+          </div>
+          <span className="font-heading text-[10px] uppercase tracking-wider text-primary">Review →</span>
+          </button>
+        </div>
+      )}
 
       <div className="p-6 space-y-4">
         {/* Filters */}
@@ -228,6 +282,14 @@ export default function Suppliers() {
 
       {showSupplierApp && (
         <SupplierAppPreview onClose={() => setShowSupplierApp(false)} />
+      )}
+
+      {showReview && (
+        <SupplierApplicationReview
+          applications={applications}
+          onClose={() => setShowReview(false)}
+          onConfirm={handleConfirmApplication}
+        />
       )}
 
       {showPOForm && (
