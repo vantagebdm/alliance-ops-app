@@ -103,6 +103,7 @@ export default function SupplierApplicationForm() {
     if (!form.phone.trim()) e.phone = "Required";
     if (!form.email.trim()) e.email = "Required";
     if (!form.declaration_name.trim()) e.declaration_name = "Authorised representative name required";
+    if (!form.declaration_date) e.declaration_date = "Declaration date required";
     return e;
   };
 
@@ -371,7 +372,7 @@ export default function SupplierApplicationForm() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Authorised Representative Name" required error={errors.declaration_name}><Input value={form.declaration_name} onChange={e => set("declaration_name", e.target.value)} /></Field>
               <Field label="Position"><Input value={form.declaration_position} onChange={e => set("declaration_position", e.target.value)} /></Field>
-              <Field label="Date"><Input type="date" value={form.declaration_date} onChange={e => set("declaration_date", e.target.value)} /></Field>
+              <Field label="Date" required error={errors.declaration_date}><Input type="date" value={form.declaration_date} onChange={e => set("declaration_date", e.target.value)} /></Field>
             </div>
           </Section>
 
