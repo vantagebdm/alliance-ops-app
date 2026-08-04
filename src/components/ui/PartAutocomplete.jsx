@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { base44 } from "@/api/base44Client";
 import { Wrench } from "lucide-react";
+import PartInfoPopover from "@/components/ui/PartInfoPopover";
 
 export default function PartAutocomplete({ value, onSelect, onChange, placeholder, className }) {
   const [allSuggestions, setAllSuggestions] = useState([]);
@@ -9,11 +10,26 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   const [loading, setLoading] = useState(false);
   const [displayValue, setDisplayValue] = useState("");
   const [serviceMode, setServiceMode] = useState(false);
+  const [selectedPart, setSelectedPart] = useState(null);
   const inputRef = useRef(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
 
   // In service mode show all matches (full search); normal mode caps at 6
   const suggestions = serviceMode ? allSuggestions : allSuggestions.slice(0, 6);
+
+  // Look up part details for cost/stock info when a value is present (e.g. editing existing line)
+  useEffect(() => {
+    if (!value || selectedPart) return;
+    let active = true;
+    base44.entities.Part.list(null, 500).then(results => {
+      if (!active) return;
+      const match = results.find(p =>
+        p.part_number === value || p.app_part_number === value || p.supplier_sku === value
+      );
+      if (match) setSelectedPart(match);
+    });
+    return () => { active = false; };
+  }, [value, selectedPart]);
 
   useEffect(() => {
     if (open && inputRef.current) {
@@ -61,6 +77,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
 
   const handleSelect = (item) => {
     onSelect(item);
+    setSelectedPart(item);
     setDisplayValue(item.app_part_number || item.part_number || "");
     setAllSuggestions([]);
     setOpen(false);
@@ -88,8 +105,9 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
           }
         }}
         placeholder={placeholder}
-        className={`flex h-9 w-full rounded-md border border-input bg-[hsl(0,0%,10%)] text-foreground px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 font-mono font-semibold ${className}`}
+        className={`flex h-9 w-full rounded-md border border-input bg-[hsl(0,0%,10%)] text-foreground px-3 py-1 text-base shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 font-mono font-semibold ${selectedPart ? "pr-8" : ""} ${className}`}
       />
+      <PartInfoPopover part={selectedPart} />
       {open && createPortal(
         <>
           <div
