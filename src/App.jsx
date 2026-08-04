@@ -117,7 +117,7 @@ function App() {
               <Routes>
                 <Route path="/workshop-parts-order" element={<STSOrderForm />} />
                 <Route path="/parts-quote-request" element={<PartsQuoteRequest />} />
-                <Route path="/supplier-application" element={<SupplierApplicationForm />} />
+                <Route path="/alliance-supplier-details" element={<SupplierApplicationForm />} />
                 <Route path="*" element={<AuthenticatedApp />} />
               </Routes>
             </Router>

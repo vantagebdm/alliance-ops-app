@@ -89,7 +89,7 @@ export default function Suppliers() {
   };
 
   const copyFormLink = () => {
-    const url = `${window.location.origin}/supplier-application`;
+    const url = `${window.location.origin}/alliance-supplier-details`;
     navigator.clipboard?.writeText(url);
     toast({ title: "Link copied", description: "Supplier application form link copied to clipboard." });
   };
