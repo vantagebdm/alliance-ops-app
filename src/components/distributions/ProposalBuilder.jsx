@@ -125,6 +125,9 @@ export default function ProposalBuilder({ supplierId, items, setItems, customer,
                   <td className="px-3 py-2">
                     <div className="text-white/90 text-xs">{it.description}</div>
                     <div className="text-white/40 text-[10px] font-mono">{it.supplier_sku} · {it.pack_size}</div>
+                    {it.per_unit != null && (
+                      <div className="text-primary/70 text-[10px]">{fmt(it.per_unit)} {it.unit_label} ex GST</div>
+                    )}
                   </td>
                   <td className="px-2 py-2 text-right">
                     <input

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import PageHeader from "@/components/ui/PageHeader";
 import DistributionCatalog from "@/components/distributions/DistributionCatalog";
 import ProposalBuilder from "@/components/distributions/ProposalBuilder";
-import { DISTRIBUTION_SUPPLIERS, packLitres } from "@/lib/distributionData";
+import { DISTRIBUTION_SUPPLIERS, productUnitPrice } from "@/lib/distributionData";
 
 export default function Distributions() {
   const [activeSupplier, setActiveSupplier] = useState("total_energies");
@@ -10,16 +10,17 @@ export default function Distributions() {
   const [customer, setCustomer] = useState({ name: "", company: "", email: "", title: "", notes: "" });
 
   const addToProposal = (product) => {
-    const litres = packLitres(product.pack_size);
-    const usePerLitre = product.unit_price != null && litres != null;
+    const pu = productUnitPrice(product);
     setItems((prev) => [
       ...prev,
       {
         supplier_sku: product.sku,
         description: `${product.product} (${product.family})`,
         pack_size: product.pack_size,
-        quantity: usePerLitre ? litres : 1,
-        unit_price: usePerLitre ? product.unit_price : product.list_price,
+        quantity: 1,
+        unit_price: product.list_price,
+        per_unit: pu.price,
+        unit_label: pu.label,
       },
     ]);
   };

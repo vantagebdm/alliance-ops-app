@@ -8,15 +8,26 @@ export const DISTRIBUTION_SUPPLIERS = [
   { id: "powercrank", name: "Powercrank", loaded: false },
 ];
 
-// Parse a pack size string into total litres (for oils). Returns null for by-weight packs (KG/G) or unknown.
-export function packLitres(pack_size) {
-  if (!pack_size) return null;
-  const s = String(pack_size).toUpperCase().trim();
+// Compute the individual unit price (ex GST) for a product: per litre, per kilo, or per item.
+export function productUnitPrice(p) {
+  const s = String(p.pack_size || "").toUpperCase().trim();
   let m = s.match(/^(\d+)\s*X\s*(\d+(?:\.\d+)?)\s*L$/);
-  if (m) return Number(m[1]) * Number(m[2]);
+  if (m) {
+    const totalL = Number(m[1]) * Number(m[2]);
+    return { price: p.unit_price != null ? p.unit_price : p.list_price / totalL, label: "/L" };
+  }
   m = s.match(/^(\d+(?:\.\d+)?)\s*L$/);
-  if (m) return Number(m[1]);
-  return null;
+  if (m) {
+    const totalL = Number(m[1]);
+    return { price: p.unit_price != null ? p.unit_price : p.list_price / totalL, label: "/L" };
+  }
+  m = s.match(/^(\d+(?:\.\d+)?)\s*KG$/);
+  if (m) return { price: p.list_price / Number(m[1]), label: "/kg" };
+  m = s.match(/^(\d+(?:\.\d+)?)\s*G$/);
+  if (m) return { price: p.list_price / (Number(m[1]) / 1000), label: "/kg" };
+  m = s.match(/^(\d+)\s*X\s*(\d+(?:\.\d+)?)$/);
+  if (m) return { price: p.list_price / Number(m[1]), label: "/ea" };
+  return { price: p.list_price, label: "/ea" };
 }
 
 export const TOTAL_ENERGIES_CATEGORIES = [
