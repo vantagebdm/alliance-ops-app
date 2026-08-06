@@ -67,7 +67,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
       const data = {
         ...form,
         valid_until: form.valid_until || undefined,
-        items: form.items.map(l => ({
+        items: form.items.map(({ part_category, part_unit_cost, part_price_per_litre, part_commercial_price, pricing_basis, ...l }) => ({
           ...l,
           eta_days: l.eta_days === "" ? undefined : l.eta_days,
           quantity: Number(l.quantity) || 0,
@@ -216,28 +216,37 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                       <PartAutocomplete
                         value={line.app_part_number || line.part_number}
                         onSelect={(part) => {
-                          const items = form.items.map((line, idx) => {
-                            if (idx !== i) return line;
-                            const updated = {
-                              ...line,
-                              app_part_number: part.app_part_number || part.part_number,
-                              part_number: part.part_number,
-                              description: part.description || part.name || "",
-                              unit_price: part.sell_price || 0,
-                              quantity: 1
-                            };
-                            updated.total = (updated.quantity || 0) * (updated.unit_price || 0);
-                            return updated;
-                          });
-                          recalc(items);
+                           const items = form.items.map((line, idx) => {
+                             if (idx !== i) return line;
+                             const isOil = part.category === "oils";
+                             const basis = isOil ? "per_litre" : "standard";
+                             let unit_price = part.sell_price || 0;
+                             if (isOil) unit_price = part.price_per_litre || 0;
+                             const updated = {
+                               ...line,
+                               app_part_number: part.app_part_number || part.part_number,
+                               part_number: part.part_number,
+                               description: part.description || part.name || "",
+                               part_category: part.category,
+                               part_unit_cost: part.unit_cost || 0,
+                               part_price_per_litre: part.price_per_litre || 0,
+                               part_commercial_price: part.commercial_price || 0,
+                               pricing_basis: basis,
+                               unit_price,
+                               quantity: 1
+                             };
+                             updated.total = (updated.quantity || 0) * (updated.unit_price || 0);
+                             return updated;
+                           });
+                           recalc(items);
                         }}
                         onChange={(val) => updateLine(i, "app_part_number", val)}
                         onClear={() => {
-                          const items = form.items.map((line, idx) => {
-                            if (idx !== i) return line;
-                            return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "" };
-                          });
-                          recalc(items);
+                           const items = form.items.map((line, idx) => {
+                             if (idx !== i) return line;
+                             return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "", part_category: "", pricing_basis: "standard", part_unit_cost: 0, part_price_per_litre: 0, part_commercial_price: 0 };
+                           });
+                           recalc(items);
                         }}
                         placeholder="Part #"
                         className="rounded-sm h-8 text-xs font-mono"
@@ -252,8 +261,34 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                         className="rounded-sm h-8 text-xs text-right" />
                     </td>
                     <td className="px-2 py-1.5">
-                      <Input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
-                        className="rounded-sm h-8 text-xs text-right" />
+                      {line.part_category === "oils" ? (
+                        <div className="space-y-1">
+                          <Select value={line.pricing_basis || "per_litre"} onValueChange={(v) => {
+                            const items = form.items.map((l, idx) => {
+                              if (idx !== i) return l;
+                              let unit_price = l.unit_price;
+                              if (v === "per_litre") unit_price = l.part_price_per_litre || 0;
+                              else if (v === "unit_cost") unit_price = l.part_unit_cost || 0;
+                              else if (v === "commercial") unit_price = l.part_commercial_price || 0;
+                              const total = (Number(l.quantity) || 0) * (Number(unit_price) || 0);
+                              return { ...l, pricing_basis: v, unit_price, total };
+                            });
+                            recalc(items);
+                          }}>
+                            <SelectTrigger className="rounded-sm h-7 text-[10px] uppercase font-heading tracking-wider px-2"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="per_litre">Per Litre</SelectItem>
+                              <SelectItem value="unit_cost">Unit Cost</SelectItem>
+                              <SelectItem value="commercial">Commercial</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
+                            className="rounded-sm h-8 text-xs text-right" />
+                        </div>
+                      ) : (
+                        <Input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
+                          className="rounded-sm h-8 text-xs text-right" />
+                      )}
                     </td>
                     <td className="px-2 py-1.5">
                       <Input type="number" min="0" value={line.eta_days} onChange={e => updateLine(i, "eta_days", e.target.value === "" ? "" : Number(e.target.value))}
