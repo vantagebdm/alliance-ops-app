@@ -277,9 +277,9 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                           }}>
                             <SelectTrigger className="rounded-sm h-7 text-[10px] uppercase font-heading tracking-wider px-2"><SelectValue /></SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="per_litre">Per Litre</SelectItem>
-                              <SelectItem value="unit_cost">Unit Cost</SelectItem>
-                              <SelectItem value="commercial">Commercial</SelectItem>
+                              <SelectItem value="per_litre">Per Litre — ${(line.part_price_per_litre || 0).toFixed(2)}</SelectItem>
+                              <SelectItem value="unit_cost">Unit Cost — ${(line.part_unit_cost || 0).toFixed(2)}</SelectItem>
+                              <SelectItem value="commercial">Commercial — ${(line.part_commercial_price || 0).toFixed(2)}</SelectItem>
                             </SelectContent>
                           </Select>
                           <Input type="number" step="0.01" value={line.unit_price} onChange={e => updateLine(i, "unit_price", Number(e.target.value))}
