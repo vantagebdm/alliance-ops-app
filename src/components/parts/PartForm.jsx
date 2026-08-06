@@ -245,7 +245,22 @@ export default function PartForm({ onClose, onSaved, initial, prefill }) {
               {form.category === "oils" && (
                 <>
                   <div>
-                    <FieldLabel>Price per Litre</FieldLabel>
+                    <div className="flex items-center justify-between mb-1">
+                      <FieldLabel>Price per Litre</FieldLabel>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const sizeStr = form.volume_size || form.pack_size || "";
+                          const qty = parseFloat(String(sizeStr).replace(/[^0-9.]/g, "")) || 0;
+                          if (qty > 0 && form.unit_cost > 0) {
+                            update("price_per_litre", parseFloat(((form.unit_cost / qty) * 1.65).toFixed(2)));
+                          }
+                        }}
+                        className="px-2 py-0.5 text-[10px] font-heading font-bold uppercase tracking-wider rounded-sm bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-black transition-colors"
+                      >
+                        Auto +65%
+                      </button>
+                    </div>
                     <Input type="number" step="0.01" value={form.price_per_litre || ""} onChange={e => update("price_per_litre", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
                   </div>
                   <div>
