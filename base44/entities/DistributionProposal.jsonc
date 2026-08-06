@@ -77,6 +77,18 @@
       "type": "string",
       "description": "Free-text terms & conditions"
     },
+    "standard_terms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "retail",
+          "trade",
+          "commercial"
+        ]
+      },
+      "description": "Selected standard term sets applied to this proposal"
+    },
     "items": {
       "type": "array",
       "items": {

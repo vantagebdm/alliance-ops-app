@@ -30,6 +30,21 @@ const TC_PRESETS = [
   "50% COD, balance 14 days from delivery",
 ];
 
+export const STANDARD_TERMS = {
+  retail: {
+    label: "Retail Terms",
+    text: "Payment is required in full before goods are released, collected or dispatched.\n\nQuoted prices remain valid for the stated quotation period and are subject to stock availability.\n\nSpecial-order, indent, custom, dangerous-goods and non-stock items may require full payment in advance and are non-cancellable and non-returnable once ordered.\n\nFreight, hot-shot delivery, handling and dangerous-goods charges are additional unless expressly included in writing.",
+  },
+  trade: {
+    label: "Business / Trade Terms",
+    text: "Trade pricing is conditional on the customer maintaining an active approved business account and meeting applicable purchasing and payment requirements.\n\nApproved credit accounts are payable within 7 or 14 days from the invoice date, as specified in the account approval.\n\nAlliance Priority Parts may suspend credit facilities, trade pricing, stock reservations or further supply where an account is overdue, exceeds its credit limit or breaches the trading terms.\n\nTrade pricing does not include dedicated or guaranteed stock allocation unless confirmed in writing.",
+  },
+  commercial: {
+    label: "Commercial Terms",
+    text: "Commercial pricing is customer-specific and conditional on forecast purchasing volumes, agreed product mix, payment performance, contract term and stockholding requirements.\n\nCommercial pricing is confidential and may not be disclosed, transferred or applied to purchases by related or third-party entities unless approved in writing.\n\nAssigned inventory remains subject to the agreed minimum and maximum stock schedule, forecast demand and replenishment arrangements.\n\nWhere customer-specific stock becomes obsolete, expires, is discontinued or remains unused because the customer's requirements change, the customer may be required to purchase that stock in accordance with the supply agreement.\n\nAlliance Priority Parts may review pricing where supplier costs, exchange rates, freight, fuel, duties, regulatory costs or other material input costs change.",
+  },
+};
+
 function Section({ idx, open, setOpen, icon: Icon, title, badge, children }) {
   const isOpen = open === idx;
   return (
@@ -69,7 +84,7 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
 
   const [qualify, setQualify] = useState({ current_customer: "no", client_name: "", client_company: "", client_number: "", client_email: "" });
   const [trade, setTrade] = useState({ proposal_type: "", trading_terms: "" });
-  const [terms, setTerms] = useState({ deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "" });
+  const [terms, setTerms] = useState({ deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "", standard_terms: [] });
   const [meta, setMeta] = useState({ title: "", notes: "" });
 
   const updateItem = (idx, patch) => setItems(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
@@ -83,7 +98,7 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     setItems([]);
     setQualify({ current_customer: "no", client_name: "", client_company: "", client_number: "", client_email: "" });
     setTrade({ proposal_type: "", trading_terms: "" });
-    setTerms({ deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "" });
+    setTerms({ deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "", standard_terms: [] });
     setMeta({ title: "", notes: "" });
     setOpen(0);
   };
@@ -104,6 +119,7 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     balance_terms: terms.balance_terms.trim(),
     validity_days: Number(terms.validity_days) || 30,
     conditions_text: terms.conditions_text.trim(),
+    standard_terms: terms.standard_terms,
     items: items.map((it) => ({
       supplier_sku: it.supplier_sku,
       description: it.description,
@@ -197,6 +213,21 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     tcLines.push(`Valid for ${terms.validity_days} days from issue.`);
     if (terms.conditions_text) tcLines.push(terms.conditions_text);
     tcLines.forEach((l) => { doc.text(doc.splitTextToSize("•  " + l, 180), 14, y); y += 5; });
+
+    terms.standard_terms.forEach((key) => {
+      const set = STANDARD_TERMS[key];
+      if (!set) return;
+      if (y > 245) { doc.addPage(); y = 14; }
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+      doc.text(set.label, 14, y); y += 5;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+      set.text.split("\n\n").forEach((para) => {
+        if (y > 275) { doc.addPage(); y = 14; }
+        doc.text(doc.splitTextToSize(para, 180), 14, y);
+        y += 5;
+      });
+      y += 3;
+    });
 
     // NOTE: branded PDF template integration pending — this clean PDF will be slotted into the saved template.
     doc.save(`${proposal_number}.pdf`);
@@ -329,6 +360,32 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
                     {p}
                   </button>
                 ))}
+              </div>
+            </div>
+            <div>
+              <span className={lblCls}>Standard Terms</span>
+              <div className="space-y-2">
+                {Object.keys(STANDARD_TERMS).map((key) => {
+                  const set = STANDARD_TERMS[key];
+                  const active = terms.standard_terms.includes(key);
+                  return (
+                    <div key={key} className={`rounded-md border ${active ? "border-primary/40 bg-primary/5" : "border-[hsl(0,0%,14%)]"}`}>
+                      <button
+                        onClick={() => setTerms({ ...terms, standard_terms: active ? terms.standard_terms.filter((k) => k !== key) : [...terms.standard_terms, key] })}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-left"
+                      >
+                        <input type="checkbox" checked={active} readOnly className="accent-primary pointer-events-none" />
+                        <span className="text-xs font-heading uppercase tracking-wider text-white/80">{set.label}</span>
+                        {active && <span className="ml-auto text-[9px] text-primary/70">included in PDF</span>}
+                      </button>
+                      {active && (
+                        <div className="px-3 pb-3 text-[10px] text-white/50 whitespace-pre-line max-h-40 overflow-auto leading-relaxed border-t border-[hsl(0,0%,14%)] pt-2">
+                          {set.text}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
