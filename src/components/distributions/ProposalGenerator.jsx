@@ -189,10 +189,10 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     notes: meta.notes?.trim(),
   });
 
-  const previewSample = () => {
+  const previewSample = async () => {
     const payload = buildPayload("DP-SAMPLE");
-    const doc = generateProposalPDF(payload);
-    window.open(doc.output("bloburl"), "_blank");
+    const blob = await generateProposalPDF(payload);
+    window.open(URL.createObjectURL(blob), "_blank");
     toast({ title: "Proposal preview opened", description: "Showing your current details as A4 PDF" });
   };
 
@@ -220,8 +220,8 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
       const proposal_number = `DP-${String(seq).padStart(4, "0")}`;
       const payload = buildPayload(proposal_number);
       await base44.entities.DistributionProposal.create(payload);
-      const doc = generateProposalPDF(payload);
-      window.open(doc.output("bloburl"), "_blank");
+      const blob = await generateProposalPDF(payload);
+      window.open(URL.createObjectURL(blob), "_blank");
       toast({ title: "Proposal generated", description: `${proposal_number} · PDF opened for review` });
       reset();
     } catch (e) {

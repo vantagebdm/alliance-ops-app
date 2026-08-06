@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { PDFDocument } from "pdf-lib";
 import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
 import { STANDARD_TERMS } from "@/lib/proposalTerms";
@@ -9,6 +10,10 @@ const TEXT_GRAY = [100, 100, 100];
 const TEXT_LIGHT = [200, 200, 200];
 const BG_LIGHT = [245, 245, 245];
 const BG_HEADER = [240, 240, 240];
+
+// Branded proposal-pack template. Generated proposal content pages are inserted
+// between page 2 and page 3 of this template before output.
+const PROPOSAL_TEMPLATE_URL = "https://media.base44.com/files/public/69dccee2e4380f803487afa5/a2a047c3d_UntitledA4.pdf";
 
 function addFooter(doc, pageW) {
   const company = getCompanyProfile();
@@ -182,7 +187,7 @@ export function generateQuotePDF(quote) {
 
 // Proposal PDF — matches the quote layout but with no part-number column and
 // includes the full documented terms, client/trade info, items and quantities.
-export function generateProposalPDF(proposal) {
+function buildProposalContentDoc(proposal) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
   const margin = 18;
@@ -321,6 +326,46 @@ export function generateProposalPDF(proposal) {
 
   addFooter(doc, pageW);
   return doc;
+}
+
+// Builds the final proposal PDF by rendering content pages (jsPDF) then inserting
+// them between page 2 and page 3 of the branded template (pdf-lib merge).
+export async function generateProposalPDF(proposal) {
+  const contentDoc = buildProposalContentDoc(proposal);
+  const contentBytes = contentDoc.output("arraybuffer");
+
+  try {
+    const res = await fetch(PROPOSAL_TEMPLATE_URL, { cache: "force-cache" });
+    if (!res.ok) throw new Error("template fetch failed");
+    const templateBytes = await res.arrayBuffer();
+
+    const templatePdf = await PDFDocument.load(templateBytes);
+    const contentPdf = await PDFDocument.load(contentBytes);
+    const out = await PDFDocument.create();
+
+    const tplCount = templatePdf.getPageCount();
+    const beforeCount = Math.min(2, Math.max(0, tplCount - 1));
+
+    // Template pages 1 & 2
+    const beforePages = await out.copyPages(templatePdf, Array.from({ length: beforeCount }, (_, i) => i));
+    beforePages.forEach((p) => out.addPage(p));
+
+    // Generated proposal content pages
+    const contentPages = await out.copyPages(contentPdf, contentPdf.getPageIndices());
+    contentPages.forEach((p) => out.addPage(p));
+
+    // Remaining template pages (page 3 onwards)
+    if (tplCount > beforeCount) {
+      const afterPages = await out.copyPages(templatePdf, Array.from({ length: tplCount - beforeCount }, (_, i) => i + beforeCount));
+      afterPages.forEach((p) => out.addPage(p));
+    }
+
+    const finalBytes = await out.save();
+    return new Blob([finalBytes], { type: "application/pdf" });
+  } catch (e) {
+    // Fallback: content-only PDF if template can't be loaded
+    return contentDoc.output("blob");
+  }
 }
 
 // Blank A4 trading application form — downloadable from the proposal generator.
