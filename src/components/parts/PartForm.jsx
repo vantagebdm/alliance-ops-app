@@ -20,6 +20,7 @@ export default function PartForm({ onClose, onSaved, initial }) {
     storage_notes: "", expiry_date: "", batch_lot_number: "",
     compliance_type: "", compliance_reference: "", inspection_interval_days: null, regulated_item: false,
     workshop_use: false, pack_size: "", volume_size: "", issue_method: "each",
+    price_per_litre: 0, price_per_pack: 0, commercial_price: 0,
   });
   const [saving, setSaving] = useState(false);
   const supplierAC = useAutocomplete("Supplier", "name");
@@ -239,6 +240,22 @@ export default function PartForm({ onClose, onSaved, initial }) {
                   <FieldLabel>Pack / Volume Size</FieldLabel>
                   <Input value={form.volume_size || form.pack_size || ""} onChange={e => { update("volume_size", e.target.value); update("pack_size", e.target.value); }} placeholder="e.g. 5L, 20L, Box of 50" className="rounded-sm" />
                 </div>
+              )}
+              {form.category === "oils" && (
+                <>
+                  <div>
+                    <FieldLabel>Price per Litre</FieldLabel>
+                    <Input type="number" step="0.01" value={form.price_per_litre || ""} onChange={e => update("price_per_litre", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
+                  </div>
+                  <div>
+                    <FieldLabel>Price per Pack / Volume</FieldLabel>
+                    <Input type="number" step="0.01" value={form.price_per_pack || ""} onChange={e => update("price_per_pack", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
+                  </div>
+                  <div>
+                    <FieldLabel>Commercial Pricing</FieldLabel>
+                    <Input type="number" step="0.01" value={form.commercial_price || ""} onChange={e => update("commercial_price", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
+                  </div>
+                </>
               )}
               {(isConsumable) && (
                 <div>

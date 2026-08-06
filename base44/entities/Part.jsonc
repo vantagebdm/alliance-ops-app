@@ -161,6 +161,21 @@
       "type": "string",
       "description": "Volume or size for oils/chemicals/sprays"
     },
+    "price_per_litre": {
+      "type": "number",
+      "default": 0,
+      "description": "Selling price per litre (distributed oils)"
+    },
+    "price_per_pack": {
+      "type": "number",
+      "default": 0,
+      "description": "Selling price per pack/volume size (distributed oils)"
+    },
+    "commercial_price": {
+      "type": "number",
+      "default": 0,
+      "description": "Commercial/bulk pricing (distributed oils)"
+    },
     "barcode": {
       "type": "string"
     },
