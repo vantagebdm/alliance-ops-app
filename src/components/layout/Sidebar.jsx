@@ -3,7 +3,7 @@ import {
   LayoutDashboard, MessageSquare, FileText, ShoppingCart,
   Package, Warehouse, ShoppingBag, Truck, Users,
   Receipt, BarChart3, Settings, X, Send, TrendingUp, ClipboardList, ArrowDownToLine, BarChart2, RefreshCw,
-  BookOpen, Building2, Calculator, BookMarked, CreditCard, DollarSign, Code2
+  BookOpen, Building2, Calculator, BookMarked, CreditCard, DollarSign, Code2, Boxes
 } from "lucide-react";
 
 const NAV_SECTIONS = [
@@ -14,6 +14,7 @@ const NAV_SECTIONS = [
       { label: "Enquiries", icon: MessageSquare, path: "/enquiries" },
       { label: "Quotes", icon: FileText, path: "/quotes" },
       { label: "Sales Orders", icon: ShoppingCart, path: "/orders" },
+      { label: "Distributions", icon: Boxes, path: "/distributions" },
     ]
   },
   {

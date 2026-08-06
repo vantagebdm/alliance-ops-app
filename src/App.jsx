@@ -33,6 +33,7 @@ import SystemSettings from './pages/SystemSettings';
 import DocumentNumbering from './pages/DocumentNumbering';
 import PartNumbering from './pages/PartNumbering';
 import PlatformDevelopment from './pages/PlatformDevelopment';
+import Distributions from './pages/Distributions';
 import { PermissionProvider } from '@/lib/PermissionContext';
 import { ThemeProvider } from '@/lib/ThemeContext';
 import STSOrderForm from './pages/STSOrderForm';
@@ -99,6 +100,7 @@ const AuthenticatedApp = () => {
         <Route path="/admin/document-numbering" element={<DocumentNumbering />} />
         <Route path="/admin/part-numbering" element={<PartNumbering />} />
         <Route path="/platform-development" element={<PlatformDevelopment />} />
+        <Route path="/distributions" element={<Distributions />} />
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
