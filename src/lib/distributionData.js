@@ -8,6 +8,17 @@ export const DISTRIBUTION_SUPPLIERS = [
   { id: "powercrank", name: "Powercrank", loaded: false },
 ];
 
+// Parse a pack size string into total litres (for oils). Returns null for by-weight packs (KG/G) or unknown.
+export function packLitres(pack_size) {
+  if (!pack_size) return null;
+  const s = String(pack_size).toUpperCase().trim();
+  let m = s.match(/^(\d+)\s*X\s*(\d+(?:\.\d+)?)\s*L$/);
+  if (m) return Number(m[1]) * Number(m[2]);
+  m = s.match(/^(\d+(?:\.\d+)?)\s*L$/);
+  if (m) return Number(m[1]);
+  return null;
+}
+
 export const TOTAL_ENERGIES_CATEGORIES = [
   "Compressor Oils",
   "Engine Oils",
