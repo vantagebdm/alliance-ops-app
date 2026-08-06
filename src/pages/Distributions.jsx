@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import PageHeader from "@/components/ui/PageHeader";
 import DistributionCatalog from "@/components/distributions/DistributionCatalog";
-import ProposalBuilder from "@/components/distributions/ProposalBuilder";
+import ProposalGenerator from "@/components/distributions/ProposalGenerator";
 import { DISTRIBUTION_SUPPLIERS, productUnitPrice, packUnitCount, packCost } from "@/lib/distributionData";
 
 export default function Distributions() {
   const [activeSupplier, setActiveSupplier] = useState("total_energies");
   const [items, setItems] = useState([]);
-  const [customer, setCustomer] = useState({ name: "", company: "", email: "", title: "", notes: "" });
 
   const addToProposal = (product) => {
     const pu = productUnitPrice(product);
@@ -55,13 +54,7 @@ export default function Distributions() {
           </div>
           <div className="xl:col-span-1">
             <div className="xl:sticky xl:top-20">
-              <ProposalBuilder
-                supplierId={activeSupplier}
-                items={items}
-                setItems={setItems}
-                customer={customer}
-                setCustomer={setCustomer}
-              />
+              <ProposalGenerator supplierId={activeSupplier} items={items} setItems={setItems} />
             </div>
           </div>
         </div>

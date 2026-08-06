@@ -27,6 +27,56 @@
     "customer_email": {
       "type": "string"
     },
+    "current_customer": {
+      "type": "string",
+      "enum": [
+        "yes",
+        "no"
+      ],
+      "default": "no",
+      "description": "Is the client an existing customer?"
+    },
+    "client_number": {
+      "type": "string",
+      "description": "Existing client/account number if current customer"
+    },
+    "proposal_type": {
+      "type": "string",
+      "enum": [
+        "retail",
+        "trade_business",
+        "commercial"
+      ]
+    },
+    "trading_terms": {
+      "type": "string",
+      "enum": [
+        "cod",
+        "14_days",
+        "30_days",
+        "30_days_plus"
+      ]
+    },
+    "deposit_required": {
+      "type": "boolean",
+      "default": false
+    },
+    "deposit_pct": {
+      "type": "number",
+      "default": 0
+    },
+    "balance_terms": {
+      "type": "string",
+      "description": "Terms for the balance payment"
+    },
+    "validity_days": {
+      "type": "number",
+      "default": 30
+    },
+    "conditions_text": {
+      "type": "string",
+      "description": "Free-text terms & conditions"
+    },
     "items": {
       "type": "array",
       "items": {
