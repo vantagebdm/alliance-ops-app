@@ -67,7 +67,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
       const data = {
         ...form,
         valid_until: form.valid_until || undefined,
-        items: form.items.map(({ part_category, part_unit_cost, part_price_per_litre, part_commercial_price, pricing_basis, ...l }) => ({
+        items: form.items.map(({ part_category, part_price_per_pack, part_price_per_litre, part_commercial_price, pricing_basis, ...l }) => ({
           ...l,
           eta_days: l.eta_days === "" ? undefined : l.eta_days,
           quantity: Number(l.quantity) || 0,
@@ -202,7 +202,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-44">Part #</th>
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20">Qty</th>
-                  <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-40">Unit Price</th>
+                  <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-56">Unit Price</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20">ETA (days)</th>
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">ETA Comment</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Total</th>
@@ -228,7 +228,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                                part_number: part.part_number,
                                description: part.description || part.name || "",
                                part_category: part.category,
-                               part_unit_cost: part.unit_cost || 0,
+                               part_price_per_pack: part.price_per_pack || part.sell_price || 0,
                                part_price_per_litre: part.price_per_litre || 0,
                                part_commercial_price: part.commercial_price || 0,
                                pricing_basis: basis,
@@ -244,7 +244,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                         onClear={() => {
                            const items = form.items.map((line, idx) => {
                              if (idx !== i) return line;
-                             return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "", part_category: "", pricing_basis: "standard", part_unit_cost: 0, part_price_per_litre: 0, part_commercial_price: 0 };
+                             return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "", part_category: "", pricing_basis: "standard", part_price_per_pack: 0, part_price_per_litre: 0, part_commercial_price: 0 };
                            });
                            recalc(items);
                         }}
@@ -268,7 +268,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                               if (idx !== i) return l;
                               let unit_price = l.unit_price;
                               if (v === "per_litre") unit_price = l.part_price_per_litre || 0;
-                              else if (v === "unit_cost") unit_price = l.part_unit_cost || 0;
+                              else if (v === "unit_cost") unit_price = l.part_price_per_pack || 0;
                               else if (v === "commercial") unit_price = l.part_commercial_price || 0;
                               const total = (Number(l.quantity) || 0) * (Number(unit_price) || 0);
                               return { ...l, pricing_basis: v, unit_price, total };
@@ -278,7 +278,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                             <SelectTrigger className="rounded-sm h-7 text-[10px] uppercase font-heading tracking-wider px-2"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="per_litre">Per Litre — ${(line.part_price_per_litre || 0).toFixed(2)}</SelectItem>
-                              <SelectItem value="unit_cost">Unit Cost — ${(line.part_unit_cost || 0).toFixed(2)}</SelectItem>
+                              <SelectItem value="unit_cost">Per Pack — ${(line.part_price_per_pack || 0).toFixed(2)}</SelectItem>
                               <SelectItem value="commercial">Commercial — ${(line.part_commercial_price || 0).toFixed(2)}</SelectItem>
                             </SelectContent>
                           </Select>
