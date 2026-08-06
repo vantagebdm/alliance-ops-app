@@ -30,6 +30,22 @@ export function productUnitPrice(p) {
   return { price: p.list_price, label: "/ea" };
 }
 
+// Number of individual units in a pack (litres / kg / items) and the sell-unit label.
+export function packUnitCount(pack_size) {
+  const s = String(pack_size || "").toUpperCase().trim();
+  let m = s.match(/^(\d+)\s*X\s*(\d+(?:\.\d+)?)\s*L$/);
+  if (m) return { count: Number(m[1]) * Number(m[2]), label: "/L" };
+  m = s.match(/^(\d+(?:\.\d+)?)\s*L$/);
+  if (m) return { count: Number(m[1]), label: "/L" };
+  m = s.match(/^(\d+(?:\.\d+)?)\s*KG$/);
+  if (m) return { count: Number(m[1]), label: "/kg" };
+  m = s.match(/^(\d+(?:\.\d+)?)\s*G$/);
+  if (m) return { count: Number(m[1]) / 1000, label: "/kg" };
+  m = s.match(/^(\d+)\s*X\s*(\d+(?:\.\d+)?)$/);
+  if (m) return { count: Number(m[1]), label: "/ea" };
+  return { count: 1, label: "/ea" };
+}
+
 export const TOTAL_ENERGIES_CATEGORIES = [
   "Compressor Oils",
   "Engine Oils",

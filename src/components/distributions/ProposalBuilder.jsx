@@ -125,8 +125,30 @@ export default function ProposalBuilder({ supplierId, items, setItems, customer,
                   <td className="px-3 py-2">
                     <div className="text-white/90 text-xs">{it.description}</div>
                     <div className="text-white/40 text-[10px] font-mono">{it.supplier_sku} · {it.pack_size}</div>
-                    {it.per_unit != null && (
-                      <div className="text-primary/70 text-[10px]">{fmt(it.per_unit)} {it.unit_label} ex GST</div>
+                    {it.per_unit_cost != null && (
+                      <div className="text-primary/70 text-[10px]">
+                        Cost: {fmt(it.per_unit_cost)} {it.unit_label} · Pack: {fmt(it.pack_cost)}
+                      </div>
+                    )}
+                    {it.per_unit_cost != null && it.pack_cost != null && (
+                      <div className="flex gap-1 mt-1">
+                        <button
+                          onClick={() => updateItem(idx, { pricing_basis: "per_unit", quantity: it.unit_count, unit_price: +(it.per_unit_cost * 1.65).toFixed(2) })}
+                          className={it.pricing_basis === "per_unit"
+                            ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground"
+                            : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}
+                        >
+                          Per Unit +65%
+                        </button>
+                        <button
+                          onClick={() => updateItem(idx, { pricing_basis: "commercial", quantity: 1, unit_price: +(it.pack_cost * 1.20).toFixed(2) })}
+                          className={it.pricing_basis === "commercial"
+                            ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground"
+                            : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}
+                        >
+                          Commercial +20%
+                        </button>
+                      </div>
                     )}
                   </td>
                   <td className="px-2 py-2 text-right">
