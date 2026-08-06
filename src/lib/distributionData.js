@@ -13,9 +13,9 @@ export const CARTRIDGE_BOX = 14;
 export function isCartridge(pack_size) {
   return /^450\s*G$/.test(String(pack_size || "").toUpperCase().trim());
 }
-// Whole-pack cost (ex GST). Cartridges: 1 box = 14 tubes.
+// Whole-pack cost (ex GST). Cartridges: list_price is the box price (1 box = 14 tubes).
 export function packCost(p) {
-  return isCartridge(p.pack_size) ? p.list_price * CARTRIDGE_BOX : p.list_price;
+  return p.list_price;
 }
 
 // Compute the individual unit price (ex GST) for a product: per litre, per kilo, or per item.
@@ -31,7 +31,8 @@ export function productUnitPrice(p) {
     const totalL = Number(m[1]);
     return { price: p.unit_price != null ? p.unit_price : p.list_price / totalL, label: "/L" };
   }
-  if (isCartridge(p.pack_size)) return { price: p.list_price, label: "/tube" };
+  // Cartridges: list_price is per box of 14 tubes — derive per-tube cost.
+  if (isCartridge(p.pack_size)) return { price: p.list_price / CARTRIDGE_BOX, label: "/tube" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*KG$/);
   if (m) return { price: p.list_price / Number(m[1]), label: "/kg" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*G$/);
