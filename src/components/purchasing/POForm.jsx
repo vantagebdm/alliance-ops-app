@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Plus, Trash2, Building2, Tag, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ export default function POForm({ onClose, onSaved, initial }) {
   const [poType, setPoType] = useState(initial?.po_type || "parts");
   const [saving, setSaving] = useState(false);
   const [previewPO, setPreviewPO] = useState("");
+  const isEdit = !!initial?.id;
+  const existingNumber = initial?.po_number || "";
 
   const loadPreview = async (type) => {
     const subtype = type === "parts" ? "parts" : "company_expense";
@@ -29,7 +31,7 @@ export default function POForm({ onClose, onSaved, initial }) {
     setPreviewPO(num || "");
   };
 
-  useState(() => { loadPreview(poType); }, []);
+  useEffect(() => { if (!isEdit) loadPreview(poType); }, []);
   const supplierAC = useAutocomplete("Supplier", "name");
   const partAC = useAutocomplete("Part", "part_number");
 
@@ -71,7 +73,10 @@ export default function POForm({ onClose, onSaved, initial }) {
   const save = async () => {
     setSaving(true);
     const data = { ...form, po_type: poType };
-    if (!data.po_number) {
+    if (initial?.id) {
+      // Editing existing PO — NEVER regenerate the number, always keep the original
+      data.po_number = initial.po_number || data.po_number;
+    } else if (!data.po_number) {
       const subtype = poType === "parts" ? "parts" : "company_expense";
       data.po_number = await generateDocNumber("purchase_order", subtype, previewPO || null);
     }
@@ -142,21 +147,29 @@ export default function POForm({ onClose, onSaved, initial }) {
                       key={opt.value}
                       type="button"
                       onClick={() => { setPoType(opt.value); loadPreview(opt.value); }}
+                      disabled={isEdit}
                       className={`px-2 py-2 text-[10px] font-heading font-semibold uppercase tracking-wider rounded-sm border transition-colors text-left ${
                         poType === opt.value
                           ? "bg-primary text-black border-primary"
                           : "bg-[hsl(0,0%,14%)] text-foreground border-border hover:border-primary/50"
-                      }`}
+                      } ${isEdit ? "opacity-60 cursor-not-allowed" : ""}`}
                     >
                       <div>{opt.label}</div>
                       <div className={`font-mono text-[9px] mt-0.5 ${poType === opt.value ? "text-black/60" : "text-muted-foreground"}`}>
-                        {poType === opt.value && previewPO ? previewPO : `${opt.prefix}00001`}
+                        {poType === opt.value && isEdit && existingNumber ? existingNumber : (poType === opt.value && previewPO ? previewPO : `${opt.prefix}00001`)}
                       </div>
                     </button>
                   ))}
                 </div>
               </div>
-              {previewPO && (
+              {isEdit && existingNumber ? (
+                <div>
+                  <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">PO Number (Locked)</label>
+                  <div className="h-9 px-3 flex items-center rounded-sm border border-border bg-muted font-mono text-sm font-semibold text-primary">
+                    {existingNumber}
+                  </div>
+                </div>
+              ) : previewPO && (
                 <div>
                   <label className="font-heading text-[10px] uppercase tracking-wider text-foreground/50 mb-1 block">PO Number (Auto-assigned)</label>
                   <div className="h-9 px-3 flex items-center rounded-sm border border-border bg-muted font-mono text-sm font-semibold text-primary">
