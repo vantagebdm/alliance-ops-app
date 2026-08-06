@@ -381,8 +381,29 @@ export function generateTradingAppPDF() {
   section("4. ACCOUNT / PAYMENT DETAILS");
   field("Requested Account Terms", 110);
   field("Credit Limit Requested ($)", 70);
-  field("Bank / Branch", 90); field("BSB", 40);
-  field("Account Name", 70); field("Account No.", 60);
+
+  const bank = getCompanyProfile();
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+  doc.text("Please direct all payments to:", margin, y);
+  y += 5;
+  field("Bank", 90);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
+  doc.text(String(bank.bank_name || ""), margin + 28, y - 0.5);
+  y += 6;
+  field("Account Name", 90);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
+  doc.text(String(bank.bank_account_name || ""), margin + 38, y - 0.5);
+  y += 6;
+  field("BSB", 90); field("Account No.", 70);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
+  doc.text(String(bank.bank_bsb || ""), margin + 14, y - 6.5);
+  doc.text(String(bank.bank_account || ""), margin + 86, y - 6.5);
+  y += 6;
+  field("Remittance Email", 90);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
+  doc.text(String(bank.remittance_email || ""), margin + 50, y - 0.5);
   gap();
 
   section("5. TRADE REFERENCES (1)");
