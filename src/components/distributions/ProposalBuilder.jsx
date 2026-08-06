@@ -131,14 +131,22 @@ export default function ProposalBuilder({ supplierId, items, setItems, customer,
                       </div>
                     )}
                     {it.per_unit_cost != null && it.pack_cost != null && (
-                      <div className="flex gap-1 mt-1">
+                      <div className="flex flex-wrap gap-1 mt-1">
                         <button
                           onClick={() => updateItem(idx, { pricing_basis: "per_unit", quantity: it.unit_count, unit_price: +(it.per_unit_cost * 1.65).toFixed(2) })}
                           className={it.pricing_basis === "per_unit"
                             ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground"
                             : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}
                         >
-                          Per Unit +65%
+                          Per Unit {it.unit_label} +65%
+                        </button>
+                        <button
+                          onClick={() => updateItem(idx, { pricing_basis: "quote_total", quantity: 1, unit_price: +(it.pack_cost * 1.30).toFixed(2) })}
+                          className={it.pricing_basis === "quote_total"
+                            ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground"
+                            : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}
+                        >
+                          Quote Total +30%
                         </button>
                         <button
                           onClick={() => updateItem(idx, { pricing_basis: "commercial", quantity: 1, unit_price: +(it.pack_cost * 1.20).toFixed(2) })}
