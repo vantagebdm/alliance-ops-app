@@ -190,37 +190,10 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
   });
 
   const previewSample = () => {
-    const sample = {
-      proposal_number: "DP-SAMPLE",
-      customer_name: "John Smith",
-      customer_company: "Smith Pty Ltd",
-      trade_company: "Smith Trading Co",
-      client_number: "ACC-0001",
-      customer_email: "name@email.com",
-      current_customer: "yes",
-      best_contact: "Jane Doe",
-      best_contact_phone: "0412 345 678",
-      best_contact_email: "contact@email.com",
-      proposal_type: "commercial",
-      trading_terms: "30_days",
-      deposit_required: true,
-      deposit_pct: 50,
-      balance_terms: "COD on delivery",
-      validity_days: 30,
-      conditions_text: "Pricing subject to supplier confirmation at time of order.",
-      standard_terms: ["retail", "commercial"],
-      items: [
-        { description: "Total Quartz 9000 5W-30 5L", quantity: 4, unit_price: 62.40, total: 249.60 },
-        { description: "Total Rubia TIR 8900 20L", quantity: 1, unit_price: 312.00, total: 312.00 },
-        { description: "Total Ceran XM 450G (box of 14)", quantity: 1, unit_price: 189.20, total: 189.20 },
-      ],
-      subtotal: 750.80,
-      gst: 75.08,
-      total: 825.88,
-    };
-    const doc = generateProposalPDF(sample);
+    const payload = buildPayload("DP-SAMPLE");
+    const doc = generateProposalPDF(payload);
     window.open(doc.output("bloburl"), "_blank");
-    toast({ title: "Sample A4 proposal opened", description: "Preview of the generated PDF layout" });
+    toast({ title: "Proposal preview opened", description: "Showing your current details as A4 PDF" });
   };
 
   const handleGenerate = async () => {
