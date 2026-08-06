@@ -41,15 +41,15 @@ export default function GlobalSearch() {
           // Use server-side $contains for partial/predictive matching across all fields
           const allItems = [];
           for (const field of cat.fields) {
-            try {
-              const items = await base44.entities[cat.entity].filter(
-                { [field]: { $contains: q } },
-                "-created_date",
-                10
-              );
-              allItems.push(...items);
-            } catch (_) {}
-          }
+                try {
+                  const items = await base44.entities[cat.entity].filter(
+                    { [field]: { $regex: q, $options: "i" } },
+                    "-created_date",
+                    10
+                  );
+                  allItems.push(...items);
+                } catch (_) {}
+              }
           // Deduplicate by id and slice to 5
           const seen = new Set();
           const deduped = allItems.filter(item => {
