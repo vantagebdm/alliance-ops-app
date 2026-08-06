@@ -14,6 +14,7 @@ const BG_HEADER = [240, 240, 240];
 // Branded proposal-pack template. Generated proposal content pages are inserted
 // between page 2 and page 3 of this template before output.
 const PROPOSAL_TEMPLATE_URL = "https://media.base44.com/files/public/69dccee2e4380f803487afa5/a2a047c3d_UntitledA4.pdf";
+const CREDIT_APP_URL = "https://media.base44.com/files/public/69dccee2e4380f803487afa5/fb10a183d_APP_Credit_Account_Application5.pdf";
 
 function addFooter(doc, pageW) {
   const company = getCompanyProfile();
@@ -335,9 +336,15 @@ export async function generateProposalPDF(proposal) {
   const contentBytes = contentDoc.output("arraybuffer");
 
   try {
-    const res = await fetch(PROPOSAL_TEMPLATE_URL, { cache: "force-cache" });
-    if (!res.ok) throw new Error("template fetch failed");
-    const templateBytes = await res.arrayBuffer();
+    const [templateRes, creditRes] = await Promise.all([
+      fetch(PROPOSAL_TEMPLATE_URL, { cache: "force-cache" }),
+      fetch(CREDIT_APP_URL, { cache: "force-cache" }),
+    ]);
+    if (!templateRes.ok) throw new Error("template fetch failed");
+    const [templateBytes, creditBytes] = await Promise.all([
+      templateRes.arrayBuffer(),
+      creditRes.ok ? creditRes.arrayBuffer() : null,
+    ]);
 
     const templatePdf = await PDFDocument.load(templateBytes);
     const contentPdf = await PDFDocument.load(contentBytes);
@@ -354,7 +361,14 @@ export async function generateProposalPDF(proposal) {
     const contentPages = await out.copyPages(contentPdf, contentPdf.getPageIndices());
     contentPages.forEach((p) => out.addPage(p));
 
-    // Remaining template pages (page 3 onwards)
+    // Credit account application pages
+    if (creditBytes) {
+      const creditPdf = await PDFDocument.load(creditBytes);
+      const creditPages = await out.copyPages(creditPdf, creditPdf.getPageIndices());
+      creditPages.forEach((p) => out.addPage(p));
+    }
+
+    // Remaining template pages (page 3 onwards — contact/back page)
     if (tplCount > beforeCount) {
       const afterPages = await out.copyPages(templatePdf, Array.from({ length: tplCount - beforeCount }, (_, i) => i + beforeCount));
       afterPages.forEach((p) => out.addPage(p));
