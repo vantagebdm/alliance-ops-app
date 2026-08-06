@@ -8,6 +8,16 @@ export const DISTRIBUTION_SUPPLIERS = [
   { id: "powercrank", name: "Powercrank", loaded: false },
 ];
 
+// Cartridges (e.g. 450G grease tubes) are priced per tube; a box holds 14 tubes.
+export const CARTRIDGE_BOX = 14;
+export function isCartridge(pack_size) {
+  return /^450\s*G$/.test(String(pack_size || "").toUpperCase().trim());
+}
+// Whole-pack cost (ex GST). Cartridges: 1 box = 14 tubes.
+export function packCost(p) {
+  return isCartridge(p.pack_size) ? p.list_price * CARTRIDGE_BOX : p.list_price;
+}
+
 // Compute the individual unit price (ex GST) for a product: per litre, per kilo, or per item.
 export function productUnitPrice(p) {
   const s = String(p.pack_size || "").toUpperCase().trim();
@@ -21,6 +31,7 @@ export function productUnitPrice(p) {
     const totalL = Number(m[1]);
     return { price: p.unit_price != null ? p.unit_price : p.list_price / totalL, label: "/L" };
   }
+  if (isCartridge(p.pack_size)) return { price: p.list_price, label: "/tube" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*KG$/);
   if (m) return { price: p.list_price / Number(m[1]), label: "/kg" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*G$/);
@@ -37,6 +48,7 @@ export function packUnitCount(pack_size) {
   if (m) return { count: Number(m[1]) * Number(m[2]), label: "/L" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*L$/);
   if (m) return { count: Number(m[1]), label: "/L" };
+  if (isCartridge(pack_size)) return { count: CARTRIDGE_BOX, label: "/tube" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*KG$/);
   if (m) return { count: Number(m[1]), label: "/kg" };
   m = s.match(/^(\d+(?:\.\d+)?)\s*G$/);

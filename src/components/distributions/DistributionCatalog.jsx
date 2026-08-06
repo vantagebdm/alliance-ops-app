@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { Plus, Search, PackageX } from "lucide-react";
-import { TOTAL_ENERGIES_PRODUCTS, TOTAL_ENERGIES_CATEGORIES, DISTRIBUTION_SUPPLIERS, productUnitPrice } from "@/lib/distributionData";
+import { TOTAL_ENERGIES_PRODUCTS, TOTAL_ENERGIES_CATEGORIES, DISTRIBUTION_SUPPLIERS, productUnitPrice, packCost, isCartridge, CARTRIDGE_BOX } from "@/lib/distributionData";
 
 const fmt = (n) => (n == null ? "—" : `$${Number(n).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 
@@ -76,8 +76,8 @@ export default function DistributionCatalog({ supplierId, onAddToProposal }) {
                 <td className="px-3 py-2 text-white/90">{p.product}</td>
                 <td className="px-3 py-2 text-white/60">{p.family}</td>
                 <td className="px-3 py-2 text-white/60 text-xs">{p.category}</td>
-                <td className="px-3 py-2 text-white/80">{p.pack_size}</td>
-                <td className="px-3 py-2 text-right text-white/90">{fmt(p.list_price)}</td>
+                <td className="px-3 py-2 text-white/80">{isCartridge(p.pack_size) ? `${p.pack_size} · Box of ${CARTRIDGE_BOX}` : p.pack_size}</td>
+                <td className="px-3 py-2 text-right text-white/90">{fmt(packCost(p))}</td>
                 <td className="px-3 py-2 text-right text-white/60 whitespace-nowrap">{(() => { const pu = productUnitPrice(p); return `${fmt(pu.price)} ${pu.label}`; })()}</td>
                 <td className="px-3 py-2 text-right">
                   <button
