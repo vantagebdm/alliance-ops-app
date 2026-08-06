@@ -387,23 +387,26 @@ export function generateTradingAppPDF() {
   doc.setFontSize(8);
   doc.setTextColor(60, 60, 60);
   doc.text("Please direct all payments to:", margin, y);
-  y += 5;
-  field("Bank", 90);
-  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
-  doc.text(String(bank.bank_name || ""), margin + 28, y - 0.5);
   y += 6;
-  field("Account Name", 90);
-  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
-  doc.text(String(bank.bank_account_name || ""), margin + 38, y - 0.5);
-  y += 6;
-  field("BSB", 90); field("Account No.", 70);
-  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
-  doc.text(String(bank.bank_bsb || ""), margin + 14, y - 6.5);
-  doc.text(String(bank.bank_account || ""), margin + 86, y - 6.5);
-  y += 6;
-  field("Remittance Email", 90);
-  doc.setFont("helvetica", "normal"); doc.setTextColor(20, 20, 20);
-  doc.text(String(bank.remittance_email || ""), margin + 50, y - 0.5);
+
+  const filledField = (label, value, labelW, lineW) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(40, 40, 40);
+    doc.text(label, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(20, 20, 20);
+    doc.text(String(value ?? ""), margin + labelW, y);
+    doc.setDrawColor(160, 160, 160);
+    doc.line(margin + labelW, y + 1, margin + labelW + lineW, y + 1);
+    y += 6;
+  };
+
+  filledField("Bank", bank.bank_name, 24, 110);
+  filledField("Account Name", bank.bank_account_name, 38, 100);
+  filledField("BSB", bank.bank_bsb, 14, 50);
+  filledField("Account No.", bank.bank_account, 28, 60);
+  filledField("Remittance Email", bank.remittance_email, 50, 90);
   gap();
 
   section("5. TRADE REFERENCES (1)");
