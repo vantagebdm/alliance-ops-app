@@ -5,7 +5,7 @@ import { Wrench, Plus } from "lucide-react";
 import PartInfoPopover from "@/components/ui/PartInfoPopover";
 import PartForm from "@/components/parts/PartForm";
 
-export default function PartAutocomplete({ value, onSelect, onChange, placeholder, className }) {
+export default function PartAutocomplete({ value, onSelect, onChange, onClear, placeholder, className }) {
   const [allSuggestions, setAllSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,11 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
 
   // Look up part details for cost/stock info when a value is present (e.g. editing existing line)
   useEffect(() => {
-    if (!value || selectedPart) return;
+    if (!value) {
+      setSelectedPart(null);
+      return;
+    }
+    if (selectedPart) return; // already resolved, don't re-fetch
     let active = true;
     base44.entities.Part.list(null, 500).then(results => {
       if (!active) return;
@@ -53,6 +57,8 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
     if (!val || val.length < 1) {
       setAllSuggestions([]);
       setOpen(false);
+      setSelectedPart(null);
+      if (onClear) onClear();
       return;
     }
 

@@ -198,6 +198,14 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
                           setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
                         }}
                         onChange={(val) => updateLine(i, "app_part_number", val)}
+                        onClear={() => {
+                          const items = form.items.map((line, idx) => {
+                            if (idx !== i) return line;
+                            return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0 };
+                          });
+                          const subtotal = items.reduce((s, l) => s + (Number(l.total) || 0), 0);
+                          setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
+                        }}
                         placeholder="Part #"
                         className="rounded-sm h-8 text-xs font-mono"
                       />

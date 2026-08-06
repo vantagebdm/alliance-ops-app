@@ -232,6 +232,13 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                           recalc(items);
                         }}
                         onChange={(val) => updateLine(i, "app_part_number", val)}
+                        onClear={() => {
+                          const items = form.items.map((line, idx) => {
+                            if (idx !== i) return line;
+                            return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "" };
+                          });
+                          recalc(items);
+                        }}
                         placeholder="Part #"
                         className="rounded-sm h-8 text-xs font-mono"
                       />

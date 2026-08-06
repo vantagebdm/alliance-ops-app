@@ -625,6 +625,13 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
                                 recalc(items);
                               }}
                               onChange={(val) => updateLine(i, "part_number", val)}
+                              onClear={() => {
+                                const items = form.items.map((line, idx) => {
+                                  if (idx !== i) return line;
+                                  return { ...line, part_number: "", description: "", unit_price: 0, discount: 0, total: 0 };
+                                });
+                                recalc(items);
+                              }}
                               placeholder="Part #"
                               className="rounded-sm text-sm"
                             />

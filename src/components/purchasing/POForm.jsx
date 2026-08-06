@@ -256,6 +256,14 @@ export default function POForm({ onClose, onSaved, initial }) {
                             setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
                           }}
                           onChange={(val) => updateLine(i, "supplier_sku", val)}
+                          onClear={() => {
+                            const items = form.items.map((line, idx) => {
+                              if (idx !== i) return line;
+                              return { ...line, part_number: "", supplier_sku: "", app_part_number: "", description: "", unit_cost: 0, total: 0 };
+                            });
+                            const subtotal = items.reduce((s, l) => s + (Number(l.total) || 0), 0);
+                            setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
+                          }}
                           placeholder="Part #"
                           className="rounded-sm h-7 text-xs font-mono w-full"
                         />
