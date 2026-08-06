@@ -323,6 +323,91 @@ export function generateProposalPDF(proposal) {
   return doc;
 }
 
+// Blank A4 trading application form — downloadable from the proposal generator.
+export function generateTradingAppPDF() {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageW = 210;
+  const margin = 18;
+  let y = 20;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, pageW, 297, "F");
+
+  const logoUrl = getLogo("company_logo");
+  y = addHeader(doc, pageW, "TRADING APPLICATION", "Form TA-01", logoUrl) + 12;
+
+  const section = (title) => {
+    doc.setFillColor(...HEADER_COLOR);
+    doc.rect(margin, y, pageW - margin * 2, 7, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "bold");
+    doc.text(title, margin + 2, y + 5);
+    y += 7;
+  };
+  const field = (label, lineW) => {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(40, 40, 40);
+    doc.text(label, margin, y);
+    doc.setDrawColor(160, 160, 160);
+    const lblW = (label.length * 2.2) + 2;
+    doc.line(margin + lblW, y - 0.5, margin + lblW + lineW, y - 0.5);
+    y += 6;
+  };
+  const gap = (h = 4) => { y += h; };
+
+  section("1. BUSINESS DETAILS");
+  field("Legal / Company Name", 110);
+  field("Trading Name", 110);
+  field("ABN", 70); gap();
+  field("ACN", 70); field("Date Established", 60);
+  field("Nature of Business", 110);
+  gap();
+
+  section("2. ADDRESS");
+  field("Street Address", 110);
+  field("Suburb", 70); field("State", 30); field("Postcode", 25);
+  field("Postal Address (if different)", 110);
+  gap();
+
+  section("3. CONTACT DETAILS");
+  field("Contact Person", 110);
+  field("Position", 70); field("Phone", 60);
+  field("Mobile", 70); field("Email", 70);
+  field("Accounts Contact", 90); field("Accounts Email", 70);
+  gap();
+
+  section("4. ACCOUNT / PAYMENT DETAILS");
+  field("Requested Account Terms", 110);
+  field("Credit Limit Requested ($)", 70);
+  field("Bank / Branch", 90); field("BSB", 40);
+  field("Account Name", 70); field("Account No.", 60);
+  gap();
+
+  section("5. TRADE REFERENCES (1)");
+  field("Ref 1 — Business", 110);
+  field("Contact", 70); field("Phone", 60);
+  gap(2);
+  field("Ref 2 — Business", 110);
+  field("Contact", 70); field("Phone", 60);
+  gap();
+
+  section("6. DECLARATION");
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(8);
+  doc.setTextColor(60, 60, 60);
+  const decl = doc.splitTextToSize("I/We declare that the information provided in this application is true and correct and authorise Alliance Priority Parts to make any enquiries necessary to verify the details. I/We have read and agree to the trading terms and conditions applicable to this account.", pageW - margin * 2);
+  doc.text(decl, margin, y + 3);
+  y += 16;
+  field("Name", 90); gap();
+  field("Position", 90); gap();
+  field("Signature", 90); field("Date", 40);
+
+  addFooter(doc, pageW);
+  return doc;
+}
+
 export function generateSalesOrderPDF(order) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;

@@ -8,7 +8,7 @@ import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { DISTRIBUTION_SUPPLIERS } from "@/lib/distributionData";
 import { STANDARD_TERMS } from "@/lib/proposalTerms";
-import { generateProposalPDF } from "@/lib/documentPdf";
+import { generateProposalPDF, generateTradingAppPDF } from "@/lib/documentPdf";
 
 const fmt = (n) => `$${Number(n || 0).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fieldCls = "h-8 w-full rounded-md border border-input bg-[hsl(0,0%,10%)] px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
@@ -145,23 +145,13 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     }
   };
 
-  const handleSendTradingApp = async () => {
-    if (!qualify.client_name.trim() || !qualify.client_email.trim()) {
-      toast({ title: "Client name & email required", variant: "destructive" });
-      return;
-    }
+  const handleDownloadTradingApp = () => {
     try {
-      await base44.entities.Customer.create({
-        name: qualify.client_name.trim(),
-        company: qualify.client_company.trim(),
-        email: qualify.client_email.trim(),
-        status: "active",
-        account_status: "credit_pending",
-        customer_type: "company",
-      });
-      toast({ title: "Trading application sent", description: "Awaiting approval" });
+      const doc = generateTradingAppPDF();
+      doc.save("Trading-Application.pdf");
+      toast({ title: "Trading application downloaded", description: "Blank A4 form ready to complete" });
     } catch (e) {
-      toast({ title: "Failed to send application", description: e?.message, variant: "destructive" });
+      toast({ title: "Failed to download form", description: e?.message, variant: "destructive" });
     }
   };
 
@@ -290,8 +280,8 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
                     <button onClick={handleAddCustomer} className="inline-flex items-center gap-1 h-7 px-2 rounded-md text-[10px] border border-primary/40 text-primary hover:bg-primary/10">
                       <UserPlus className="w-3 h-3" /> Add Customer
                     </button>
-                    <button onClick={handleSendTradingApp} className="inline-flex items-center gap-1 h-7 px-2 rounded-md text-[10px] border border-input text-white/60 hover:text-white hover:border-primary/40">
-                      <Mail className="w-3 h-3" /> Send Trading App
+                    <button onClick={handleDownloadTradingApp} className="inline-flex items-center gap-1 h-7 px-2 rounded-md text-[10px] border border-input text-white/60 hover:text-white hover:border-primary/40">
+                      <Mail className="w-3 h-3" /> Download Trading App
                     </button>
                   </div>
                 ) : (
