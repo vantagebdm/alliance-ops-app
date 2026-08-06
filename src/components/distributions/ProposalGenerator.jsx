@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import {
   Trash2, RotateCcw, ChevronDown, FileDown,
   UserCheck, Building2, ScrollText, Package, Send,
-  UserPlus, Mail, Phone, ShieldCheck,
+  UserPlus, Mail, Phone, ShieldCheck, Eye,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
@@ -198,6 +198,40 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     status: "draft",
     notes: meta.notes?.trim(),
   });
+
+  const previewSample = () => {
+    const sample = {
+      proposal_number: "DP-SAMPLE",
+      customer_name: "John Smith",
+      customer_company: "Smith Pty Ltd",
+      trade_company: "Smith Trading Co",
+      client_number: "ACC-0001",
+      customer_email: "name@email.com",
+      current_customer: "yes",
+      best_contact: "Jane Doe",
+      best_contact_phone: "0412 345 678",
+      best_contact_email: "contact@email.com",
+      proposal_type: "commercial",
+      trading_terms: "30_days",
+      deposit_required: true,
+      deposit_pct: 50,
+      balance_terms: "COD on delivery",
+      validity_days: 30,
+      conditions_text: "Pricing subject to supplier confirmation at time of order.",
+      standard_terms: ["retail", "commercial"],
+      items: [
+        { description: "Total Quartz 9000 5W-30 5L", quantity: 4, unit_price: 62.40, total: 249.60 },
+        { description: "Total Rubia TIR 8900 20L", quantity: 1, unit_price: 312.00, total: 312.00 },
+        { description: "Total Ceran XM 450G (box of 14)", quantity: 1, unit_price: 189.20, total: 189.20 },
+      ],
+      subtotal: 750.80,
+      gst: 75.08,
+      total: 825.88,
+    };
+    const doc = generateProposalPDF(sample);
+    window.open(doc.output("bloburl"), "_blank");
+    toast({ title: "Sample A4 proposal opened", description: "Preview of the generated PDF layout" });
+  };
 
   const handleGenerate = async () => {
     if (!qualify.client_name.trim()) {
@@ -492,9 +526,12 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
               {!canGenerate && <div className="text-[10px] text-amber-400/70 pt-1">Complete client name, contact details & add items to generate.</div>}
             </div>
             <p className="text-[11px] text-white/40">Generates a quote-style proposal PDF (no part numbers) with all terms, info, items & quantities, and opens it for review. The branded proposal-pack template will be slotted in once you add it.</p>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <button onClick={handleGenerate} disabled={saving || !canGenerate} className="flex-1 inline-flex items-center justify-center gap-2 h-9 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50">
                 <FileDown className="w-4 h-4" /> {saving ? "Generating..." : "Generate Proposal"}
+              </button>
+              <button onClick={previewSample} className="inline-flex items-center justify-center gap-2 h-9 px-3 rounded-md border border-input text-white/70 text-sm hover:bg-white/5">
+                <Eye className="w-4 h-4" /> Sample
               </button>
               <button onClick={reset} disabled={!items.length && !qualify.client_name && !contact.company_name} className="inline-flex items-center justify-center h-9 px-3 rounded-md border border-input text-white/60 text-sm hover:bg-white/5 disabled:opacity-50">
                 <RotateCcw className="w-4 h-4" />
