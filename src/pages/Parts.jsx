@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Search, Filter, AlertTriangle, ChevronLeft, FileUp, FileBarChart } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,31 @@ export default function Parts() {
     acc["all"] = (acc["all"] || 0) + 1;
     return acc;
   }, {});
+
+  // Parse a volume size string (e.g. "20L", "208L", "1000L", "5L") into litres
+  const parseLitres = (vs) => {
+    if (!vs) return 0;
+    const m = String(vs).match(/([\d.]+)\s*(l|ltr|litre|liter)s?/i);
+    return m ? parseFloat(m[1]) || 0 : 0;
+  };
+
+  // Normalise a part name to its base product by stripping trailing pack/volume size
+  const baseProductName = (name) => {
+    if (!name) return "";
+    return String(name).trim().replace(/\s*\d+(\.\d+)?\s*(l|ltr|litre|liter)s?\.?$/i, "").trim();
+  };
+
+  // Total litres on hand per base product name (across all pack-size variants), for oils
+  const oilLitresByBase = useMemo(() => {
+    const map = {};
+    for (const p of parts) {
+      if (p.category !== "oils") continue;
+      const base = baseProductName(p.name);
+      if (!base) continue;
+      map[base] = (map[base] || 0) + (p.stock_quantity || 0) * parseLitres(p.volume_size || p.pack_size);
+    }
+    return map;
+  }, [parts]);
 
   // Filter by equipment type + search + category
   const filtered = parts.filter(p => {
@@ -93,9 +118,13 @@ export default function Parts() {
     { key: "stock_quantity", label: "In Stock", render: (v, row) => {
       const low = row.min_stock_level > 0 && v <= row.min_stock_level;
       const out = v === 0;
+      const isOil = row.category === "oils";
+      const display = isOil
+        ? `${oilLitresByBase[baseProductName(row.name)] || 0} L`
+        : (v ?? 0);
       return (
         <div className="flex items-center gap-1.5">
-          <span className={`font-bold text-sm ${out ? "text-red-500" : low ? "text-amber-500" : "text-foreground"}`}>{v ?? 0}</span>
+          <span className={`font-bold text-sm ${out ? "text-red-500" : low ? "text-amber-500" : "text-foreground"}`}>{display}</span>
           {(low || out) && <AlertTriangle className="w-3.5 h-3.5 text-red-500" />}
         </div>
       );
