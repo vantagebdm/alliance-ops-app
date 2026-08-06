@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Trash2, RotateCcw, ChevronDown, FileDown,
-  UserCheck, Handshake, ScrollText, Package, Send,
+  UserCheck, Building2, ScrollText, Package, Send,
+  UserPlus, Mail, Phone, ShieldCheck,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useToast } from "@/components/ui/use-toast";
 import { DISTRIBUTION_SUPPLIERS } from "@/lib/distributionData";
-import { jsPDF } from "jspdf";
+import { STANDARD_TERMS } from "@/lib/proposalTerms";
+import { generateProposalPDF } from "@/lib/documentPdf";
 
 const fmt = (n) => `$${Number(n || 0).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fieldCls = "h-8 w-full rounded-md border border-input bg-[hsl(0,0%,10%)] px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
@@ -30,21 +32,6 @@ const TC_PRESETS = [
   "50% COD, balance 14 days from delivery",
 ];
 
-export const STANDARD_TERMS = {
-  retail: {
-    label: "Retail Terms",
-    text: "Payment is required in full before goods are released, collected or dispatched.\n\nQuoted prices remain valid for the stated quotation period and are subject to stock availability.\n\nSpecial-order, indent, custom, dangerous-goods and non-stock items may require full payment in advance and are non-cancellable and non-returnable once ordered.\n\nFreight, hot-shot delivery, handling and dangerous-goods charges are additional unless expressly included in writing.",
-  },
-  trade: {
-    label: "Business / Trade Terms",
-    text: "Trade pricing is conditional on the customer maintaining an active approved business account and meeting applicable purchasing and payment requirements.\n\nApproved credit accounts are payable within 7 or 14 days from the invoice date, as specified in the account approval.\n\nAlliance Priority Parts may suspend credit facilities, trade pricing, stock reservations or further supply where an account is overdue, exceeds its credit limit or breaches the trading terms.\n\nTrade pricing does not include dedicated or guaranteed stock allocation unless confirmed in writing.",
-  },
-  commercial: {
-    label: "Commercial Terms",
-    text: "Commercial pricing is customer-specific and conditional on forecast purchasing volumes, agreed product mix, payment performance, contract term and stockholding requirements.\n\nCommercial pricing is confidential and may not be disclosed, transferred or applied to purchases by related or third-party entities unless approved in writing.\n\nAssigned inventory remains subject to the agreed minimum and maximum stock schedule, forecast demand and replenishment arrangements.\n\nWhere customer-specific stock becomes obsolete, expires, is discontinued or remains unused because the customer's requirements change, the customer may be required to purchase that stock in accordance with the supply agreement.\n\nAlliance Priority Parts may review pricing where supplier costs, exchange rates, freight, fuel, duties, regulatory costs or other material input costs change.",
-  },
-};
-
 function Section({ idx, open, setOpen, icon: Icon, title, badge, children }) {
   const isOpen = open === idx;
   return (
@@ -63,13 +50,17 @@ function Section({ idx, open, setOpen, icon: Icon, title, badge, children }) {
   );
 }
 
-function Chip({ active, onClick, children }) {
+function Chip({ active, onClick, children, disabled, title }) {
   return (
     <button
       onClick={onClick}
-      className={active
-        ? "px-2.5 py-1 rounded-md text-xs bg-primary text-primary-foreground"
-        : "px-2.5 py-1 rounded-md text-xs border border-input text-white/60 hover:text-white"}
+      disabled={disabled}
+      title={title}
+      className={disabled
+        ? "px-2.5 py-1 rounded-md text-xs border border-input text-white/20 cursor-not-allowed"
+        : active
+          ? "px-2.5 py-1 rounded-md text-xs bg-primary text-primary-foreground"
+          : "px-2.5 py-1 rounded-md text-xs border border-input text-white/60 hover:text-white"}
     >
       {children}
     </button>
@@ -80,11 +71,12 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
   const { toast } = useToast();
   const [open, setOpen] = useState(0);
   const [saving, setSaving] = useState(false);
+  const [customerStatus, setCustomerStatus] = useState(null);
   const supplier = DISTRIBUTION_SUPPLIERS.find((s) => s.id === supplierId);
 
   const [qualify, setQualify] = useState({ current_customer: "no", client_name: "", client_company: "", client_number: "", client_email: "" });
-  const [trade, setTrade] = useState({ proposal_type: "", trading_terms: "" });
-  const [terms, setTerms] = useState({ deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "", standard_terms: [] });
+  const [contact, setContact] = useState({ company_name: "", best_contact: "", phone: "", email: "" });
+  const [terms, setTerms] = useState({ proposal_type: "", trading_terms: "", deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "", standard_terms: [] });
   const [meta, setMeta] = useState({ title: "", notes: "" });
 
   const updateItem = (idx, patch) => setItems(items.map((it, i) => (i === idx ? { ...it, ...patch } : it)));
@@ -94,13 +86,83 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
   const gst = subtotal * 0.1;
   const total = subtotal + gst;
 
+  const commercialSelectable = qualify.current_customer === "yes" && customerStatus?.active === true;
+  const commercialAllowed = terms.proposal_type === "commercial";
+  const contactComplete = !!(contact.company_name.trim() && contact.best_contact.trim() && contact.phone.trim() && contact.email.trim());
+  const canGenerate = !!(qualify.client_name.trim() && contactComplete && items.length > 0);
+
+  // Verify existing customer when marked current + email provided
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (qualify.current_customer !== "yes" || !qualify.client_email.trim()) { setCustomerStatus(null); return; }
+      try {
+        const res = await base44.entities.Customer.filter({ email: qualify.client_email.trim() });
+        const c = res && res[0];
+        if (cancelled) return;
+        if (c) {
+          const active = c.status === "active" && !["on_hold", "declined"].includes(c.account_status);
+          const thirty = /30/.test(c.payment_terms || "");
+          setCustomerStatus({ active, thirty });
+          setTerms((prev) => ({ ...prev, trading_terms: prev.trading_terms || (thirty ? "30_days" : "14_days") }));
+        } else {
+          setCustomerStatus({ active: false, thirty: false });
+        }
+      } catch { setCustomerStatus(null); }
+    };
+    run();
+    return () => { cancelled = true; };
+  }, [qualify.current_customer, qualify.client_email]);
+
   const reset = () => {
     setItems([]);
     setQualify({ current_customer: "no", client_name: "", client_company: "", client_number: "", client_email: "" });
-    setTrade({ proposal_type: "", trading_terms: "" });
-    setTerms({ deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "", standard_terms: [] });
+    setContact({ company_name: "", best_contact: "", phone: "", email: "" });
+    setTerms({ proposal_type: "", trading_terms: "", deposit_required: false, deposit_pct: 50, balance_terms: "", validity_days: 30, conditions_text: "", standard_terms: [] });
     setMeta({ title: "", notes: "" });
+    setCustomerStatus(null);
     setOpen(0);
+  };
+
+  const handleAddCustomer = async () => {
+    if (!qualify.client_name.trim() || !qualify.client_email.trim()) {
+      toast({ title: "Client name & email required", variant: "destructive" });
+      return;
+    }
+    try {
+      const c = await base44.entities.Customer.create({
+        name: qualify.client_name.trim(),
+        company: qualify.client_company.trim(),
+        email: qualify.client_email.trim(),
+        status: "active",
+        account_status: "cash_sale",
+        customer_type: "company",
+      });
+      setQualify((q) => ({ ...q, current_customer: "yes", client_number: String(c.id).slice(-6).toUpperCase() }));
+      toast({ title: "Customer added", description: c.name });
+    } catch (e) {
+      toast({ title: "Failed to add customer", description: e?.message, variant: "destructive" });
+    }
+  };
+
+  const handleSendTradingApp = async () => {
+    if (!qualify.client_name.trim() || !qualify.client_email.trim()) {
+      toast({ title: "Client name & email required", variant: "destructive" });
+      return;
+    }
+    try {
+      await base44.entities.Customer.create({
+        name: qualify.client_name.trim(),
+        company: qualify.client_company.trim(),
+        email: qualify.client_email.trim(),
+        status: "active",
+        account_status: "credit_pending",
+        customer_type: "company",
+      });
+      toast({ title: "Trading application sent", description: "Awaiting approval" });
+    } catch (e) {
+      toast({ title: "Failed to send application", description: e?.message, variant: "destructive" });
+    }
   };
 
   const buildPayload = (proposal_number) => ({
@@ -112,8 +174,12 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     customer_email: qualify.client_email.trim(),
     current_customer: qualify.current_customer,
     client_number: qualify.client_number.trim(),
-    proposal_type: trade.proposal_type,
-    trading_terms: trade.trading_terms,
+    trade_company: contact.company_name.trim(),
+    best_contact: contact.best_contact.trim(),
+    best_contact_phone: contact.phone.trim(),
+    best_contact_email: contact.email.trim(),
+    proposal_type: terms.proposal_type,
+    trading_terms: terms.trading_terms,
     deposit_required: terms.deposit_required,
     deposit_pct: Number(terms.deposit_pct) || 0,
     balance_terms: terms.balance_terms.trim(),
@@ -133,116 +199,22 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     notes: meta.notes?.trim(),
   });
 
-  const generatePDF = (proposal_number, payload) => {
-    const doc = new jsPDF({ unit: "mm", format: "a4" });
-    const W = doc.internal.pageSize.getWidth();
-    let y = 14;
-
-    doc.setFont("helvetica", "bold"); doc.setFontSize(18);
-    doc.text("PROPOSAL", 14, y);
-    doc.setFontSize(10); doc.setFont("helvetica", "normal");
-    doc.text(proposal_number, W - 14, y, { align: "right" });
-    y += 6;
-    doc.text(supplier?.name || "", 14, y);
-    doc.text(new Date().toLocaleDateString("en-AU"), W - 14, y, { align: "right" });
-    y += 4;
-    doc.text(payload.title || "", 14, y);
-    y += 4;
-    doc.setDrawColor(200); doc.line(14, y, W - 14, y); y += 6;
-
-    const kv = (label, val) => {
-      doc.setFont("helvetica", "bold"); doc.setFontSize(9);
-      doc.text(label, 14, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(doc.splitTextToSize(String(val || "—"), 130), 50, y);
-      y += 5;
-    };
-
-    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("Client Details", 14, y); y += 5;
-    kv("Name", payload.customer_name);
-    kv("Company", payload.customer_company);
-    kv("Client No.", payload.client_number);
-    kv("Email", payload.customer_email);
-    kv("Existing Customer", payload.current_customer === "yes" ? "Yes" : "No");
-    y += 3;
-
-    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("Trade Details", 14, y); y += 5;
-    kv("Proposal Type", PROPOSAL_TYPES.find((t) => t.id === payload.proposal_type)?.label);
-    kv("Trading Terms", TRADING_TERMS.find((t) => t.id === payload.trading_terms)?.label);
-    y += 3;
-
-    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("Items", 14, y); y += 5;
-    doc.setFontSize(8); doc.setFont("helvetica", "bold");
-    doc.text("Description", 14, y);
-    doc.text("Qty", 130, y, { align: "right" });
-    doc.text("Unit $", 155, y, { align: "right" });
-    doc.text("Total", W - 14, y, { align: "right" });
-    y += 3;
-    doc.setDrawColor(220); doc.line(14, y, W - 14, y); y += 4;
-    doc.setFont("helvetica", "normal");
-    payload.items.forEach((it) => {
-      if (y > 272) { doc.addPage(); y = 14; }
-      doc.text(doc.splitTextToSize(`${it.description} (${it.supplier_sku})`, 110), 14, y);
-      doc.text(String(it.quantity), 130, y, { align: "right" });
-      doc.text(fmt(it.unit_price), 155, y, { align: "right" });
-      doc.text(fmt(it.total), W - 14, y, { align: "right" });
-      y += 6;
-    });
-    y += 1;
-    doc.setDrawColor(220); doc.line(14, y, W - 14, y); y += 5;
-    const tot = (label, val, bold) => {
-      doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(9);
-      doc.text(label, W - 60, y);
-      doc.text(fmt(val), W - 14, y, { align: "right" });
-      y += 5;
-    };
-    tot("Subtotal", payload.subtotal);
-    tot("GST (10%)", payload.gst);
-    doc.setFont("helvetica", "bold"); doc.setFontSize(11);
-    doc.text("TOTAL", W - 60, y);
-    doc.text(fmt(payload.total), W - 14, y, { align: "right" });
-    y += 7;
-    doc.setFontSize(9); doc.setFont("helvetica", "normal");
-
-    if (y > 250) { doc.addPage(); y = 14; }
-    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.text("Terms & Conditions", 14, y); y += 5;
-    doc.setFontSize(9); doc.setFont("helvetica", "normal");
-    const tcLines = [];
-    if (terms.deposit_required) tcLines.push(`${terms.deposit_pct}% deposit required on order.`);
-    if (terms.balance_terms) tcLines.push(`Balance: ${terms.balance_terms}.`);
-    tcLines.push(`Valid for ${terms.validity_days} days from issue.`);
-    if (terms.conditions_text) tcLines.push(terms.conditions_text);
-    tcLines.forEach((l) => { doc.text(doc.splitTextToSize("•  " + l, 180), 14, y); y += 5; });
-
-    terms.standard_terms.forEach((key) => {
-      const set = STANDARD_TERMS[key];
-      if (!set) return;
-      if (y > 245) { doc.addPage(); y = 14; }
-      doc.setFont("helvetica", "bold"); doc.setFontSize(10);
-      doc.text(set.label, 14, y); y += 5;
-      doc.setFont("helvetica", "normal"); doc.setFontSize(9);
-      set.text.split("\n\n").forEach((para) => {
-        if (y > 275) { doc.addPage(); y = 14; }
-        doc.text(doc.splitTextToSize(para, 180), 14, y);
-        y += 5;
-      });
-      y += 3;
-    });
-
-    // NOTE: branded PDF template integration pending — this clean PDF will be slotted into the saved template.
-    doc.save(`${proposal_number}.pdf`);
-  };
-
   const handleGenerate = async () => {
-    if (!qualify.client_name?.trim()) {
-      toast({ title: "Client name required", description: "Complete the Qualify tab first", variant: "destructive" });
-      setOpen(0);
-      return;
+    if (!qualify.client_name.trim()) {
+      toast({ title: "Client name required", description: "Complete the Qualify tab", variant: "destructive" });
+      setOpen(0); return;
+    }
+    if (!contactComplete) {
+      toast({ title: "Contact details required", description: "Company, best contact, phone & email", variant: "destructive" });
+      setOpen(1); return;
+    }
+    if (terms.proposal_type === "commercial" && !commercialSelectable) {
+      toast({ title: "Commercial not available", description: "Client must be current & active", variant: "destructive" });
+      setOpen(2); return;
     }
     if (!items.length) {
-      toast({ title: "Add at least one product", description: "Use the Items tab", variant: "destructive" });
-      setOpen(3);
-      return;
+      toast({ title: "Add at least one product", variant: "destructive" });
+      setOpen(3); return;
     }
     setSaving(true);
     try {
@@ -251,8 +223,9 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
       const proposal_number = `DP-${String(seq).padStart(4, "0")}`;
       const payload = buildPayload(proposal_number);
       await base44.entities.DistributionProposal.create(payload);
-      generatePDF(proposal_number, payload);
-      toast({ title: "Proposal generated", description: `${proposal_number} · PDF downloaded` });
+      const doc = generateProposalPDF(payload);
+      window.open(doc.output("bloburl"), "_blank");
+      toast({ title: "Proposal generated", description: `${proposal_number} · PDF opened for review` });
       reset();
     } catch (e) {
       toast({ title: "Failed to generate proposal", description: e?.message || "Please try again", variant: "destructive" });
@@ -275,9 +248,25 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
           <div className="space-y-3 pt-2">
             <div>
               <span className={lblCls}>Current Customer?</span>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <Chip active={qualify.current_customer === "yes"} onClick={() => setQualify({ ...qualify, current_customer: "yes" })}>Yes</Chip>
                 <Chip active={qualify.current_customer === "no"} onClick={() => setQualify({ ...qualify, current_customer: "no" })}>No</Chip>
+                {qualify.current_customer === "no" ? (
+                  <div className="flex gap-1.5 ml-auto">
+                    <button onClick={handleAddCustomer} className="inline-flex items-center gap-1 h-7 px-2 rounded-md text-[10px] border border-primary/40 text-primary hover:bg-primary/10">
+                      <UserPlus className="w-3 h-3" /> Add Customer
+                    </button>
+                    <button onClick={handleSendTradingApp} className="inline-flex items-center gap-1 h-7 px-2 rounded-md text-[10px] border border-input text-white/60 hover:text-white hover:border-primary/40">
+                      <Mail className="w-3 h-3" /> Send Trading App
+                    </button>
+                  </div>
+                ) : (
+                  customerStatus && (
+                    <span className={`ml-auto inline-flex items-center gap-1 text-[10px] ${customerStatus.active ? "text-primary" : "text-amber-400"}`}>
+                      <ShieldCheck className="w-3 h-3" /> {customerStatus.active ? "Active account" : "Not active"}
+                    </span>
+                  )
+                )}
               </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
@@ -301,31 +290,61 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
           </div>
         </Section>
 
-        {/* TAB 2 — TRADE DETAILS */}
-        <Section idx={1} open={open} setOpen={setOpen} icon={Handshake} title="2 · Trade Details" badge={[PROPOSAL_TYPES.find(t=>t.id===trade.proposal_type)?.label, TRADING_TERMS.find(t=>t.id===trade.trading_terms)?.label].filter(Boolean).join(" · ")}>
+        {/* TAB 2 — CONTACT DETAILS */}
+        <Section idx={1} open={open} setOpen={setOpen} icon={Building2} title="2 · Contact Details" badge={contactComplete ? "complete" : "required"}>
           <div className="space-y-3 pt-2">
-            <div>
-              <span className={lblCls}>Proposal Type</span>
-              <div className="flex flex-wrap gap-2">
-                {PROPOSAL_TYPES.map((t) => (
-                  <Chip key={t.id} active={trade.proposal_type === t.id} onClick={() => setTrade({ ...trade, proposal_type: t.id })}>{t.label}</Chip>
-                ))}
+            <p className="text-[10px] text-white/40">Required before a proposal can be generated.</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <span className={lblCls}>Company Name *</span>
+                <input value={contact.company_name} onChange={(e) => setContact({ ...contact, company_name: e.target.value })} className={fieldCls} placeholder="Company Pty Ltd" />
               </div>
-            </div>
-            <div>
-              <span className={lblCls}>Trading Terms</span>
-              <div className="flex flex-wrap gap-2">
-                {TRADING_TERMS.map((t) => (
-                  <Chip key={t.id} active={trade.trading_terms === t.id} onClick={() => setTrade({ ...trade, trading_terms: t.id })}>{t.label}</Chip>
-                ))}
+              <div>
+                <span className={lblCls}>Best Contact *</span>
+                <input value={contact.best_contact} onChange={(e) => setContact({ ...contact, best_contact: e.target.value })} className={fieldCls} placeholder="Contact name" />
+              </div>
+              <div>
+                <span className={lblCls}>Phone Number *</span>
+                <input value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} className={fieldCls} placeholder="04xx xxx xxx" />
+              </div>
+              <div>
+                <span className={lblCls}>Best Email *</span>
+                <input value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} className={fieldCls} placeholder="contact@email.com" />
               </div>
             </div>
           </div>
         </Section>
 
         {/* TAB 3 — TERMS & CONDITIONS */}
-        <Section idx={2} open={open} setOpen={setOpen} icon={ScrollText} title="3 · Terms & Conditions" badge={terms.deposit_required ? `${terms.deposit_pct}% dep` : ""}>
+        <Section idx={2} open={open} setOpen={setOpen} icon={ScrollText} title="3 · Terms & Conditions" badge={[PROPOSAL_TYPES.find(t=>t.id===terms.proposal_type)?.label, TRADING_TERMS.find(t=>t.id===terms.trading_terms)?.label].filter(Boolean).join(" · ")}>
           <div className="space-y-3 pt-2">
+            <div>
+              <span className={lblCls}>Proposal Type</span>
+              <div className="flex flex-wrap gap-2">
+                {PROPOSAL_TYPES.map((t) => (
+                  <Chip
+                    key={t.id}
+                    active={terms.proposal_type === t.id}
+                    disabled={t.id === "commercial" && !commercialSelectable}
+                    title={t.id === "commercial" && !commercialSelectable ? "Client must be a current, active customer" : ""}
+                    onClick={() => setTerms({ ...terms, proposal_type: t.id })}
+                  >
+                    {t.label}{t.id === "commercial" && !commercialSelectable ? " 🔒" : ""}
+                  </Chip>
+                ))}
+              </div>
+              {!commercialSelectable && <p className="text-[10px] text-amber-400/70 mt-1">Commercial requires a current, active customer account.</p>}
+            </div>
+            <div>
+              <span className={lblCls}>Trading Terms {customerStatus?.thirty && <span className="text-primary/60">(client on 30 days)</span>}</span>
+              <div className="flex flex-wrap gap-2">
+                {TRADING_TERMS.map((t) => (
+                  <Chip key={t.id} active={terms.trading_terms === t.id} onClick={() => setTerms({ ...terms, trading_terms: t.id })}>{t.label}</Chip>
+                ))}
+              </div>
+              <p className="text-[10px] text-white/30 mt-1">Standard is 14 days unless the client is already set to 30 days.</p>
+            </div>
+
             <div className="flex items-center gap-3">
               <label className="flex items-center gap-2 text-xs text-white/70 cursor-pointer">
                 <input type="checkbox" checked={terms.deposit_required} onChange={(e) => setTerms({ ...terms, deposit_required: e.target.checked })} className="accent-primary" />
@@ -376,7 +395,7 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
                       >
                         <input type="checkbox" checked={active} readOnly className="accent-primary pointer-events-none" />
                         <span className="text-xs font-heading uppercase tracking-wider text-white/80">{set.label}</span>
-                        {active && <span className="ml-auto text-[9px] text-primary/70">included in PDF</span>}
+                        {active && <span className="ml-auto text-[9px] text-primary/70">in PDF</span>}
                       </button>
                       {active && (
                         <div className="px-3 pb-3 text-[10px] text-white/50 whitespace-pre-line max-h-40 overflow-auto leading-relaxed border-t border-[hsl(0,0%,14%)] pt-2">
@@ -395,6 +414,10 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
         <Section idx={3} open={open} setOpen={setOpen} icon={Package} title="4 · Items" badge={`${items.length} line${items.length === 1 ? "" : "s"}`}>
           <div className="space-y-3 pt-2">
             <input value={meta.title} onChange={(e) => setMeta({ ...meta, title: e.target.value })} className={fieldCls} placeholder="Proposal title (optional)" />
+
+            {!commercialAllowed && (
+              <p className="text-[10px] text-amber-400/70">Commercial pricing is locked — select a Commercial proposal type in Tab 3 to enable it.</p>
+            )}
 
             {items.length === 0 ? (
               <div className="py-8 text-center text-white/40 text-sm">
@@ -424,7 +447,14 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
                           <div className="flex flex-wrap gap-1 mt-1">
                             <button onClick={() => updateItem(idx, { pricing_basis: "per_unit", quantity: it.unit_count, unit_price: +(it.per_unit_cost * 1.65).toFixed(2) })} className={it.pricing_basis === "per_unit" ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground" : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}>Per Unit {it.unit_label} +65%</button>
                             <button onClick={() => updateItem(idx, { pricing_basis: "quote_total", quantity: 1, unit_price: +(it.pack_cost * 1.30).toFixed(2) })} className={it.pricing_basis === "quote_total" ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground" : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}>Quote Total +30%</button>
-                            <button onClick={() => updateItem(idx, { pricing_basis: "commercial", quantity: 1, unit_price: +(it.pack_cost * 1.20).toFixed(2) })} className={it.pricing_basis === "commercial" ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground" : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white"}>Commercial +20%</button>
+                            <button
+                              onClick={commercialAllowed ? () => updateItem(idx, { pricing_basis: "commercial", quantity: 1, unit_price: +(it.pack_cost * 1.20).toFixed(2) }) : undefined}
+                              disabled={!commercialAllowed}
+                              title={commercialAllowed ? "" : "Select Commercial proposal type in Tab 3"}
+                              className={it.pricing_basis === "commercial" ? "px-1.5 py-0.5 rounded text-[9px] bg-primary text-primary-foreground" : commercialAllowed ? "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/50 hover:text-white" : "px-1.5 py-0.5 rounded text-[9px] border border-input text-white/20 cursor-not-allowed"}
+                            >
+                              Commercial +20%
+                            </button>
                           </div>
                         )}
                       </td>
@@ -453,19 +483,20 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
           <div className="space-y-3 pt-2 text-sm">
             <div className="rounded-md border border-[hsl(0,0%,14%)] bg-[hsl(0,0%,10%)] p-3 space-y-1 text-xs">
               <div className="flex justify-between"><span className="text-white/40">Client</span><span className="text-white/80">{qualify.client_name || "—"}</span></div>
-              <div className="flex justify-between"><span className="text-white/40">Company</span><span className="text-white/80">{qualify.client_company || "—"}</span></div>
-              <div className="flex justify-between"><span className="text-white/40">Existing</span><span className="text-white/80">{qualify.current_customer === "yes" ? "Yes" : "No"}</span></div>
-              <div className="flex justify-between"><span className="text-white/40">Type</span><span className="text-white/80">{PROPOSAL_TYPES.find(t => t.id === trade.proposal_type)?.label || "—"}</span></div>
-              <div className="flex justify-between"><span className="text-white/40">Terms</span><span className="text-white/80">{TRADING_TERMS.find(t => t.id === trade.trading_terms)?.label || "—"}</span></div>
+              <div className="flex justify-between"><span className="text-white/40">Contact</span><span className="text-white/80">{contact.best_contact || "—"}</span></div>
+              <div className="flex justify-between"><span className="text-white/40">Phone</span><span className="text-white/80">{contact.phone || "—"}</span></div>
+              <div className="flex justify-between"><span className="text-white/40">Type</span><span className="text-white/80">{PROPOSAL_TYPES.find(t => t.id === terms.proposal_type)?.label || "—"}</span></div>
+              <div className="flex justify-between"><span className="text-white/40">Terms</span><span className="text-white/80">{TRADING_TERMS.find(t => t.id === terms.trading_terms)?.label || "—"}</span></div>
               <div className="flex justify-between"><span className="text-white/40">Lines</span><span className="text-white/80">{items.length}</span></div>
               <div className="flex justify-between pt-1 border-t border-[hsl(0,0%,14%)]"><span className="text-white/40">Total (inc GST)</span><span className="text-primary font-heading">{fmt(total)}</span></div>
+              {!canGenerate && <div className="text-[10px] text-amber-400/70 pt-1">Complete client name, contact details & add items to generate.</div>}
             </div>
-            <p className="text-[11px] text-white/40">Generates the proposal record and downloads a PDF. The branded template will be slotted in once you save it.</p>
+            <p className="text-[11px] text-white/40">Generates a quote-style proposal PDF (no part numbers) with all terms, info, items & quantities, and opens it for review. The branded proposal-pack template will be slotted in once you add it.</p>
             <div className="flex gap-2">
-              <button onClick={handleGenerate} disabled={saving} className="flex-1 inline-flex items-center justify-center gap-2 h-9 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50">
+              <button onClick={handleGenerate} disabled={saving || !canGenerate} className="flex-1 inline-flex items-center justify-center gap-2 h-9 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 disabled:opacity-50">
                 <FileDown className="w-4 h-4" /> {saving ? "Generating..." : "Generate Proposal"}
               </button>
-              <button onClick={reset} disabled={!items.length && !qualify.client_name} className="inline-flex items-center justify-center h-9 px-3 rounded-md border border-input text-white/60 text-sm hover:bg-white/5 disabled:opacity-50">
+              <button onClick={reset} disabled={!items.length && !qualify.client_name && !contact.company_name} className="inline-flex items-center justify-center h-9 px-3 rounded-md border border-input text-white/60 text-sm hover:bg-white/5 disabled:opacity-50">
                 <RotateCcw className="w-4 h-4" />
               </button>
             </div>

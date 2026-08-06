@@ -40,6 +40,20 @@
       "type": "string",
       "description": "Existing client/account number if current customer"
     },
+    "trade_company": {
+      "type": "string",
+      "description": "Trading company name (Tab 2 contact details)"
+    },
+    "best_contact": {
+      "type": "string",
+      "description": "Best contact person for the proposal"
+    },
+    "best_contact_phone": {
+      "type": "string"
+    },
+    "best_contact_email": {
+      "type": "string"
+    },
     "proposal_type": {
       "type": "string",
       "enum": [

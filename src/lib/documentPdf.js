@@ -1,6 +1,7 @@
 import { jsPDF } from "jspdf";
 import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
+import { STANDARD_TERMS } from "@/lib/proposalTerms";
 
 const HEADER_COLOR = [0, 0, 0]; // Black (#000000)
 const TEXT_DARK = [30, 30, 30];
@@ -177,6 +178,149 @@ export function generateQuotePDF(quote) {
 
   addFooter(doc, pageW);
   return doc.output("blob");
+}
+
+// Proposal PDF — matches the quote layout but with no part-number column and
+// includes the full documented terms, client/trade info, items and quantities.
+export function generateProposalPDF(proposal) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const pageW = 210;
+  const margin = 18;
+  let y = 20;
+
+  doc.setFillColor(255, 255, 255);
+  doc.rect(0, 0, pageW, 297, "F");
+
+  const logoUrl = getLogo("quote_logo") || getLogo("company_logo");
+  y = addHeader(doc, pageW, "PROPOSAL", `Proposal #${proposal.proposal_number || ""}`, logoUrl) + 10;
+
+  const ptLabel = { retail: "Retail", trade_business: "Trade Business", commercial: "Commercial" }[proposal.proposal_type] || "—";
+  const ttLabel = { cod: "COD", "14_days": "14 Days", "30_days": "30 Days", "30_days_plus": "30 Days Plus" }[proposal.trading_terms] || "—";
+  const infoRows = [
+    ["Client:", proposal.customer_name || ""],
+    proposal.customer_company ? ["Company:", proposal.customer_company] : null,
+    proposal.trade_company ? ["Trade Company:", proposal.trade_company] : null,
+    proposal.client_number ? ["Client No.:", proposal.client_number] : null,
+    proposal.customer_email ? ["Email:", proposal.customer_email] : null,
+    ["Existing Customer:", proposal.current_customer === "yes" ? "Yes" : "No"],
+    proposal.best_contact ? ["Best Contact:", proposal.best_contact] : null,
+    proposal.best_contact_phone ? ["Phone:", proposal.best_contact_phone] : null,
+    proposal.best_contact_email ? ["Best Email:", proposal.best_contact_email] : null,
+    ["Proposal Type:", ptLabel],
+    ["Trading Terms:", ttLabel],
+  ].filter(Boolean);
+
+  doc.setFontSize(9);
+  infoRows.forEach(([label, val]) => {
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(80, 80, 80);
+    doc.text(label, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(30, 30, 30);
+    doc.text(doc.splitTextToSize(String(val), 120), margin + 42, y);
+    y += 6;
+  });
+  y += 4;
+
+  // Items table — NO part number column
+  doc.setFillColor(...HEADER_COLOR);
+  doc.rect(margin, y, pageW - margin * 2, 9, "F");
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.setFont("helvetica", "bold");
+  doc.text("Description", margin + 2, y + 6);
+  doc.text("Qty", margin + 112, y + 6, { align: "right" });
+  doc.text("Unit Price", margin + 142, y + 6, { align: "right" });
+  doc.text("Total", pageW - margin - 2, y + 6, { align: "right" });
+  y += 11;
+
+  doc.setFont("helvetica", "normal");
+  (proposal.items || []).forEach((item, idx) => {
+    if (y > 250) { doc.addPage(); y = 20; }
+    if (idx % 2 === 0) {
+      doc.setFillColor(...BG_LIGHT);
+      doc.rect(margin, y - 1, pageW - margin * 2, 8, "F");
+    }
+    doc.setTextColor(...TEXT_DARK);
+    doc.setFontSize(8);
+    const desc = doc.splitTextToSize(String(item.description || ""), 104);
+    doc.text(desc, margin + 2, y + 4.5);
+    doc.text(String(Number(item.quantity || 0)), margin + 112, y + 4.5, { align: "right" });
+    doc.text(`$${Number(item.unit_price || 0).toFixed(2)}`, margin + 142, y + 4.5, { align: "right" });
+    doc.text(`$${Number(item.total || 0).toFixed(2)}`, pageW - margin - 2, y + 4.5, { align: "right" });
+    y += 8;
+  });
+
+  y += 4;
+  doc.setDrawColor(200, 200, 200);
+  doc.line(margin, y, pageW - margin, y);
+  y += 4;
+
+  const totalsX = pageW - margin - 65;
+  doc.setFontSize(9);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...TEXT_GRAY);
+  doc.text("Subtotal:", totalsX, y);
+  doc.setTextColor(...TEXT_DARK);
+  doc.text(`$${Number(proposal.subtotal || 0).toFixed(2)}`, pageW - margin, y, { align: "right" });
+  y += 7;
+  doc.setTextColor(...TEXT_GRAY);
+  doc.text("GST (10%):", totalsX, y);
+  doc.setTextColor(...TEXT_DARK);
+  doc.text(`$${Number(proposal.gst || 0).toFixed(2)}`, pageW - margin, y, { align: "right" });
+  y += 5;
+  doc.setDrawColor(180, 180, 180);
+  doc.line(totalsX, y, pageW - margin, y);
+  y += 6;
+  doc.setFillColor(...HEADER_COLOR);
+  doc.rect(totalsX - 4, y - 4, pageW - margin - totalsX + 8, 10, "F");
+  doc.setFontSize(10);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(255, 255, 255);
+  doc.text("TOTAL:", totalsX, y + 3);
+  doc.text(`$${Number(proposal.total || 0).toFixed(2)}`, pageW - margin, y + 3, { align: "right" });
+  y += 14;
+
+  // Terms & Conditions
+  const drawHeading = (t) => {
+    if (y > 272) { doc.addPage(); y = 20; }
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...TEXT_DARK);
+    doc.text(t, margin, y);
+    y += 5;
+  };
+  const drawPara = (t) => {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(60, 60, 60);
+    const lines = doc.splitTextToSize(t, pageW - margin * 2);
+    lines.forEach((ln) => {
+      if (y > 282) { doc.addPage(); y = 20; }
+      doc.text(ln, margin, y);
+      y += 4.5;
+    });
+  };
+
+  drawHeading("Terms & Conditions");
+  const tcLines = [];
+  if (proposal.deposit_required) tcLines.push(`${proposal.deposit_pct}% deposit required on order.`);
+  if (proposal.balance_terms) tcLines.push(`Balance: ${proposal.balance_terms}.`);
+  tcLines.push(`Valid for ${proposal.validity_days} days from issue.`);
+  if (proposal.conditions_text) tcLines.push(proposal.conditions_text);
+  tcLines.forEach((l) => drawPara("•  " + l));
+  y += 2;
+
+  (proposal.standard_terms || []).forEach((key) => {
+    const set = STANDARD_TERMS[key];
+    if (!set) return;
+    y += 3;
+    drawHeading(set.label);
+    set.text.split("\n\n").forEach((p) => drawPara(p));
+  });
+
+  addFooter(doc, pageW);
+  return doc;
 }
 
 export function generateSalesOrderPDF(order) {
