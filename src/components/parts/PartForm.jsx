@@ -268,7 +268,20 @@ export default function PartForm({ onClose, onSaved, initial, prefill }) {
                     <Input type="number" step="0.01" value={form.price_per_pack || ""} onChange={e => update("price_per_pack", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
                   </div>
                   <div>
-                    <FieldLabel>Commercial Pricing</FieldLabel>
+                    <div className="flex items-center justify-between mb-1">
+                      <FieldLabel>Commercial Pricing</FieldLabel>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (form.unit_cost > 0) {
+                            update("commercial_price", parseFloat((form.unit_cost * 1.20).toFixed(2)));
+                          }
+                        }}
+                        className="px-2 py-0.5 text-[10px] font-heading font-bold uppercase tracking-wider rounded-sm bg-primary/10 text-primary border border-primary/30 hover:bg-primary hover:text-black transition-colors"
+                      >
+                        Auto +20%
+                      </button>
+                    </div>
                     <Input type="number" step="0.01" value={form.commercial_price || ""} onChange={e => update("commercial_price", Number(e.target.value))} className="rounded-sm" placeholder="0.00" />
                   </div>
                 </>
