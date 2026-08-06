@@ -225,7 +225,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                      <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-48 border-r border-border">Part #</th>
                      <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 flex-1 border-r border-border">Description</th>
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-24 border-r border-border">Qty</th>
-                     <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-36 border-r border-border">Unit Cost</th>
+                     <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-48 border-r border-border">Unit Cost</th>
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-32">Total</th>
                      <th className="w-20 border-l border-border" />
                      <th className="w-10" />
@@ -280,9 +280,9 @@ export default function POForm({ onClose, onSaved, initial }) {
                         <Input type="number" min="1" value={line.quantity || 1} onChange={e => updateLine(i, "quantity", Number(e.target.value))}
                           className="rounded-sm h-7 text-xs text-right" />
                       </td>
-                      <td className="px-4 py-1 w-36 border-r border-border/50">
+                      <td className="px-2 py-1 w-48 border-r border-border/50">
                                                <Input type="number" step="0.01" value={line.unit_cost || 0} onChange={e => updateLine(i, "unit_cost", Number(e.target.value))}
-                          className="rounded-sm h-7 text-xs text-right" />
+                          className="rounded-sm h-7 text-xs text-right px-1" />
                       </td>
                       <td className="px-4 py-1 w-32 text-right font-semibold text-sm">${(line.total || 0).toFixed(2)}</td>
                       <td className="px-1 py-1 w-20 border-l border-border/50">
