@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { base44 } from "@/api/base44Client";
-import { Wrench } from "lucide-react";
+import { Wrench, Plus } from "lucide-react";
 import PartInfoPopover from "@/components/ui/PartInfoPopover";
+import PartForm from "@/components/parts/PartForm";
 
 export default function PartAutocomplete({ value, onSelect, onChange, placeholder, className }) {
   const [allSuggestions, setAllSuggestions] = useState([]);
@@ -11,6 +12,8 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
   const [displayValue, setDisplayValue] = useState("");
   const [serviceMode, setServiceMode] = useState(false);
   const [selectedPart, setSelectedPart] = useState(null);
+  const [showAddPart, setShowAddPart] = useState(false);
+  const [addPartNumber, setAddPartNumber] = useState("");
   const inputRef = useRef(null);
   const [dropdownStyle, setDropdownStyle] = useState({});
 
@@ -89,6 +92,18 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
     setServiceMode(false);
   };
 
+  const handleAddNew = () => {
+    setAddPartNumber(displayValue || value || "");
+    setOpen(false);
+    setAllSuggestions([]);
+    setShowAddPart(true);
+  };
+
+  const handlePartCreated = (part) => {
+    setShowAddPart(false);
+    handleSelect(part);
+  };
+
   return (
     <div className="relative">
       <input
@@ -144,13 +159,37 @@ export default function PartAutocomplete({ value, onSelect, onChange, placeholde
                 >
                   <Wrench className="w-3 h-3" /> {serviceMode ? "Service Part Mode: On" : "Service Part"}
                 </button>
+                <button
+                  type="button"
+                  onMouseDown={(e) => { e.preventDefault(); handleAddNew(); }}
+                  className="w-full text-left px-3 py-2 text-xs font-heading font-semibold uppercase tracking-wider transition-colors flex items-center gap-1.5 sticky bottom-0 bg-[hsl(0,0%,14%)] text-primary hover:bg-[hsl(0,0%,18%)] border-t border-border/40"
+                >
+                  <Plus className="w-3 h-3" /> Add New Part
+                </button>
               </>
             ) : (
-              <div className="px-3 py-2 text-sm text-muted-foreground">No results</div>
+              <button
+                type="button"
+                onMouseDown={(e) => { e.preventDefault(); handleAddNew(); }}
+                className="w-full text-left px-3 py-2.5 text-sm transition-colors flex items-center gap-2 bg-primary/10 text-primary hover:bg-primary hover:text-black"
+              >
+                <Plus className="w-4 h-4" />
+                <div>
+                  <div className="font-heading font-semibold uppercase tracking-wider text-xs">No results — Add New Part</div>
+                  {(displayValue || value) && <div className="text-xs opacity-80 font-mono">"{displayValue || value}"</div>}
+                </div>
+              </button>
             )}
           </div>
         </>,
         document.body
+      )}
+      {showAddPart && (
+        <PartForm
+          prefill={{ part_number: addPartNumber }}
+          onSaved={handlePartCreated}
+          onClose={() => setShowAddPart(false)}
+        />
       )}
     </div>
   );

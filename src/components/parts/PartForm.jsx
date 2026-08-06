@@ -11,9 +11,9 @@ import { useAutocomplete } from "@/hooks/useAutocomplete";
 import FitmentBuilder from "./FitmentBuilder";
 import { PART_CATEGORIES, SUBCATEGORIES, EXTENDED_CATEGORIES, HAZMAT_CATEGORIES } from "@/lib/categories";
 
-export default function PartForm({ onClose, onSaved, initial }) {
+export default function PartForm({ onClose, onSaved, initial, prefill }) {
   const [form, setForm] = useState(initial || {
-    app_part_number: "", part_number: "", name: "", description: "", category: "other", subcategory: "", brand: "",
+    app_part_number: "", part_number: prefill?.part_number || "", name: "", description: "", category: "other", subcategory: "", brand: "",
     oem_number: "", supplier_sku: "", aftermarket_number: "", fitments: [], unit_cost: 0, sell_price: 0,
     stock_quantity: 0, min_stock_level: 0, location: "", supplier_name: "", status: "active",
     equipment_type: "", hazardous: false, dangerous_goods: false, sds_required: false,
@@ -91,13 +91,14 @@ export default function PartForm({ onClose, onSaved, initial }) {
 
     setSaving(true);
     try {
+      let saved;
       if (initial?.id) {
-        await base44.entities.Part.update(initial.id, form);
+        saved = await base44.entities.Part.update(initial.id, form);
       } else {
-        await base44.entities.Part.create(form);
+        saved = await base44.entities.Part.create(form);
       }
       setSaving(false);
-      onSaved();
+      onSaved(saved);
     } catch (err) {
       setSaving(false);
       alert(err.message || "Error saving part");
