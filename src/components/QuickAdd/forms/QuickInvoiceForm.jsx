@@ -600,7 +600,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
               <div className="p-4">
                 <div className="space-y-2">
                     {/* Header row */}
-                    <div className="grid gap-2 px-1 text-[10px] font-heading uppercase tracking-wider text-foreground/40" style={{ gridTemplateColumns: "1fr 2fr 60px 90px 60px 40px 80px 32px" }}>
+                    <div className="grid gap-2 px-1 text-[10px] font-heading uppercase tracking-wider text-foreground/40" style={{ gridTemplateColumns: "1fr 2fr 60px 120px 60px 40px 80px 32px" }}>
                       <span>Part #</span>
                       <span>Description</span>
                       <span className="text-right">Qty</span>
@@ -612,7 +612,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
                     </div>
 
                     {form.items.map((line, i) => (
-                      <div key={i} className={`grid gap-2 items-center p-2 rounded-sm border ${line._charge ? "bg-blue-500/10 border-blue-500/30" : "bg-[hsl(0,0%,13%)] border-[hsl(0,0%,20%)]"}`} style={{ gridTemplateColumns: "1fr 2fr 60px 90px 60px 40px 80px 32px" }}>
+                      <div key={i} className={`grid gap-2 items-center p-2 rounded-sm border ${line._charge ? "bg-blue-500/10 border-blue-500/30" : "bg-[hsl(0,0%,13%)] border-[hsl(0,0%,20%)]"}`} style={{ gridTemplateColumns: "1fr 2fr 60px 120px 60px 40px 80px 32px" }}>
                         {/* Part # */}
                         <div>
                           {line._charge ? (

@@ -203,7 +203,7 @@ export default function SalesOrderForm({ onClose, onSaved, initial, prefillCusto
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-44">Part #</th>
                   <th className="text-left px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50">Description</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-20">Qty</th>
-                  <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-32">Unit Price</th>
+                  <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-40">Unit Price</th>
                   <th className="text-right px-3 py-2 font-heading text-[10px] uppercase tracking-wider text-foreground/50 w-28">Total</th>
                   <th className="w-10" />
                 </tr>
