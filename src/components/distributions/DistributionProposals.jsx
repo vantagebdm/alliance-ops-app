@@ -5,8 +5,9 @@ import { generateProposalPDF } from "@/lib/documentPdf";
 import { DISTRIBUTION_SUPPLIERS } from "@/lib/distributionData";
 import { generateDocNumber } from "@/hooks/useDocNumber";
 import {
-  Search, Eye, Send, Check, X, FileText, UserPlus, RotateCcw, Clock, CalendarOff,
+  Search, Eye, Send, Check, X, FileText, UserPlus, RotateCcw, Clock, CalendarOff, Pencil,
 } from "lucide-react";
+import EditProposalModal from "@/components/distributions/EditProposalModal";
 
 const fmt = (n) => `$${Number(n || 0).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const fieldCls = "h-8 w-full rounded-md border border-input bg-[hsl(0,0%,10%)] px-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring";
@@ -39,6 +40,7 @@ export default function DistributionProposals() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [viewing, setViewing] = useState(null);
+  const [editing, setEditing] = useState(null);
   const [busy, setBusy] = useState({});
 
   const load = async () => {
@@ -232,6 +234,9 @@ export default function DistributionProposals() {
                         <button onClick={() => setViewing(p)} title="View" className="p-1.5 rounded text-white/50 hover:text-white hover:bg-white/10"><Eye className="w-3.5 h-3.5" /></button>
                         <button onClick={() => viewPdf(p)} disabled={isBusy === "pdf"} title="Open PDF" className="p-1.5 rounded text-white/50 hover:text-primary hover:bg-white/10 disabled:opacity-50"><FileText className="w-3.5 h-3.5" /></button>
                         {p.status === "draft" && (
+                          <button onClick={() => setEditing(p)} title="Edit draft" className="p-1.5 rounded text-white/50 hover:text-amber-400 hover:bg-white/10"><Pencil className="w-3.5 h-3.5" /></button>
+                        )}
+                        {p.status === "draft" && (
                           <button onClick={() => updateStatus(p, "sent")} disabled={isBusy === "sent"} title="Mark sent" className="p-1.5 rounded text-white/50 hover:text-blue-400 hover:bg-white/10 disabled:opacity-50"><Send className="w-3.5 h-3.5" /></button>
                         )}
                         {(p.status === "sent" || p.status === "draft") && (
@@ -254,6 +259,14 @@ export default function DistributionProposals() {
             </tbody>
           </table>
         </div>
+      )}
+
+      {editing && (
+        <EditProposalModal
+          proposal={editing}
+          onClose={() => setEditing(null)}
+          onSaved={load}
+        />
       )}
 
       {viewing && (
