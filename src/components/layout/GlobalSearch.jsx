@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, X, Package, Users, FileText, ShoppingCart, Truck, Receipt, ClipboardList, Building2 } from "lucide-react";
+import { Search, X, Package, Users, FileText, ShoppingCart, Truck, Receipt, ClipboardList, Building2, Send } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
@@ -11,6 +11,7 @@ const SEARCH_CATEGORIES = [
   { key: "quotes", label: "QUOTES", icon: FileText, entity: "Quote", fields: ["quote_number", "customer_name"], path: "/quotes" },
   { key: "enquiries", label: "ENQUIRIES", icon: ClipboardList, entity: "Enquiry", fields: ["enquiry_number", "customer_name"], path: "/enquiries" },
   { key: "pos", label: "PURCHASE ORDERS", icon: Truck, entity: "PurchaseOrder", fields: ["po_number", "supplier_name"], path: "/purchasing" },
+  { key: "dispatch", label: "DISPATCH", icon: Send, entity: "Dispatch", fields: ["dispatch_number", "customer_name"], path: "/dispatch" },
   { key: "customers", label: "CUSTOMERS", icon: Users, entity: "Customer", fields: ["name", "company"], path: "/customers" },
   { key: "suppliers", label: "SUPPLIERS", icon: Building2, entity: "Supplier", fields: ["name", "supplier_code"], path: "/suppliers" },
 ];
