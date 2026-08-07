@@ -2,11 +2,14 @@ import React, { useState } from "react";
 import PageHeader from "@/components/ui/PageHeader";
 import DistributionCatalog from "@/components/distributions/DistributionCatalog";
 import ProposalGenerator from "@/components/distributions/ProposalGenerator";
+import DistributionProposals from "@/components/distributions/DistributionProposals";
 import { DISTRIBUTION_SUPPLIERS, productUnitPrice, packUnitCount, packCost } from "@/lib/distributionData";
+import { Send, FileText } from "lucide-react";
 
 export default function Distributions() {
   const [activeSupplier, setActiveSupplier] = useState("total_energies");
   const [items, setItems] = useState([]);
+  const [view, setView] = useState("generate");
 
   const addToProposal = (product) => {
     const pu = productUnitPrice(product);
@@ -30,34 +33,57 @@ export default function Distributions() {
 
   return (
     <div>
-      <PageHeader title="Distributions" subtitle="Supplier portals & proposal generator" />
+      <PageHeader title="Distributions" subtitle="Supplier portals, proposal generator & stored proposals" />
       <div className="p-4 lg:p-6">
-        <div className="flex gap-1 mb-5 border-b border-[hsl(0,0%,14%)] overflow-x-auto">
-          {DISTRIBUTION_SUPPLIERS.map((s) => (
+        <div className="flex items-center gap-2 mb-5">
+          <div className="flex gap-1 border border-[hsl(0,0%,14%)] rounded-md p-0.5">
             <button
-              key={s.id}
-              onClick={() => setActiveSupplier(s.id)}
-              className={`px-4 py-2.5 text-xs uppercase tracking-wider font-heading border-b-2 transition whitespace-nowrap ${
-                activeSupplier === s.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-white/50 hover:text-white/80"
-              }`}
+              onClick={() => setView("generate")}
+              className={`inline-flex items-center gap-1.5 px-3 h-8 rounded text-xs font-heading uppercase tracking-wider transition ${view === "generate" ? "bg-primary text-primary-foreground" : "text-white/50 hover:text-white"}`}
             >
-              {s.name}
+              <Send className="w-3.5 h-3.5" /> Generate
             </button>
-          ))}
+            <button
+              onClick={() => setView("proposals")}
+              className={`inline-flex items-center gap-1.5 px-3 h-8 rounded text-xs font-heading uppercase tracking-wider transition ${view === "proposals" ? "bg-primary text-primary-foreground" : "text-white/50 hover:text-white"}`}
+            >
+              <FileText className="w-3.5 h-3.5" /> Saved Proposals
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
-          <div className="xl:col-span-2">
-            <DistributionCatalog supplierId={activeSupplier} onAddToProposal={addToProposal} />
-          </div>
-          <div className="xl:col-span-1">
-            <div className="xl:sticky xl:top-20">
-              <ProposalGenerator supplierId={activeSupplier} items={items} setItems={setItems} />
+        {view === "proposals" ? (
+          <DistributionProposals />
+        ) : (
+          <>
+            <div className="flex gap-1 mb-5 border-b border-[hsl(0,0%,14%)] overflow-x-auto">
+              {DISTRIBUTION_SUPPLIERS.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setActiveSupplier(s.id)}
+                  className={`px-4 py-2.5 text-xs uppercase tracking-wider font-heading border-b-2 transition whitespace-nowrap ${
+                    activeSupplier === s.id
+                      ? "border-primary text-primary"
+                      : "border-transparent text-white/50 hover:text-white/80"
+                  }`}
+                >
+                  {s.name}
+                </button>
+              ))}
             </div>
-          </div>
-        </div>
+
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-5">
+              <div className="xl:col-span-2">
+                <DistributionCatalog supplierId={activeSupplier} onAddToProposal={addToProposal} />
+              </div>
+              <div className="xl:col-span-1">
+                <div className="xl:sticky xl:top-20">
+                  <ProposalGenerator supplierId={activeSupplier} items={items} setItems={setItems} />
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -155,39 +155,20 @@ export default function ProposalGenerator({ supplierId, items, setItems }) {
     }
   };
 
-  const buildPayload = (proposal_number) => ({
+  const buildPayload = (proposal_number) => {
+    const validDate = new Date();
+    validDate.setDate(validDate.getDate() + (Number(terms.validity_days) || 30));
+    return {
     proposal_number,
     supplier: supplierId,
     title: meta.title?.trim() || `${supplier?.name} Proposal`,
-    customer_name: qualify.client_name.trim(),
-    customer_company: qualify.client_company.trim(),
-    customer_email: qualify.client_email.trim(),
-    current_customer: qualify.current_customer,
-    client_number: qualify.client_number.trim(),
-    trade_company: contact.company_name.trim(),
-    best_contact: contact.best_contact.trim(),
-    best_contact_phone: contact.phone.trim(),
-    best_contact_email: contact.email.trim(),
-    proposal_type: terms.proposal_type,
-    trading_terms: terms.trading_terms,
-    deposit_required: terms.deposit_required,
-    deposit_pct: Number(terms.deposit_pct) || 0,
-    balance_terms: terms.balance_terms.trim(),
-    validity_days: Number(terms.validity_days) || 30,
-    conditions_text: terms.conditions_text.trim(),
-    standard_terms: terms.standard_terms,
-    items: items.map((it) => ({
-      supplier_sku: it.supplier_sku,
-      description: it.description,
-      pack_size: it.pack_size,
-      quantity: Number(it.quantity) || 0,
-      unit_price: Number(it.unit_price) || 0,
-      total: (Number(it.quantity) || 0) * (Number(it.unit_price) || 0),
-    })),
+    valid_until: validDate.toISOString().slice(0, 10),
+...
     subtotal, gst, total,
     status: "draft",
     notes: meta.notes?.trim(),
-  });
+  };
+  };
 
   const previewSample = async () => {
     const payload = buildPayload("DP-SAMPLE");
