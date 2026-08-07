@@ -1,11 +1,13 @@
-import { base44 } from "@/api/base44Client";
-import { X, Edit3, Package, AlertTriangle, DollarSign, Warehouse, Tag, ShieldAlert } from "lucide-react";
+import { useState } from "react";
+import { X, Edit3, Package, AlertTriangle, DollarSign, Warehouse, Tag, ShieldAlert, History } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import FitmentDisplay from "./FitmentDisplay";
+import PartSalesHistory from "./PartSalesHistory";
 import { CATEGORY_LABEL, CATEGORY_COLORS } from "@/lib/categories";
 
 export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
+  const [showHistory, setShowHistory] = useState(false);
   const lowStock = part.min_stock_level > 0 && part.stock_quantity <= part.min_stock_level;
   const outOfStock = part.stock_quantity === 0;
 
@@ -164,11 +166,18 @@ export default function PartDetail({ part, onClose, onEdit, onUpdated }) {
 
         <div className="px-6 py-4 bg-muted/30 border-t border-border flex items-center justify-between gap-3">
           <Button variant="outline" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">Close</Button>
-          <Button onClick={onEdit} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
-            <Edit3 className="w-4 h-4 mr-1" /> Edit Part
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={() => setShowHistory(true)} className="rounded-sm font-heading text-xs uppercase tracking-wider">
+              <History className="w-4 h-4 mr-1" /> Sale History
+            </Button>
+            <Button onClick={onEdit} className="bg-primary text-black font-heading font-semibold uppercase text-xs tracking-wider hover:bg-primary/90 rounded-sm">
+              <Edit3 className="w-4 h-4 mr-1" /> Edit Part
+            </Button>
+          </div>
         </div>
       </div>
+
+      {showHistory && <PartSalesHistory part={part} onClose={() => setShowHistory(false)} />}
     </div>
   );
 }
