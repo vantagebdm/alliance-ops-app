@@ -330,5 +330,84 @@
   "required": [
     "part_number",
     "name"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "parts_interpreter"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "parts_interpreter"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "sales_representative"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "parts_interpreter"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

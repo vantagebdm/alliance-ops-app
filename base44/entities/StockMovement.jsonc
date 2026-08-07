@@ -79,5 +79,55 @@
   "required": [
     "part_number",
     "movement_type"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

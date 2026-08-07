@@ -141,5 +141,74 @@
   "required": [
     "part_number",
     "warehouse"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "parts_interpreter"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "sales_representative"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

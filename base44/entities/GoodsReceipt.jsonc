@@ -339,5 +339,74 @@
   "required": [
     "receipt_type",
     "supplier_name"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "warehouse_operator"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

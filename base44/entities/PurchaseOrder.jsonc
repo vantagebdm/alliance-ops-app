@@ -77,5 +77,74 @@
   "required": [
     "supplier_name",
     "po_number"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "inventory_controller"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

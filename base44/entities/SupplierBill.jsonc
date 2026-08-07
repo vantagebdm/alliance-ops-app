@@ -125,5 +125,69 @@
   "required": [
     "supplier_name",
     "bill_date"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "purchasing_officer"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }

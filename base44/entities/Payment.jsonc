@@ -90,5 +90,84 @@
     "payment_type",
     "payment_date",
     "amount"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_manager"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_receivable"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_manager"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_receivable"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_manager"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_receivable"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "accounts_payable"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }
