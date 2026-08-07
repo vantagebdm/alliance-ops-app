@@ -90,6 +90,7 @@ export function generateQuotePDF(quote) {
     ["Valid Until:", quote.valid_until || ""],
   ].filter(Boolean);
 
+  const infoStartY = y;
   doc.setFontSize(9);
   infoRows.forEach(([label, val]) => {
     doc.setFont("helvetica", "bold");
@@ -100,7 +101,33 @@ export function generateQuotePDF(quote) {
     doc.text(String(val), margin + 34, y);
     y += 7;
   });
-  y += 6;
+  const infoEndY = y;
+
+  // Customer notes box — top-right, aligned with the info rows
+  if (quote.notes && String(quote.notes).trim()) {
+    const boxX = 118;
+    const boxW = pageW - margin - boxX;
+    let nbY = infoStartY;
+    doc.setFillColor(...HEADER_COLOR);
+    doc.rect(boxX, nbY, boxW, 7, "F");
+    doc.setTextColor(255, 255, 255);
+    doc.setFontSize(7);
+    doc.setFont("helvetica", "bold");
+    doc.text("CUSTOMER NOTES", boxX + 2, nbY + 5);
+    nbY += 9;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(40, 40, 40);
+    const noteLines = doc.splitTextToSize(String(quote.notes).trim(), boxW - 4);
+    noteLines.forEach((ln) => {
+      doc.text(ln, boxX + 2, nbY);
+      nbY += 4;
+    });
+    const boxH = Math.max(nbY - infoStartY, infoEndY - infoStartY);
+    doc.setDrawColor(180, 180, 180);
+    doc.rect(boxX, infoStartY, boxW, boxH, "S");
+  }
+  y = Math.max(infoEndY, y) + 6;
 
   // Table header
   doc.setFillColor(...HEADER_COLOR);

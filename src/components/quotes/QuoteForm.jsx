@@ -176,10 +176,11 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
               <div className="w-5 h-5 bg-primary flex items-center justify-center rounded-sm">
                 <span className="font-heading font-bold text-black text-[10px]">3</span>
               </div>
-              <h3 className="font-heading text-xs font-semibold uppercase tracking-wider">Notes</h3>
+              <h3 className="font-heading text-xs font-semibold uppercase tracking-wider">Customer Notes</h3>
+              <span className="text-[9px] text-primary/70">Visible on quote PDF</span>
             </div>
             <Textarea value={form.notes} onChange={e => u("notes", e.target.value)}
-              placeholder="Terms, conditions, delivery notes..." className="rounded-sm h-32 resize-none" />
+              placeholder="Job details, purpose of quote, special instructions..." className="rounded-sm h-32 resize-none" />
           </div>
         </div>
 
