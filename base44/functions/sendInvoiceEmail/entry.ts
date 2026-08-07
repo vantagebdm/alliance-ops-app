@@ -60,7 +60,31 @@ Deno.serve(async (req) => {
     let pdfBase64 = null;
     let filename = pdfFilename || 'invoice.pdf';
     if (pdfUrl) {
-      const pdfRes = await fetch(pdfUrl);
+      // Validate the URL to prevent SSRF: https only, trusted hosts, no internal/private IPs.
+      let parsed;
+      try {
+        parsed = new URL(pdfUrl);
+      } catch {
+        return Response.json({ error: 'Invalid PDF URL' }, { status: 400 });
+      }
+      if (parsed.protocol !== 'https:') {
+        return Response.json({ error: 'PDF URL must use https' }, { status: 400 });
+      }
+      const host = parsed.hostname.toLowerCase();
+      const ALLOWED_HOSTS = ['media.base44.com', 'base44.com', 'files.base44.com'];
+      const isAllowedHost = ALLOWED_HOSTS.some((h) => host === h || host.endsWith('.' + h));
+      if (!isAllowedHost) {
+        return Response.json({ error: 'PDF URL host is not allowed' }, { status: 400 });
+      }
+      // Reject literal internal/private IP hosts (SSRF guard).
+      const ipMatch = host.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
+      if (ipMatch) {
+        const [a, b] = ipMatch.slice(1).map(Number);
+        if (a === 127 || a === 10 || a === 0 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 169 && b === 254)) {
+          return Response.json({ error: 'Internal host addresses are not allowed' }, { status: 400 });
+        }
+      }
+      const pdfRes = await fetch(parsed.href);
       const pdfBuffer = await pdfRes.arrayBuffer();
       const uint8 = new Uint8Array(pdfBuffer);
       let binary = '';

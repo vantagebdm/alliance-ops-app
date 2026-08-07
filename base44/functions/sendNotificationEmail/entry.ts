@@ -82,11 +82,25 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // This function is called by an automation (no user context), use service role
+    // Require an authenticated app user — this endpoint must not relay mail for anonymous callers.
+    const user = await base44.auth.me();
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+
     const { notification, notifEmail } = await req.json();
 
     if (!notification || !notifEmail) {
       return Response.json({ error: 'Missing notification or notifEmail' }, { status: 400 });
+    }
+
+    // Only allow delivery to a registered app user's email — prevents arbitrary external email relay.
+    const emailLower = String(notifEmail).trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLower)) {
+      return Response.json({ error: 'Invalid recipient email' }, { status: 400 });
+    }
+    const recipients = await base44.asServiceRole.entities.User.filter({ email: emailLower });
+    const isRegistered = Array.isArray(recipients) && recipients.some((u) => String(u.email || '').toLowerCase() === emailLower);
+    if (!isRegistered) {
+      return Response.json({ error: 'Recipient is not a registered app user' }, { status: 403 });
     }
 
     // Get Gmail access token
