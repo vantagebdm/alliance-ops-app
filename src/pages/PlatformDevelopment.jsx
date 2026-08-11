@@ -146,7 +146,7 @@ export default function PlatformDevelopment() {
         </div>
 
         {portal === "bdm" ? (
-          <BDMRolloutsPortal />
+          <BDMRolloutsPortal user={user} />
         ) : (
           <div className="space-y-4">
             {/* Stats */}
