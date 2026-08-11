@@ -10,6 +10,7 @@ import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
+import { reduceStockForInvoiceItems } from "@/lib/stockReduction";
 import { format } from "date-fns";
 
 const today = format(new Date(), "yyyy-MM-dd");
@@ -300,10 +301,16 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
         invoice_source: source,
       };
       if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
+      const isNew = !invoice?.id;
       if (invoice?.id) {
         await base44.entities.Invoice.update(invoice.id, data);
       } else {
         await base44.entities.Invoice.create(data);
+      }
+
+      // Decrement part stock for new, non-draft invoices (a confirmed sale)
+      if (isNew && action !== "draft") {
+        try { await reduceStockForInvoiceItems(form.items); } catch (_) {}
       }
 
       // Auto-regenerate PDF when marked as paid

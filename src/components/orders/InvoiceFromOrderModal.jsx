@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { postInvoiceToLedger } from "@/lib/accountingLedger";
+import { reduceStockForInvoiceItems } from "@/lib/stockReduction";
 import { previewDocNumber, generateDocNumber } from "@/hooks/useDocNumber";
 import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
 import { X, AlertTriangle, Plus, Trash2 } from "lucide-react";
@@ -219,6 +220,11 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
 
       // Post to accounting ledger
       await postInvoiceToLedger(invoice);
+
+      // Decrement part stock for invoiced items (drafts are not a confirmed sale)
+      if (action !== "draft") {
+        try { await reduceStockForInvoiceItems(invoiceItems); } catch (_) {}
+      }
 
       // Update order: compute newly invoiced state
       const updatedItems = (order.items || []).map(item => {
