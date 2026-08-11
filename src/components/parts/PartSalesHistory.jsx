@@ -61,8 +61,9 @@ export default function PartSalesHistory({ part, onClose }) {
     return () => { cancelled = true; };
   }, [part.id]);
 
-  const totalQty = rows.reduce((s, r) => s + r.quantity, 0);
-  const totalValue = rows.reduce((s, r) => s + r.total, 0);
+  const soldRows = rows.filter((r) => r.source === "invoice");
+  const totalQty = soldRows.reduce((s, r) => s + r.quantity, 0);
+  const totalValue = soldRows.reduce((s, r) => s + r.total, 0);
 
   return (
     <div className="fixed inset-0 bg-black/80 z-[60] flex items-start justify-center pt-8 pb-8 overflow-y-auto">
@@ -84,7 +85,7 @@ export default function PartSalesHistory({ part, onClose }) {
             <div className="font-heading text-xl font-bold text-white">{rows.length}</div>
           </div>
           <div className="bg-muted/50 rounded-sm p-2.5 text-center">
-            <div className="font-heading text-[10px] uppercase tracking-wider text-white/40">Total Qty Sold</div>
+            <div className="font-heading text-[10px] uppercase tracking-wider text-white/40">Qty Sold (Invoiced)</div>
             <div className="font-heading text-xl font-bold text-primary">{totalQty}</div>
           </div>
           <div className="bg-primary/5 border border-primary/20 rounded-sm p-2.5 text-center">
