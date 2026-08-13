@@ -9,6 +9,7 @@ import DevRequestForm from "@/components/devrequests/DevRequestForm";
 import DevRequestDetail from "@/components/devrequests/DevRequestDetail";
 import BDMRolloutsPortal from "@/components/devrequests/BDMRolloutsPortal";
 import ComingSoonPortal from "@/components/devrequests/ComingSoonPortal";
+import CriticalTasksPortal from "@/components/devrequests/CriticalTasksPortal";
 import moment from "moment";
 
 const REQUEST_TYPE_LABELS = {
@@ -173,7 +174,7 @@ export default function PlatformDevelopment() {
         {portal === "bdm" ? (
           <BDMRolloutsPortal user={user} />
         ) : portal === "critical" ? (
-          <ComingSoonPortal title="Tasks Marked Critical" />
+          <CriticalTasksPortal user={user} />
         ) : portal === "pipeline" ? (
           <ComingSoonPortal title="Pipeline" />
         ) : portal === "compliance" ? (

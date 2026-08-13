@@ -3,8 +3,9 @@ import {
   LayoutDashboard, MessageSquare, FileText, ShoppingCart,
   Package, Warehouse, ShoppingBag, Truck, Users,
   Receipt, BarChart3, Settings, X, Send, TrendingUp, ClipboardList, ArrowDownToLine, BarChart2, RefreshCw,
-  BookOpen, Building2, Calculator, BookMarked, CreditCard, DollarSign, Code2, Boxes
+  BookOpen, Building2, Calculator, BookMarked, CreditCard, DollarSign, Code2, Boxes, TriangleAlert
 } from "lucide-react";
+import useCriticalTasksCount from "@/hooks/useCriticalTasksCount";
 
 const NAV_SECTIONS = [
   {
@@ -64,6 +65,7 @@ const NAV_SECTIONS = [
 
 export default function Sidebar({ open, onClose }) {
   const location = useLocation();
+  const criticalCount = useCriticalTasksCount();
 
   return (
     <>
@@ -98,22 +100,31 @@ export default function Sidebar({ open, onClose }) {
                   const isActive = (location.pathname === itemPath && (!item.path.includes("?") || location.search === `?${item.path.split("?")[1]}`)) ||
                     (itemPath !== "/" && location.pathname.startsWith(itemPath) && !item.path.includes("?") && itemPath !== "/accounting");
                   return (
-                    <Link
-                      key={item.path}
-                      to={item.path}
-                      onClick={onClose}
-                      className={`
-                        flex items-center gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-all duration-100
-                        ${
-                          isActive
-                            ? "bg-primary/15 text-primary border-l-2 border-primary pl-[10px]"
-                            : "text-white/55 hover:text-white hover:bg-white/5 border-l-2 border-transparent"
-                        }
-                      `}
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="font-body text-xs uppercase tracking-wider">{item.label}</span>
-                    </Link>
+                    <div key={item.path}>
+                      {item.label === "Platform Development" && criticalCount > 0 && (
+                        <div className="flex items-center gap-3 px-3 py-1.5" title={`${criticalCount} task${criticalCount !== 1 ? "s" : ""} marked critical`}>
+                          <TriangleAlert className="w-4 h-4 flex-shrink-0 text-red-500 animate-pulse" fill="currentColor" />
+                          <span className="font-body text-[10px] uppercase tracking-wider text-red-500 font-semibold">
+                            {criticalCount} Critical
+                          </span>
+                        </div>
+                      )}
+                      <Link
+                        to={item.path}
+                        onClick={onClose}
+                        className={`
+                          flex items-center gap-3 px-3 py-2 rounded-sm text-sm font-medium transition-all duration-100
+                          ${
+                            isActive
+                              ? "bg-primary/15 text-primary border-l-2 border-primary pl-[10px]"
+                              : "text-white/55 hover:text-white hover:bg-white/5 border-l-2 border-transparent"
+                          }
+                        `}
+                      >
+                        <Icon className="w-4 h-4 flex-shrink-0" />
+                        <span className="font-body text-xs uppercase tracking-wider">{item.label}</span>
+                      </Link>
+                    </div>
                   );
                 })}
               </div>

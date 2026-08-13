@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import moment from "moment";
 import { base44 } from "@/api/base44Client";
 import {
-  ChevronRight, Check, Bell, Pencil, Upload, CheckCircle2, X,
+  ChevronRight, Check, Bell, Pencil, Upload, CheckCircle2, X, TriangleAlert,
 } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
@@ -113,6 +113,17 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
     setField(field, value);
   };
 
+  const toggleCritical = () => {
+    patch({
+      marked_critical: !task.marked_critical,
+      critical_viewed: task.marked_critical ? true : false,
+      critical_marked_at: !task.marked_critical ? new Date().toISOString() : "",
+      has_unread_edits: true,
+      last_edited_by: user?.full_name || user?.email || "Unknown",
+      last_edited_at: new Date().toISOString(),
+    });
+  };
+
   const approve = () => {
     patch({
       approved: !task.approved,
@@ -214,6 +225,11 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
             {task.approved && (
               <span className="flex-shrink-0 text-green-400" title={`Approved by ${task.approved_by || ""}`}>
                 <CheckCircle2 className="w-3.5 h-3.5" />
+              </span>
+            )}
+            {task.marked_critical && (
+              <span className="flex-shrink-0 text-red-400" title="Marked Critical">
+                <TriangleAlert className="w-3.5 h-3.5" fill="currentColor" />
               </span>
             )}
           </div>
@@ -379,15 +395,26 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
                 <span className="text-[10px] text-muted-foreground">
                   {task.last_edited_at ? `Last edited ${moment(task.last_edited_at).format("DD/MM/YY HH:mm")}${task.last_edited_by ? ` by ${task.last_edited_by}` : ""}` : ""}
                 </span>
-                <Button
-                  size="sm"
-                  onClick={approve}
-                  variant={task.approved ? "default" : "outline"}
-                  className={`h-7 text-[10px] rounded-sm ${task.approved ? "bg-green-600 text-white" : "border-white/20 text-white hover:bg-white/10"}`}
-                >
-                  <CheckCircle2 className="w-3 h-3 mr-1" />
-                  {task.approved ? "Approved" : "Approve"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    onClick={toggleCritical}
+                    variant={task.marked_critical ? "default" : "outline"}
+                    className={`h-7 text-[10px] rounded-sm ${task.marked_critical ? "bg-red-600 text-white hover:bg-red-700" : "border-white/20 text-white hover:bg-white/10"}`}
+                  >
+                    <TriangleAlert className="w-3 h-3 mr-1" />
+                    {task.marked_critical ? "Marked Critical" : "Mark Critical"}
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={approve}
+                    variant={task.approved ? "default" : "outline"}
+                    className={`h-7 text-[10px] rounded-sm ${task.approved ? "bg-green-600 text-white" : "border-white/20 text-white hover:bg-white/10"}`}
+                  >
+                    <CheckCircle2 className="w-3 h-3 mr-1" />
+                    {task.approved ? "Approved" : "Approve"}
+                  </Button>
+                </div>
               </div>
 
               {/* Comments */}

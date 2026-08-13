@@ -144,6 +144,20 @@
     "sort_order": {
       "type": "number",
       "default": 0
+    },
+    "marked_critical": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when this task has been shifted to the Tasks Marked Critical portal"
+    },
+    "critical_viewed": {
+      "type": "boolean",
+      "default": true,
+      "description": "False when moved to critical and not yet viewed in the Tasks Marked Critical portal \u2014 drives the hazard notification badge"
+    },
+    "critical_marked_at": {
+      "type": "string",
+      "format": "date-time"
     }
   },
   "required": [
