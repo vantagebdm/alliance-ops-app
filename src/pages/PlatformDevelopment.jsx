@@ -8,6 +8,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import DevRequestForm from "@/components/devrequests/DevRequestForm";
 import DevRequestDetail from "@/components/devrequests/DevRequestDetail";
 import BDMRolloutsPortal from "@/components/devrequests/BDMRolloutsPortal";
+import ComingSoonPortal from "@/components/devrequests/ComingSoonPortal";
 import moment from "moment";
 
 const REQUEST_TYPE_LABELS = {
@@ -143,10 +144,40 @@ export default function PlatformDevelopment() {
           >
             BDM Rollouts &amp; Deliverables
           </button>
+          <button
+            onClick={() => setPortal("critical")}
+            className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
+              portal === "critical" ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
+            }`}
+          >
+            Tasks Marked Critical
+          </button>
+          <button
+            onClick={() => setPortal("pipeline")}
+            className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
+              portal === "pipeline" ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
+            }`}
+          >
+            Pipeline
+          </button>
+          <button
+            onClick={() => setPortal("compliance")}
+            className={`px-4 py-2 text-xs font-heading font-semibold uppercase tracking-wider rounded-sm transition-colors ${
+              portal === "compliance" ? "bg-primary text-black" : "bg-[hsl(0,0%,14%)] text-white/50 hover:text-white hover:bg-[hsl(0,0%,18%)]"
+            }`}
+          >
+            Compliance
+          </button>
         </div>
 
         {portal === "bdm" ? (
           <BDMRolloutsPortal user={user} />
+        ) : portal === "critical" ? (
+          <ComingSoonPortal title="Tasks Marked Critical" />
+        ) : portal === "pipeline" ? (
+          <ComingSoonPortal title="Pipeline" />
+        ) : portal === "compliance" ? (
+          <ComingSoonPortal title="Compliance" />
         ) : (
           <div className="space-y-4">
             {/* Stats */}
