@@ -37,6 +37,13 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
   const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [taskText, setTaskText] = useState(task.task_text);
+  const [owner, setOwner] = useState(task.owner || "");
+  const [supplier, setSupplier] = useState(task.supplier || "");
+  const [purchaseLink, setPurchaseLink] = useState(task.purchase_link || "");
+  const [notes, setNotes] = useState(task.notes || "");
+  const [quotedPrice, setQuotedPrice] = useState(task.quoted_price || 0);
+  const [approvedPrice, setApprovedPrice] = useState(task.approved_price || 0);
+  const [finalCost, setFinalCost] = useState(task.final_cost || 0);
   const fileRef = useRef(null);
 
   const hasUnread = task.has_unread_comments || task.has_unread_edits;
@@ -99,6 +106,11 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
       last_edited_by: user?.full_name || user?.email || "Unknown",
       last_edited_at: new Date().toISOString(),
     });
+  };
+
+  const saveFieldOnBlur = (field, value) => {
+    if (value === (task[field] ?? (typeof value === "number" ? 0 : ""))) return;
+    setField(field, value);
   };
 
   const approve = () => {
@@ -225,8 +237,9 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
                 <div>
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Owner</label>
                   <Input
-                    value={task.owner || ""}
-                    onChange={(e) => setField("owner", e.target.value)}
+                    value={owner}
+                    onChange={(e) => setOwner(e.target.value)}
+                    onBlur={() => saveFieldOnBlur("owner", owner)}
                     className="h-7 text-xs"
                     placeholder="Assign"
                   />
@@ -267,8 +280,9 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Quoted $</label>
                   <Input
                     type="number"
-                    value={task.quoted_price || 0}
-                    onChange={(e) => setField("quoted_price", Number(e.target.value) || 0)}
+                    value={quotedPrice}
+                    onChange={(e) => setQuotedPrice(e.target.value)}
+                    onBlur={() => saveFieldOnBlur("quoted_price", Number(quotedPrice) || 0)}
                     className="h-7 text-xs"
                   />
                 </div>
@@ -276,8 +290,9 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Approved $</label>
                   <Input
                     type="number"
-                    value={task.approved_price || 0}
-                    onChange={(e) => setField("approved_price", Number(e.target.value) || 0)}
+                    value={approvedPrice}
+                    onChange={(e) => setApprovedPrice(e.target.value)}
+                    onBlur={() => saveFieldOnBlur("approved_price", Number(approvedPrice) || 0)}
                     className="h-7 text-xs"
                   />
                 </div>
@@ -285,16 +300,18 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Final Cost $</label>
                   <Input
                     type="number"
-                    value={task.final_cost || 0}
-                    onChange={(e) => setField("final_cost", Number(e.target.value) || 0)}
+                    value={finalCost}
+                    onChange={(e) => setFinalCost(e.target.value)}
+                    onBlur={() => saveFieldOnBlur("final_cost", Number(finalCost) || 0)}
                     className="h-7 text-xs"
                   />
                 </div>
                 <div>
                   <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Supplier</label>
                   <Input
-                    value={task.supplier || ""}
-                    onChange={(e) => setField("supplier", e.target.value)}
+                    value={supplier}
+                    onChange={(e) => setSupplier(e.target.value)}
+                    onBlur={() => saveFieldOnBlur("supplier", supplier)}
                     className="h-7 text-xs"
                     placeholder="Supplier"
                   />
@@ -304,8 +321,9 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
               <div>
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Purchase Link</label>
                 <Input
-                  value={task.purchase_link || ""}
-                  onChange={(e) => setField("purchase_link", e.target.value)}
+                  value={purchaseLink}
+                  onChange={(e) => setPurchaseLink(e.target.value)}
+                  onBlur={() => saveFieldOnBlur("purchase_link", purchaseLink)}
                   className="h-7 text-xs"
                   placeholder="https://..."
                 />
@@ -314,8 +332,9 @@ export default function BDMDeliverableItem({ task, user, onUpdated }) {
               <div>
                 <label className="text-[10px] uppercase tracking-wider text-muted-foreground">Notes / Remarks</label>
                 <Textarea
-                  value={task.notes || ""}
-                  onChange={(e) => setField("notes", e.target.value)}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  onBlur={() => saveFieldOnBlur("notes", notes)}
                   className="text-xs min-h-[48px]"
                   placeholder="Add notes, decisions, variations..."
                   rows={2}
