@@ -1,0 +1,34 @@
+{
+  "name": "Notify STS on New Order",
+  "description": "",
+  "trigger": {
+    "condition": "${ (.trigger.data.company == \"STS Service Desk\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "SalesOrder"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "notify_sts_on_new_order",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notifySTSNewOrder",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

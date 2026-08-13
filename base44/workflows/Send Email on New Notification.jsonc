@@ -1,0 +1,34 @@
+{
+  "name": "Send Email on New Notification",
+  "description": "When a new notification is created, check settings and email mitch@alliancepartsgroup.com.au if the notification type has email enabled",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Notification"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "send_email_on_new_notification",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "onNotificationCreated",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

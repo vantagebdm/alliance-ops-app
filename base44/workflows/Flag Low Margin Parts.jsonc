@@ -1,0 +1,35 @@
+{
+  "name": "Flag Low Margin Parts",
+  "description": "",
+  "trigger": {
+    "condition": "${ ((.trigger.data.sell_price > 0) and (.trigger.data.unit_cost > 0)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "Part"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "flag_low_margin_parts",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "checkPartMargin",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}
