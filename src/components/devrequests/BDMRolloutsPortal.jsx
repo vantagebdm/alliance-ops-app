@@ -66,10 +66,13 @@ export default function BDMRolloutsPortal({ user }) {
     setExpandedSections((prev) => ({ ...prev, [num]: !prev[num] }));
   };
 
+  // Tasks marked critical are only shown in the Critical Tasks portal
+  const visibleTasks = useMemo(() => tasks.filter((t) => !t.marked_critical), [tasks]);
+
   // Group tasks by section number, preserve seed order
   const sections = useMemo(() => {
     const map = {};
-    for (const t of tasks) {
+    for (const t of visibleTasks) {
       if (!map[t.section_number]) map[t.section_number] = { title: t.section_title, tasks: [] };
       map[t.section_number].tasks.push(t);
     }
@@ -77,13 +80,13 @@ export default function BDMRolloutsPortal({ user }) {
       .map(Number)
       .sort((a, b) => a - b)
       .map((num) => ({ number: num, title: map[num].title, tasks: map[num].tasks }));
-  }, [tasks]);
+  }, [visibleTasks]);
 
   // Overall stats
-  const totalTasks = tasks.length;
-  const completedTasks = tasks.filter((t) => t.completed).length;
-  const unreadCount = tasks.filter((t) => t.has_unread_comments || t.has_unread_edits).length;
-  const approvedCount = tasks.filter((t) => t.approved).length;
+  const totalTasks = visibleTasks.length;
+  const completedTasks = visibleTasks.filter((t) => t.completed).length;
+  const unreadCount = visibleTasks.filter((t) => t.has_unread_comments || t.has_unread_edits).length;
+  const approvedCount = visibleTasks.filter((t) => t.approved).length;
   const progressPct = totalTasks ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   // Filter
