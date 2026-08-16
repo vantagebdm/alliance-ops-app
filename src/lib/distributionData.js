@@ -67,6 +67,7 @@ export const TOTAL_ENERGIES_CATEGORIES = [
   "Industrial Gear Oils",
   "Transmission, Driveline & Gear Oils",
   "Greases",
+  "Coolants",
 ];
 
 // list_price = sell price per pack; unit_price = price per litre (null for greases/by-weight)
@@ -281,4 +282,12 @@ export const TOTAL_ENERGIES_PRODUCTS = [
   { sku: "216186", product: "QUARTZ INEO FDE 0W30", family: "QUARTZ", category: "Engine Oils", pack_size: "12 x 1L", list_price: 142.35, unit_price: 11.86 },
   { sku: "214242", product: "TRAX. GEAR 6 75W85", family: "TRAXIUM", category: "Transmission, Driveline & Gear Oils", pack_size: "208L", list_price: 1599.09, unit_price: 7.69 },
   { sku: "214243", product: "TRAX. GEAR 6 75W85", family: "TRAXIUM", category: "Transmission, Driveline & Gear Oils", pack_size: "3 x 5L", list_price: 136.06, unit_price: 9.07 },
+
+  // ---- Engine Oils (added from parts records) ----
+  { sku: "236323", product: "QUARTZ INEO 5W30", family: "QUARTZ", category: "Engine Oils", pack_size: "20L", list_price: 154.20, unit_price: 7.71 },
+
+  // ---- Coolants (added from parts records) ----
+  { sku: "232919", product: "COOLELF AUTO SUPRA -37", family: "COOLELF", category: "Coolants", pack_size: "205L", list_price: 959.40, unit_price: 4.68 },
+  { sku: "232918", product: "COOLELF AUTO SUPRA COOLANT", family: "COOLELF", category: "Coolants", pack_size: "20L", list_price: 102.40, unit_price: 5.12 },
+  { sku: "232944", product: "GLACELF AUTO SUPRA CONCENTRATE", family: "GLACELF", category: "Coolants", pack_size: "20L", list_price: 145.80, unit_price: 7.29 },
 ];
