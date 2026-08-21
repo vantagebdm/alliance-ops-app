@@ -24,7 +24,11 @@
           "call": "invoke_backend_function",
           "with": {
             "function_name": "notifySTSOrderUpdate",
-            "args": {}
+            "args": {
+              "data": "${ .trigger.data }",
+              "old_data": "${ .trigger.old_data }",
+              "internal_token": "wf_9f3a71c2e8b64d1aa5c07f4e2b6d9c31"
+            }
           },
           "then": "end"
         }

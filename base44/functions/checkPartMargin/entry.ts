@@ -1,9 +1,19 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { isValidInternalToken } from '../../shared/internalWorkflowAuth.ts';
 
 Deno.serve(async (req) => {
   const base44 = createClientFromRequest(req);
 
   const body = await req.json().catch(() => ({}));
+
+  // This function is only meant to be invoked by the "Flag Low Margin Parts"
+  // workflow (system-triggered on Part create/update), never by a signed-in
+  // user or a public form — verify the shared internal token instead of
+  // requiring a login, which the workflow doesn't have.
+  if (!isValidInternalToken(body)) {
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const { data: part, event } = body;
 
   if (!part) {

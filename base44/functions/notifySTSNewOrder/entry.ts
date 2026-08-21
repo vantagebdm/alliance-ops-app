@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { isValidInternalToken } from '../../shared/internalWorkflowAuth.ts';
 
 function buildMimeMessage(to, subject, htmlBody, fromEmail) {
   const boundary = `boundary_${Date.now()}`;
@@ -25,6 +26,15 @@ function buildMimeMessage(to, subject, htmlBody, fromEmail) {
 Deno.serve(async (req) => {
   try {
     const body = await req.json();
+
+    // This function is only meant to be invoked by the "Notify STS on New
+    // Order" workflow (system-triggered on SalesOrder create), never by a
+    // signed-in user — verify the shared internal token instead of requiring
+    // a login, which the workflow doesn't have.
+    if (!isValidInternalToken(body)) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { event, data } = body;
 
     const base44 = createClientFromRequest(req);
