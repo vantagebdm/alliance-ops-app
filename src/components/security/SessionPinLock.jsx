@@ -17,7 +17,7 @@ export default function SessionPinLock({ children }) {
   useEffect(() => {
     (async () => {
       const user = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      const profiles = await base44.entities.UserProfile.filter({ email: user.email });
       const p = profiles[0] || null;
       setProfile(p);
       // Only lock if an admin has assigned this user a PIN in Security > Session Control.

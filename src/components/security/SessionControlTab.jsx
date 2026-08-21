@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
-import { Save, LogOut, KeyRound, Check } from "lucide-react";
+import { Save, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import SessionPinManager from "@/components/security/SessionPinManager";
 
 const Toggle = ({ label, desc, value, onChange }) => (
   <div className="flex items-start justify-between py-3 border-b border-[hsl(0,0%,14%)] last:border-0">
@@ -34,8 +35,6 @@ const NumField = ({ label, desc, value, onChange, unit }) => (
 export default function SessionControlTab() {
   const [profiles, setProfiles] = useState([]);
   const [saved, setSaved] = useState(false);
-  const [pinDrafts, setPinDrafts] = useState({});
-  const [savedPinId, setSavedPinId] = useState(null);
   const [settings, setSettings] = useState({
     idle_timeout: 30,
     concurrent_sessions: 2,
@@ -44,24 +43,12 @@ export default function SessionControlTab() {
     idle_logout: true,
   });
 
-  const loadProfiles = () => {
-    base44.entities.UserProfile.list("-created_date", 200).then(setProfiles).catch(() => {});
-  };
-
   useEffect(() => {
-    loadProfiles();
+    base44.entities.UserProfile.list("-created_date", 200).then(setProfiles).catch(() => {});
   }, []);
 
   const set = (k) => (v) => setSettings(s => ({ ...s, [k]: v }));
   const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
-
-  const handleSavePin = async (profile) => {
-    const value = (pinDrafts[profile.id] ?? profile.session_pin ?? "").replace(/\D/g, "");
-    const updated = await base44.entities.UserProfile.update(profile.id, { session_pin: value });
-    setProfiles((prev) => prev.map((p) => (p.id === updated.id ? updated : p)));
-    setSavedPinId(profile.id);
-    setTimeout(() => setSavedPinId(null), 1500);
-  };
 
   // Generate mock active sessions from profiles
   const activeSessions = profiles.filter(p => p.account_status === "active").slice(0, 5).map(p => ({
@@ -96,6 +83,8 @@ export default function SessionControlTab() {
           <Toggle label="Require Re-Authentication Before Sensitive Actions" desc="Users must confirm identity before financial or admin actions" value={settings.require_reauth_sensitive} onChange={set("require_reauth_sensitive")} />
         </div>
       </div>
+
+      <SessionPinManager />
 
       <div>
         <h3 className="font-heading text-xs uppercase tracking-wider text-white/40 mb-3">Active Sessions</h3>
