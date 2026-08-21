@@ -131,6 +131,10 @@
     "hide_financial_reports": {
       "type": "boolean",
       "default": false
+    },
+    "session_pin": {
+      "type": "string",
+      "description": "4-6 digit PIN required to re-enter the app after fresh login or 5 minutes of inactivity"
     }
   },
   "required": [

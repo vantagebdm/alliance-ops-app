@@ -39,6 +39,7 @@ import { ThemeProvider } from '@/lib/ThemeContext';
 import STSOrderForm from './pages/STSOrderForm';
 import PartsQuoteRequest from './pages/PartsQuoteRequest';
 import SupplierApplicationForm from './pages/SupplierApplicationForm';
+import SessionPinLock from './components/security/SessionPinLock';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -65,6 +66,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
+    <SessionPinLock>
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
@@ -104,6 +106,7 @@ const AuthenticatedApp = () => {
         <Route path="*" element={<PageNotFound />} />
       </Route>
     </Routes>
+    </SessionPinLock>
   );
 };
 
