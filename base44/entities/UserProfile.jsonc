@@ -134,7 +134,7 @@
     },
     "session_pin": {
       "type": "string",
-      "description": "4-6 digit PIN required to re-enter the app after fresh login or 5 minutes of inactivity"
+      "description": "4-6 digit PIN, assigned by an admin, required to re-enter the app after fresh login or 5 minutes of inactivity"
     }
   },
   "required": [
@@ -156,7 +156,16 @@
       ]
     },
     "read": {
-      "created_by_id": "{{user.id}}"
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
     },
     "update": {
       "$or": [
