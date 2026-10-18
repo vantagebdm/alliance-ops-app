@@ -1,4 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { buildMimeMessage, escapeEmailData } from '../../shared/emailSafety.ts';
 
 const STORAGE_KEY = "app_notification_settings";
 
@@ -32,7 +33,8 @@ const PRIORITY_COLORS = {
   critical: '#ef4444',
 };
 
-function buildEmailHtml(notification) {
+function buildEmailHtml(record) {
+  const notification = escapeEmailData(record);
   const color = PRIORITY_COLORS[notification.priority] || '#22c55e';
   return `
 <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;color:#111111;border-radius:6px;border:1px solid #e0e0e0;">
@@ -56,37 +58,19 @@ function buildEmailHtml(notification) {
 </div>`;
 }
 
-function buildMimeMessage(to, subject, htmlBody, fromEmail) {
-  const boundary = `boundary_${Date.now()}`;
-  const lines = [
-    `From: ${fromEmail}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    htmlBody,
-    `--${boundary}--`,
-  ];
-  return btoa(unescape(encodeURIComponent(lines.join('\r\n'))))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
 
-Deno.serve(async (req) => {
+
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
     const payload = await req.json();
-    const notification = payload.data;
-
-    if (!notification) {
-      return Response.json({ skipped: 'no data' });
-    }
+    const notificationId = payload.notification_id || payload.data?.id;
+    if (typeof notificationId !== 'string' || !notificationId) return Response.json({ skipped: 'no data' });
+    const notification = await base44.entities.Notification.get(notificationId);
+    if (!notification) return Response.json({ skipped: 'no data' });
 
     // Load notification settings from AppSettings entity (server-side)
     let settings = null;
@@ -129,7 +113,7 @@ Deno.serve(async (req) => {
       .replace(/\s{2,}/g, ' ')           // collapse double spaces
       .trim();
     const htmlBody = buildEmailHtml(notification);
-    const raw = buildMimeMessage(notifEmail, subject, htmlBody, fromEmail);
+    const raw = await buildMimeMessage(notifEmail, subject, htmlBody, fromEmail);
 
     const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
@@ -149,4 +133,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

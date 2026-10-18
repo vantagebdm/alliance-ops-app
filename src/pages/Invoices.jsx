@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Plus, Filter, Send, X, Eye, FileText, ChevronDown, Edit } from "lucide-react";
-import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
+import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import PageHeader from "@/components/ui/PageHeader";
@@ -13,25 +13,25 @@ import QuickInvoiceForm from "@/components/QuickAdd/forms/QuickInvoiceForm";
 import InvoiceEditForm from "@/components/invoices/InvoiceEditForm";
 
 function ResendModal({ invoice, onClose }) {
-  const [email, setEmail] = useState(invoice.billing_email || "");
+  const email = invoice.billing_email || "";
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const send = async () => {
     if (!email) return alert("Please enter an email address.");
     setSending(true);
-    const pdfUrl = await generateAndUploadInvoicePDF(invoice, base44);
-    const emailBody = buildInvoiceEmailBody(invoice, pdfUrl);
-    await base44.functions.invoke('sendInvoiceEmail', {
-      to: email,
-      subject: `Invoice Due`,
-      body: emailBody,
-      pdfUrl,
-      pdfFilename: `Invoice-${invoice.invoice_number || 'INV'}.pdf`,
-    });
-    setSending(false);
-    setSent(true);
-    setTimeout(onClose, 1500);
+    setError("");
+    try {
+      const pdfUrl = await generateAndUploadInvoicePDF(invoice, base44);
+      await base44.functions.invoke('sendInvoiceEmail', { invoice_id: invoice.id, pdfUrl });
+      setSent(true);
+      setTimeout(onClose, 1500);
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || "Unable to send invoice");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -54,11 +54,13 @@ function ResendModal({ invoice, onClose }) {
                 <Input
                   type="email"
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  readOnly
                   placeholder="customer@example.com"
                   className="rounded-sm"
                 />
               </div>
+              <p className="text-xs text-muted-foreground">To change the recipient, edit the invoice billing email first.</p>
+              {error && <p role="alert" className="text-xs text-destructive">{error}</p>}
               <div className="flex justify-end gap-2">
                 <Button variant="outline" size="sm" onClick={onClose} className="rounded-sm font-heading text-xs uppercase tracking-wider">Cancel</Button>
                 <Button size="sm" onClick={send} disabled={sending} className="rounded-sm font-heading text-xs uppercase tracking-wider bg-blue-600 text-white hover:bg-blue-700">

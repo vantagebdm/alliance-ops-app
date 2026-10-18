@@ -1,4 +1,5 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { buildMimeMessage, escapeEmailData } from '../../shared/emailSafety.ts';
 
 // Maps Notification.type to the notification settings key used in localStorage
 const TYPE_TO_SETTINGS_KEY = {
@@ -23,29 +24,10 @@ const PRIORITY_LABELS = {
   critical: '🔴 CRITICAL',
 };
 
-function buildMimeMessage(to, subject, htmlBody, fromEmail) {
-  const boundary = `boundary_${Date.now()}`;
-  const lines = [
-    `From: ${fromEmail}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    htmlBody,
-    `--${boundary}--`,
-  ];
-  return btoa(unescape(encodeURIComponent(lines.join('\r\n'))))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
 
-function buildEmailHtml(notification) {
+
+function buildEmailHtml(record) {
+  const notification = escapeEmailData(record);
   const priorityColor = {
     low: '#3b82f6',
     normal: '#22c55e',
@@ -78,15 +60,20 @@ function buildEmailHtml(notification) {
 </div>`;
 }
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
 
     // Require an authenticated app user — this endpoint must not relay mail for anonymous callers.
-    const user = await base44.auth.me();
+    const user = await base44.auth.me().catch(() => null);
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
 
-    const { notification, notifEmail } = await req.json();
+    const payload = await req.json();
+    const { notifEmail } = payload;
+    const id = payload.notification_id || payload.notification?.id;
+    if (typeof id !== 'string' || !id) return Response.json({ error: 'A saved notification is required' }, { status: 400 });
+    const notification = await base44.entities.Notification.get(id);
 
     if (!notification || !notifEmail) {
       return Response.json({ error: 'Missing notification or notifEmail' }, { status: 400 });
@@ -116,7 +103,7 @@ Deno.serve(async (req) => {
     const priorityLabel = PRIORITY_LABELS[notification.priority] || '';
     const subject = `${priorityLabel} | ${notification.title}`;
     const htmlBody = buildEmailHtml(notification);
-    const raw = buildMimeMessage(notifEmail, subject, htmlBody, fromEmail);
+    const raw = await buildMimeMessage(emailLower, subject, htmlBody, fromEmail);
 
     const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
@@ -136,4 +123,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

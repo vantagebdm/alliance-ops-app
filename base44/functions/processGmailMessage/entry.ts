@@ -46,13 +46,18 @@ function parseEmailBody(message) {
   };
 }
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
-    const body = await req.json();
-    console.log('Gmail webhook received:', JSON.stringify(body, null, 2));
     const base44 = createClientFromRequest(req);
+    // The Base44 connector dispatches as the workflow's admin, not as Google.
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
+    const body = await req.json();
     const messageIds = body.data?.new_message_ids ?? [];
-    console.log('New message IDs:', messageIds);
+    if (!Array.isArray(messageIds) || messageIds.length > 100 || messageIds.some(id => typeof id !== 'string' || !/^[a-zA-Z0-9_-]{1,128}$/.test(id))) {
+      return Response.json({ error: 'Invalid message IDs' }, { status: 400 });
+    }
 
     if (messageIds.length === 0) {
       console.log('No new messages found');
@@ -138,6 +143,6 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Error processing Gmail:', error);
     console.error('Stack:', error.stack);
-    return Response.json({ error: error.message, stack: error.stack }, { status: 500 });
+    return Response.json({ error: 'Unable to process mailbox' }, { status: 500 });
   }
-});
+}

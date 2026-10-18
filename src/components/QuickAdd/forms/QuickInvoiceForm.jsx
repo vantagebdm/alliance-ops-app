@@ -9,7 +9,7 @@ import Autocomplete from "@/components/ui/Autocomplete";
 import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
-import { generateAndUploadInvoicePDF, buildInvoiceEmailBody } from "@/lib/invoicePdf";
+import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
 import { reduceStockForInvoiceItems } from "@/lib/stockReduction";
 import { format } from "date-fns";
 
@@ -123,6 +123,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
     company: prefillCustomer?.company || "",
   });
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const [saveAction, setSaveAction] = useState("draft");
   const [openSections, setOpenSections] = useState([0, 1, 2, 3, 4, 5]);
   const [linkedOrder, setLinkedOrder] = useState(null);
@@ -283,6 +284,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
     setSaveAction(action);
     const err = validate();
     if (err) { alert(err); return; }
+    setSaveError("");
     setSaving(true);
     try {
       const status = action === "draft" ? "draft" : action === "paid" ? "paid" : "sent";
@@ -302,11 +304,9 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
       };
       if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
       const isNew = !invoice?.id;
-      if (invoice?.id) {
-        await base44.entities.Invoice.update(invoice.id, data);
-      } else {
-        await base44.entities.Invoice.create(data);
-      }
+      const savedInvoice = invoice?.id
+        ? await base44.entities.Invoice.update(invoice.id, data)
+        : await base44.entities.Invoice.create(data);
 
       // Decrement part stock for new, non-draft invoices (a confirmed sale)
       if (isNew && action !== "draft") {
@@ -324,17 +324,15 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
       if (action === "email" && form.billing_email) {
         const invoiceData = { ...data, invoice_number: invoiceNumber, subtotal, gst: gstAmount, total: totalAmount };
         const pdfUrl = await generateAndUploadInvoicePDF(invoiceData, base44);
-        const emailBody = buildInvoiceEmailBody(invoiceData, pdfUrl);
         await base44.functions.invoke('sendInvoiceEmail', {
-          to: form.billing_email,
-          subject: `Invoice Due`,
-          body: emailBody,
+          invoice_id: savedInvoice.id,
           pdfUrl,
-          pdfFilename: `Invoice-${invoiceNumber || 'INV'}.pdf`,
         });
       }
 
       onSaved?.();
+    } catch (err) {
+      setSaveError(err.response?.data?.error || err.message || "Unable to save or email invoice");
     } finally {
       setSaving(false);
     }
@@ -798,6 +796,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
           </div>
         </div>
 
+        {saveError && <p role="alert" className="px-6 py-2 text-sm text-destructive">{saveError}</p>}
         {/* Footer Actions */}
         <div className="px-6 py-4 bg-[hsl(0,0%,6%)] border-t border-border flex flex-wrap items-center justify-between gap-3 rounded-b-sm sticky bottom-0">
           <div className="text-white/50 text-xs font-heading uppercase tracking-wider">

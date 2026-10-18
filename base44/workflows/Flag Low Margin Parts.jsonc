@@ -26,8 +26,7 @@
           "with": {
             "function_name": "checkPartMargin",
             "args": {
-              "data": "${ .trigger.data }",
-              "internal_token": "wf_9f3a71c2e8b64d1aa5c07f4e2b6d9c31"
+              "data": "${ .trigger.data }"
             }
           },
           "then": "end"

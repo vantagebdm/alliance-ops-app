@@ -3,13 +3,14 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 // Fallback function to manually poll Gmail inbox for testing
 // Call this to sync past emails (last 24 hours) that may have been missed
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
 
     // Manual admin-triggered utility — require an authenticated admin.
-    const user = await base44.auth.me();
-    if (!user || user.role !== 'admin') {
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -36,7 +37,7 @@ Deno.serve(async (req) => {
     }
 
     // Invoke the processor with these messages
-    const processRes = await base44.asServiceRole.functions.invoke('processGmailMessage', {
+    const processRes = await base44.functions.invoke('processGmailMessage', {
       data: {
         has_new_messages: true,
         new_message_ids: messageIds,
@@ -51,4 +52,4 @@ Deno.serve(async (req) => {
     console.error('Error checking inbox:', error);
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

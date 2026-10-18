@@ -134,10 +134,8 @@ export default function SupplierApplicationForm() {
           <div className="bg-muted/40 rounded-lg p-4 text-left space-y-2 mb-5">
             <div className="flex justify-between"><span className="text-muted-foreground text-xs uppercase tracking-wider">Reference</span><span className="font-mono font-bold">{submitted.application_number}</span></div>
             <div className="flex justify-between"><span className="text-muted-foreground text-xs uppercase tracking-wider">Submitted</span><span className="text-xs">{new Date(submitted.submitted_at).toLocaleString("en-AU")}</span></div>
-            <div className="flex justify-between items-center"><span className="text-muted-foreground text-xs uppercase tracking-wider">Match Status</span>
-              {submitted.status === "matched"
-                ? <span className="text-xs font-bold text-primary">Matched to On Hold account</span>
-                : <span className="text-xs text-amber-400">Pending internal review</span>}
+            <div className="flex justify-between items-center"><span className="text-muted-foreground text-xs uppercase tracking-wider">Status</span>
+              <span className="text-xs text-muted-foreground">Pending internal review</span>
             </div>
           </div>
           <p className="text-xs text-muted-foreground">Our accounts team has been notified and will be in contact. Please retain your reference number.</p>

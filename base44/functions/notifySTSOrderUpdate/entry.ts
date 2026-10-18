@@ -1,27 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
-import { isValidInternalToken } from '../../shared/internalWorkflowAuth.ts';
+import { buildMimeMessage, escapeEmailData, escapeHtml } from '../../shared/emailSafety.ts';
 
-function buildMimeMessage(to, subject, htmlBody, fromEmail) {
-  const boundary = `boundary_${Date.now()}`;
-  const lines = [
-    `From: ${fromEmail}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    htmlBody,
-    `--${boundary}--`,
-  ];
-  return btoa(unescape(encodeURIComponent(lines.join('\r\n'))))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
+
 
 const STATUS_LABELS = {
   pending: 'Pending',
@@ -43,18 +23,13 @@ const STATUS_COLORS = {
   cancelled: '#dc2626',
 };
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
     const body = await req.json();
-
-    // This function is only meant to be invoked by the "Notify STS on Order
-    // Update" workflow (system-triggered on SalesOrder update), never by a
-    // signed-in user — verify the shared internal token instead of requiring
-    // a login, which the workflow doesn't have.
-    if (!isValidInternalToken(body)) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { event, data, old_data } = body;
 
     // Only process STS Service Desk orders
@@ -63,26 +38,27 @@ Deno.serve(async (req) => {
     }
 
     const order = data;
+    const safeOrder = escapeEmailData(order);
     const oldStatus = old_data?.status;
     const newStatus = order.status;
     const statusChanged = oldStatus && newStatus && oldStatus !== newStatus;
 
-    const oldStatusLabel = STATUS_LABELS[oldStatus] || oldStatus || '—';
-    const newStatusLabel = STATUS_LABELS[newStatus] || newStatus || '—';
+    const oldStatusLabel = STATUS_LABELS[oldStatus] || escapeHtml(oldStatus || '—');
+    const newStatusLabel = STATUS_LABELS[newStatus] || escapeHtml(newStatus || '—');
     const newStatusColor = STATUS_COLORS[newStatus] || '#6b7280';
 
     const urgencyLabel = { normal: 'Normal', urgent: 'URGENT', breakdown: 'BREAKDOWN / EMERGENCY' };
-    const urgency = urgencyLabel[order.priority] || order.priority || 'Normal';
+    const urgency = urgencyLabel[order.priority] || safeOrder.priority || 'Normal';
     const isUrgent = order.priority === 'urgent' || order.priority === 'breakdown';
     const urgencyColor = order.priority === 'breakdown' ? '#dc2626' : order.priority === 'urgent' ? '#d97706' : '#16a34a';
 
     const subjectPrefix = statusChanged
-      ? `Order ${order.order_number} Status → ${newStatusLabel}`
-      : `Order ${order.order_number} Updated`;
+      ? `Order ${safeOrder.order_number} Status → ${newStatusLabel}`
+      : `Order ${safeOrder.order_number} Updated`;
 
     const subject = `${isUrgent ? '⚠️ ' : ''}[STS Parts] ${subjectPrefix}`;
 
-    const lines = (order.items || []).map((item, i) =>
+    const lines = (safeOrder.items || []).map((item, i) =>
       `<tr style="background:${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
         <td style="padding:8px 12px;border-bottom:1px solid #eee;">${item.quantity || 1}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #eee;font-family:monospace;">${item.part_number || '—'}</td>
@@ -90,13 +66,13 @@ Deno.serve(async (req) => {
       </tr>`
     ).join('');
 
-    const jobNumber = order.job_number || order.customer_po_number || '—';
-    const assetType = order.asset_type || '—';
-    const fleetNumber = order.asset_fleet_number || '—';
-    const make = order.asset_make || '—';
-    const model = order.asset_model || '—';
-    const clientOwner = order.client_owner || '—';
-    const submittedBy = order.submitted_by_name || '—';
+    const jobNumber = safeOrder.job_number || safeOrder.customer_po_number || '—';
+    const assetType = safeOrder.asset_type || '—';
+    const fleetNumber = safeOrder.asset_fleet_number || '—';
+    const make = safeOrder.asset_make || '—';
+    const model = safeOrder.asset_model || '—';
+    const clientOwner = safeOrder.client_owner || '—';
+    const submittedBy = safeOrder.submitted_by_name || '—';
 
     const statusChangeBlock = statusChanged ? `
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:16px;">
@@ -111,7 +87,7 @@ Deno.serve(async (req) => {
       </div>
     </div>` : `
     <div style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:14px 20px;margin-bottom:20px;">
-      <p style="margin:0;font-size:13px;color:#713f12;"><strong>Order Updated</strong> — Details for order ${order.order_number} have been modified. Please review the latest information below.</p>
+      <p style="margin:0;font-size:13px;color:#713f12;"><strong>Order Updated</strong> — Details for order ${safeOrder.order_number} have been modified. Please review the latest information below.</p>
     </div>`;
 
     const emailBody = `
@@ -123,14 +99,14 @@ Deno.serve(async (req) => {
   ${isUrgent ? `<div style="background:${urgencyColor};padding:10px 28px;color:#fff;font-weight:bold;font-size:13px;letter-spacing:0.5px;">⚠️ ${urgency}</div>` : ''}
   <div style="padding:24px 28px;">
     <p style="margin:0 0 16px 0;">Hi Adam,</p>
-    <p style="margin:0 0 20px 0;">${statusChanged ? `The status of parts order <strong>${order.order_number}</strong> has been updated.` : `Parts order <strong>${order.order_number}</strong> has been modified.`}</p>
+    <p style="margin:0 0 20px 0;">${statusChanged ? `The status of parts order <strong>${safeOrder.order_number}</strong> has been updated.` : `Parts order <strong>${safeOrder.order_number}</strong> has been modified.`}</p>
 
     ${statusChangeBlock}
 
     <table style="width:100%;font-size:14px;margin-bottom:20px;border-collapse:collapse;border:1px solid #e5e5e5;border-radius:6px;">
       <tr style="background:#f3f4f6;">
         <td style="padding:9px 14px;color:#666;width:160px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Order Number</td>
-        <td style="padding:9px 14px;font-weight:bold;color:#111;font-size:15px;">${order.order_number}</td>
+        <td style="padding:9px 14px;font-weight:bold;color:#111;font-size:15px;">${safeOrder.order_number}</td>
       </tr>
       <tr>
         <td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Submitted By</td>
@@ -186,7 +162,6 @@ Deno.serve(async (req) => {
   </div>
 </div>`;
 
-    const base44 = createClientFromRequest(req);
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('gmail');
 
     const profileRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/profile', {
@@ -195,7 +170,7 @@ Deno.serve(async (req) => {
     const profile = await profileRes.json();
     const fromEmail = profile.emailAddress;
 
-    const raw = buildMimeMessage('adam.h@thestshub.com.au', subject, emailBody, fromEmail);
+    const raw = await buildMimeMessage('adam.h@thestshub.com.au', subject, emailBody, fromEmail);
 
     const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
@@ -216,4 +191,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

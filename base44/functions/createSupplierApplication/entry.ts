@@ -1,26 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import { buildMimeMessage, escapeEmailData, escapeHtml } from '../../shared/emailSafety.ts';
 
-function buildMimeMessage(to, subject, htmlBody, fromEmail) {
-  const boundary = `boundary_${Date.now()}`;
-  const lines = [
-    `From: ${fromEmail}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    htmlBody,
-    `--${boundary}--`,
-  ];
-  return btoa(unescape(encodeURIComponent(lines.join('\r\n'))))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
+
 
 // Normalise a supplier name for fuzzy matching: uppercase, strip legal suffixes & punctuation
 function normaliseName(s) {
@@ -35,6 +16,7 @@ function normaliseName(s) {
 export default async function(req) {
   try {
     const body = await req.json();
+    if (typeof body.name !== 'string' || !body.name.trim() || body.name.length > 300) return Response.json({ error: 'A valid supplier name is required' }, { status: 400 });
 
     // Application number: SA-YYYY-NNN
     const now = new Date();
@@ -218,10 +200,11 @@ export default async function(req) {
       const profile = await profileRes.json();
       const fromEmail = profile.emailAddress;
 
-      const cats = (appFields.categories_supplied || []).join(', ') || '—';
-      const brands = (appFields.brands_supplied || []).join(', ') || '—';
+      const safeFields = escapeEmailData(appFields);
+      const cats = (safeFields.categories_supplied || []).join(', ') || '—';
+      const brands = (safeFields.brands_supplied || []).join(', ') || '—';
       const matchedLine = matched
-        ? `<tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Matched On Hold Supplier</td><td style="padding:9px 14px;font-weight:bold;color:#16a34a;">${matched.name} — ready to confirm</td></tr>`
+        ? `<tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Matched On Hold Supplier</td><td style="padding:9px 14px;font-weight:bold;color:#16a34a;">${escapeHtml(matched.name)} — ready to confirm</td></tr>`
         : `<tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Match Status</td><td style="padding:9px 14px;color:#d97706;">No matching On Hold supplier — create one to proceed</td></tr>`;
 
       const emailBody = `
@@ -233,12 +216,12 @@ export default async function(req) {
   <div style="padding:24px 28px;">
     <table style="width:100%;font-size:14px;margin-bottom:18px;border-collapse:collapse;border:1px solid #e5e5e5;border-radius:6px;">
       <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;width:170px;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Application No.</td><td style="padding:9px 14px;font-weight:bold;">${applicationNumber}</td></tr>
-      <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Legal Name</td><td style="padding:9px 14px;font-weight:600;">${appFields.name || '—'}</td></tr>
-      <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Trading Name</td><td style="padding:9px 14px;">${appFields.trading_name || '—'}</td></tr>
-      <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">ABN / ACN</td><td style="padding:9px 14px;">${appFields.abn || '—'} / ${appFields.acn || '—'}</td></tr>
-      <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Phone / Email</td><td style="padding:9px 14px;">${appFields.phone || '—'} · ${appFields.email || '—'}</td></tr>
-      <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Sales Contact</td><td style="padding:9px 14px;">${appFields.contact_person || '—'} (${appFields.contact_email || '—'})</td></tr>
-      <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Payment Terms</td><td style="padding:9px 14px;">${appFields.payment_terms || '—'}</td></tr>
+      <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Legal Name</td><td style="padding:9px 14px;font-weight:600;">${safeFields.name || '—'}</td></tr>
+      <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Trading Name</td><td style="padding:9px 14px;">${safeFields.trading_name || '—'}</td></tr>
+      <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">ABN / ACN</td><td style="padding:9px 14px;">${safeFields.abn || '—'} / ${safeFields.acn || '—'}</td></tr>
+      <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Phone / Email</td><td style="padding:9px 14px;">${safeFields.phone || '—'} · ${safeFields.email || '—'}</td></tr>
+      <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Sales Contact</td><td style="padding:9px 14px;">${safeFields.contact_person || '—'} (${safeFields.contact_email || '—'})</td></tr>
+      <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Payment Terms</td><td style="padding:9px 14px;">${safeFields.payment_terms || '—'}</td></tr>
       <tr><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Categories</td><td style="padding:9px 14px;">${cats}</td></tr>
       <tr style="background:#f3f4f6;"><td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:.5px;">Brands</td><td style="padding:9px 14px;">${brands}</td></tr>
       ${matchedLine}
@@ -249,8 +232,8 @@ export default async function(req) {
   <div style="background:#f3f4f6;padding:14px 28px;font-size:11px;color:#aaa;border-top:1px solid #e5e5e5;">Alliance Priority Parts — Automated notification from Supplier Application Portal</div>
 </div>`;
 
-      const subject = `New Supplier Application ${applicationNumber} — ${appFields.name}`;
-      const raw = buildMimeMessage('accounts@alliancepartsgroup.com.au', subject, emailBody, fromEmail);
+      const subject = `New Supplier Application ${applicationNumber} — ${safeFields.name}`;
+      const raw = await buildMimeMessage('accounts@alliancepartsgroup.com.au', subject, emailBody, fromEmail);
       await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
         method: 'POST',
         headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
@@ -264,9 +247,9 @@ export default async function(req) {
       success: true,
       application_number: applicationNumber,
       application_id: application.id,
-      status: matchStatus,
-      matched_supplier_id: matched ? matched.id : null,
-      matched_supplier_name: matched ? matched.name : null,
+      status: 'submitted',
+      matched_supplier_id: null,
+      matched_supplier_name: null,
       submitted_at: now.toISOString(),
     });
   } catch (error) {

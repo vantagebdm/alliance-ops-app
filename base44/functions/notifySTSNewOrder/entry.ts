@@ -1,44 +1,18 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
-import { isValidInternalToken } from '../../shared/internalWorkflowAuth.ts';
+import { buildMimeMessage, escapeEmailData } from '../../shared/emailSafety.ts';
 
-function buildMimeMessage(to, subject, htmlBody, fromEmail) {
-  const boundary = `boundary_${Date.now()}`;
-  const lines = [
-    `From: ${fromEmail}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    htmlBody,
-    `--${boundary}--`,
-  ];
-  return btoa(unescape(encodeURIComponent(lines.join('\r\n'))))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
 
-Deno.serve(async (req) => {
+
+export default async function(req) {
   try {
-    const body = await req.json();
-
-    // This function is only meant to be invoked by the "Notify STS on New
-    // Order" workflow (system-triggered on SalesOrder create), never by a
-    // signed-in user — verify the shared internal token instead of requiring
-    // a login, which the workflow doesn't have.
-    if (!isValidInternalToken(body)) {
-      return Response.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { event, data } = body;
-
     const base44 = createClientFromRequest(req);
-    const order = data || {};
+    const user = await base44.auth.me().catch(() => null);
+    if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
+    const body = await req.json();
+    const { event, data } = body;
+    if (!data || typeof data.order_number !== 'string' || !data.order_number) return Response.json({ error: 'Order data is required' }, { status: 400 });
+    const order = data;
 
     // Always create an in-app notification for the bell — works for ALL new sales orders
     const isUrgentOrder = order.priority === 'urgent' || order.priority === 'breakdown';
@@ -67,12 +41,13 @@ Deno.serve(async (req) => {
     if (!data || data.company !== 'STS Service Desk') {
       return Response.json({ notification_created: true, skipped: true, reason: 'Not an STS Service Desk order' });
     }
+    const safeOrder = escapeEmailData(order);
     const urgencyLabel = { normal: 'Normal', urgent: 'URGENT', breakdown: 'BREAKDOWN / EMERGENCY' };
-    const urgency = urgencyLabel[order.priority] || order.priority || 'Normal';
+    const urgency = urgencyLabel[order.priority] || safeOrder.priority || 'Normal';
     const isUrgent = order.priority === 'urgent' || order.priority === 'breakdown';
     const urgencyColor = order.priority === 'breakdown' ? '#dc2626' : order.priority === 'urgent' ? '#d97706' : '#16a34a';
 
-    const lines = (order.items || []).map((item, i) =>
+    const lines = (safeOrder.items || []).map((item, i) =>
       `<tr style="background:${i % 2 === 0 ? '#f9f9f9' : '#ffffff'};">
         <td style="padding:8px 12px;border-bottom:1px solid #eee;">${item.quantity || 1}</td>
         <td style="padding:8px 12px;border-bottom:1px solid #eee;font-family:monospace;">${item.part_number || '—'}</td>
@@ -80,13 +55,13 @@ Deno.serve(async (req) => {
       </tr>`
     ).join('');
 
-    const jobNumber = order.job_number || order.customer_po_number || '—';
-    const assetType = order.asset_type || '—';
-    const fleetNumber = order.asset_fleet_number || '—';
-    const make = order.asset_make || '—';
-    const model = order.asset_model || '—';
-    const clientOwner = order.client_owner || '—';
-    const submittedBy = order.submitted_by_name || '—';
+    const jobNumber = safeOrder.job_number || safeOrder.customer_po_number || '—';
+    const assetType = safeOrder.asset_type || '—';
+    const fleetNumber = safeOrder.asset_fleet_number || '—';
+    const make = safeOrder.asset_make || '—';
+    const model = safeOrder.asset_model || '—';
+    const clientOwner = safeOrder.client_owner || '—';
+    const submittedBy = safeOrder.submitted_by_name || '—';
 
     const emailBody = `
 <div style="font-family:Arial,sans-serif;max-width:650px;margin:0 auto;background:#ffffff;color:#111;border-radius:8px;border:1px solid #e0e0e0;overflow:hidden;">
@@ -102,7 +77,7 @@ Deno.serve(async (req) => {
     <table style="width:100%;font-size:14px;margin-bottom:20px;border-collapse:collapse;border:1px solid #e5e5e5;border-radius:6px;">
       <tr style="background:#f3f4f6;">
         <td style="padding:9px 14px;color:#666;width:160px;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Order Number</td>
-        <td style="padding:9px 14px;font-weight:bold;color:#111;font-size:15px;">${order.order_number}</td>
+        <td style="padding:9px 14px;font-weight:bold;color:#111;font-size:15px;">${safeOrder.order_number}</td>
       </tr>
       <tr>
         <td style="padding:9px 14px;color:#666;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;">Submitted By</td>
@@ -164,8 +139,8 @@ Deno.serve(async (req) => {
     const profile = await profileRes.json();
     const fromEmail = profile.emailAddress;
 
-    const subject = `${isUrgent ? `⚠️ [${urgency}] ` : ''}New Parts Order ${order.order_number} — STS Service Desk`;
-    const raw = buildMimeMessage('adam.h@thestshub.com.au', subject, emailBody, fromEmail);
+    const subject = `${isUrgent ? `⚠️ [${urgency}] ` : ''}New Parts Order ${safeOrder.order_number} — STS Service Desk`;
+    const raw = await buildMimeMessage('adam.h@thestshub.com.au', subject, emailBody, fromEmail);
 
     const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
@@ -186,4 +161,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

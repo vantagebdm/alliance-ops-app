@@ -1,51 +1,30 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.52';
+import { buildMimeMessage, emailAddress } from '../../shared/emailSafety.ts';
+import { buildInvoiceEmailBody } from '../../shared/invoiceEmail.ts';
 
-function buildMimeWithAttachment(to, subject, htmlBody, fromEmail, pdfBase64, pdfFilename) {
-  const boundary = `boundary_${Date.now()}`;
-  const lines = [
-    `From: ${fromEmail}`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    `MIME-Version: 1.0`,
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    ``,
-    `--${boundary}`,
-    `Content-Type: text/html; charset=UTF-8`,
-    `Content-Transfer-Encoding: quoted-printable`,
-    ``,
-    htmlBody,
-  ];
 
-  if (pdfBase64 && pdfFilename) {
-    lines.push(
-      `--${boundary}`,
-      `Content-Type: application/pdf; name="${pdfFilename}"`,
-      `Content-Disposition: attachment; filename="${pdfFilename}"`,
-      `Content-Transfer-Encoding: base64`,
-      ``,
-      pdfBase64,
-    );
-  }
 
-  lines.push(`--${boundary}--`);
-  const raw = lines.join('\r\n');
-
-  return btoa(unescape(encodeURIComponent(raw)))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-}
-
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
+    const user = await base44.auth.me().catch(() => null);
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!['admin', 'accounts_receivable'].includes(user.role)) return Response.json({ error: 'Forbidden' }, { status: 403 });
 
-    const { to, subject, body, pdfUrl, pdfFilename } = await req.json();
-    if (!to || !subject || !body) {
-      return Response.json({ error: 'Missing required fields: to, subject, body' }, { status: 400 });
+    const { invoice_id, pdfUrl, to: requestedTo } = await req.json();
+    if (typeof invoice_id !== 'string' || !invoice_id || typeof pdfUrl !== 'string' || !pdfUrl) {
+      return Response.json({ error: 'A saved invoice and its PDF are required' }, { status: 400 });
     }
+    // User-scoped read: the role check does not bypass invoice record permissions.
+    const invoice = await base44.entities.Invoice.get(invoice_id);
+    if (!invoice) return Response.json({ error: 'Invoice not found' }, { status: 404 });
+    let to;
+    try { to = emailAddress(invoice.billing_email); }
+    catch { return Response.json({ error: 'Save a valid billing email on the invoice first' }, { status: 400 }); }
+    if (requestedTo && requestedTo.trim().toLowerCase() !== to) return Response.json({ error: 'Recipient must match the saved invoice billing email' }, { status: 403 });
+    const subject = `Invoice Due - ${invoice.invoice_number || ''}`;
+    const body = buildInvoiceEmailBody(invoice);
+    const pdfFilename = `Invoice-${invoice.invoice_number || 'INV'}.pdf`;
 
     const { accessToken } = await base44.asServiceRole.connectors.getConnection('gmail');
 
@@ -84,15 +63,18 @@ Deno.serve(async (req) => {
           return Response.json({ error: 'Internal host addresses are not allowed' }, { status: 400 });
         }
       }
-      const pdfRes = await fetch(parsed.href);
+      const pdfRes = await fetch(parsed.href, { redirect: 'error', signal: AbortSignal.timeout(10000) });
+      if (!pdfRes.ok) return Response.json({ error: 'Unable to read invoice PDF' }, { status: 400 });
+      if (Number(pdfRes.headers.get('content-length')) > 5000000) return Response.json({ error: 'Invoice PDF is too large' }, { status: 400 });
       const pdfBuffer = await pdfRes.arrayBuffer();
       const uint8 = new Uint8Array(pdfBuffer);
+      if (uint8.length > 5000000 || new TextDecoder().decode(uint8.slice(0, 5)) !== '%PDF-') return Response.json({ error: 'Invalid invoice PDF' }, { status: 400 });
       let binary = '';
       for (let i = 0; i < uint8.length; i++) binary += String.fromCharCode(uint8[i]);
       pdfBase64 = btoa(binary);
     }
 
-    const raw = buildMimeWithAttachment(to, subject, body, fromEmail, pdfBase64, filename);
+    const raw = await buildMimeMessage(to, subject, body, fromEmail, pdfBase64, filename);
 
     const sendRes = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send', {
       method: 'POST',
@@ -112,4 +94,4 @@ Deno.serve(async (req) => {
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

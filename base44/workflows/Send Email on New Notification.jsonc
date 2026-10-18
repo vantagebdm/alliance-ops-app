@@ -24,7 +24,9 @@
           "call": "invoke_backend_function",
           "with": {
             "function_name": "onNotificationCreated",
-            "args": {}
+            "args": {
+              "notification_id": "${ .trigger.entity_id }"
+            }
           },
           "then": "end"
         }

@@ -1,19 +1,13 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { isValidInternalToken } from '../../shared/internalWorkflowAuth.ts';
 
-Deno.serve(async (req) => {
+
+export default async function(req) {
+  try {
   const base44 = createClientFromRequest(req);
-
-  const body = await req.json().catch(() => ({}));
-
-  // This function is only meant to be invoked by the "Flag Low Margin Parts"
-  // workflow (system-triggered on Part create/update), never by a signed-in
-  // user or a public form — verify the shared internal token instead of
-  // requiring a login, which the workflow doesn't have.
-  if (!isValidInternalToken(body)) {
-    return Response.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+  const user = await base44.auth.me().catch(() => null);
+  if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
+  if (user.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 });
+  const body = await req.json();
   const { data: part, event } = body;
 
   if (!part) {
@@ -68,4 +62,7 @@ Deno.serve(async (req) => {
   }
 
   return Response.json({ ok: true, margin: ((sellPrice - unitCost) / sellPrice * 100).toFixed(1) });
-});
+  } catch (error) {
+    return Response.json({ error: error.message }, { status: 500 });
+  }
+}
