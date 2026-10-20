@@ -12,6 +12,7 @@ import EquipmentTypeSelector, { EQUIPMENT_TYPES } from "../components/parts/Equi
 import { PART_CATEGORIES, CATEGORY_COLORS, CATEGORY_LABEL } from "@/lib/categories";
 import QuoteImporter from "../components/parts/QuoteImporter";
 import CategoryReportModal from "../components/parts/CategoryReportModal";
+import PartsMasterExport from "@/components/parts/PartsMasterExport";
 
 export default function Parts() {
   const [parts, setParts] = useState([]);
@@ -146,7 +147,8 @@ export default function Parts() {
           title="Parts Master"
           subtitle={`${parts.length} parts in catalogue`}
           actions={
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              <PartsMasterExport />
               <Button onClick={() => setShowReport(true)} variant="outline" className="rounded-sm font-heading text-xs uppercase tracking-wider border-white/20 text-white hover:bg-white/10">
                 <FileBarChart className="w-4 h-4 mr-1" /> Category Report
               </Button>
@@ -184,7 +186,8 @@ export default function Parts() {
         title="Parts Master"
         subtitle={`${filtered.length} parts · ${selectedTypeLabel}${lowStockCount > 0 ? ` · ${lowStockCount} low stock` : ""}`}
         actions={
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            <PartsMasterExport />
             <Button
               variant="outline"
               onClick={() => { setEquipmentType(null); setSearch(""); setCatFilter("all"); }}
