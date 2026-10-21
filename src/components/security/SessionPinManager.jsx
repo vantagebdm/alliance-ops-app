@@ -10,15 +10,17 @@ export default function SessionPinManager() {
   const [drafts, setDrafts] = useState({});
   const [savedEmail, setSavedEmail] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [savingEmail, setSavingEmail] = useState(null);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     Promise.all([
       base44.entities.User.list(),
-      base44.entities.UserProfile.list("-created_date", 500),
+      base44.entities.UserProfile.list("-updated_date", 500),
     ]).then(([userList, profileList]) => {
       setUsers(userList);
       const map = {};
-      profileList.forEach((p) => { if (p.email) map[p.email] = p; });
+      profileList.forEach((p) => { if (p.email && !map[p.email]) map[p.email] = p; });
       setProfilesByEmail(map);
       setLoading(false);
     });
@@ -26,23 +28,29 @@ export default function SessionPinManager() {
 
   const handleSave = async (user) => {
     const email = user.email;
-    const pin = (drafts[email] ?? profilesByEmail[email]?.session_pin ?? "").replace(/\D/g, "");
-    const existing = profilesByEmail[email];
-    let updated;
-    if (existing) {
-      updated = await base44.entities.UserProfile.update(existing.id, { session_pin: pin });
-    } else {
-      const [first_name, ...rest] = (user.full_name || email).split(" ");
-      updated = await base44.entities.UserProfile.create({
-        email,
-        first_name: first_name || email,
-        last_name: rest.join(" "),
-        session_pin: pin,
-      });
+    const pin = String(drafts[email] ?? profilesByEmail[email]?.session_pin ?? "").trim();
+    setSaveError("");
+    if (pin && !/^\d{4,6}$/.test(pin)) {
+      setSaveError("Enter a 4–6 digit PIN, or leave it blank to remove the PIN.");
+      return;
     }
-    setProfilesByEmail((prev) => ({ ...prev, [email]: updated }));
-    setSavedEmail(email);
-    setTimeout(() => setSavedEmail(null), 1500);
+    setSavingEmail(email);
+    setSavedEmail(null);
+    try {
+      const profiles = await base44.entities.UserProfile.filter({ email }, "-updated_date", 1);
+      const existing = profiles[0];
+      const [first_name, ...rest] = (user.full_name || email).split(" ");
+      const updated = existing
+        ? await base44.entities.UserProfile.update(existing.id, { session_pin: pin, user_id: user.id })
+        : await base44.entities.UserProfile.create({ email, user_id: user.id, first_name: first_name || email, last_name: rest.join(" "), session_pin: pin });
+      setProfilesByEmail((prev) => ({ ...prev, [email]: updated }));
+      setSavedEmail(email);
+      setTimeout(() => setSavedEmail(null), 3000);
+    } catch (err) {
+      setSaveError(err.message || "PIN could not be saved. Please try again.");
+    } finally {
+      setSavingEmail(null);
+    }
   };
 
   if (loading) {
@@ -54,6 +62,7 @@ export default function SessionPinManager() {
       <h3 className="font-heading text-xs uppercase tracking-wider text-white/40 mb-3 flex items-center gap-2">
         <KeyRound className="w-3.5 h-3.5" /> Authorised Users — Session PINs
       </h3>
+      {saveError && <p role="alert" className="text-sm text-destructive mb-3">{saveError}</p>}
       <div className="border border-[hsl(0,0%,18%)] rounded-sm overflow-hidden">
         <table className="w-full text-xs">
           <thead>
@@ -83,8 +92,8 @@ export default function SessionPinManager() {
                     />
                   </td>
                   <td className="px-4 py-2.5">
-                    <Button size="sm" onClick={() => handleSave(u)} className="bg-primary text-black text-[10px] font-heading uppercase tracking-wider rounded-sm h-7">
-                      {savedEmail === u.email ? <Check className="w-3.5 h-3.5" /> : "Save"}
+                    <Button size="sm" onClick={() => handleSave(u)} disabled={!!savingEmail} className="bg-primary text-black text-[10px] font-heading uppercase tracking-wider rounded-sm h-7">
+                      {savingEmail === u.email ? "Saving…" : savedEmail === u.email ? <><Check className="w-3.5 h-3.5" /> Saved</> : "Save"}
                     </Button>
                   </td>
                 </tr>

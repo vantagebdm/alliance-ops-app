@@ -12,17 +12,26 @@ export default function SessionPinLock({ children }) {
   const [locked, setLocked] = useState(false);
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
+  const [user, setUser] = useState(null);
+  const [checking, setChecking] = useState(false);
   const idleTimer = useRef(null);
 
   useEffect(() => {
     (async () => {
-      const user = await base44.auth.me();
-      const profiles = await base44.entities.UserProfile.filter({ email: user.email });
-      const p = profiles[0] || null;
-      setProfile(p);
-      // Only lock if an admin has assigned this user a PIN in Security > Session Control.
-      setLocked(!!p?.session_pin);
-      setLoading(false);
+      try {
+        const currentUser = await base44.auth.me();
+        setUser(currentUser);
+        const profiles = await base44.entities.UserProfile.filter({ email: currentUser.email }, "-updated_date", 1);
+        const p = profiles[0] || null;
+        setProfile(p);
+        setLocked(!!p?.session_pin);
+      } catch (err) {
+        setLocked(true);
+        if (err.status === 401 || err.response?.status === 401) base44.auth.redirectToLogin(window.location.href);
+        else setError("Unable to load your PIN settings. Refresh and try again.");
+      } finally {
+        setLoading(false);
+      }
     })();
   }, []);
 
@@ -47,18 +56,35 @@ export default function SessionPinLock({ children }) {
     };
   }, [loading, locked, profile, resetIdleTimer]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (checking || !user || !/^\d{4,6}$/.test(pin)) return;
     setError("");
-    if (pin === profile?.session_pin) {
-      setPin("");
-      setLocked(false);
-    } else {
-      setError("Incorrect PIN");
-      setPin("");
+    setChecking(true);
+    try {
+      // Re-read on every attempt so a PIN changed by an admin works immediately.
+      const profiles = await base44.entities.UserProfile.filter({ email: user.email }, "-updated_date", 1);
+      const currentProfile = profiles[0];
+      if (!currentProfile) {
+        setError("Your PIN settings could not be found. Ask an administrator to check your account.");
+        return;
+      }
+      setProfile(currentProfile);
+      if (!currentProfile.session_pin || pin === String(currentProfile.session_pin).trim()) {
+        setPin("");
+        setLocked(false);
+      } else {
+        setError("Incorrect PIN for this account. Ask an administrator to reset it in Security → Session Control.");
+        setPin("");
+      }
+    } catch (err) {
+      setError("Unable to check your PIN. Please try again.");
+    } finally {
+      setChecking(false);
     }
   };
 
-  if (loading || !locked) return children;
+  if (loading) return <div role="status" className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">Loading PIN settings…</div>;
+  if (!locked) return children;
 
   return (
     <>
@@ -67,6 +93,7 @@ export default function SessionPinLock({ children }) {
         <div className="bg-card border border-border rounded-lg p-6 w-full max-w-xs text-center space-y-4">
           <Lock className="w-8 h-8 text-primary mx-auto" />
           <h2 className="font-heading text-sm uppercase tracking-wider text-white">Enter PIN to Continue</h2>
+          {user && <p className="text-xs text-muted-foreground break-all">{user.full_name}<br />{user.email}</p>}
           <Input
             type="password"
             inputMode="numeric"
@@ -79,9 +106,10 @@ export default function SessionPinLock({ children }) {
             autoFocus
           />
           {error && <p className="text-xs text-red-400">{error}</p>}
-          <Button onClick={handleSubmit} className="w-full" disabled={pin.length < 4}>
-            Unlock
+          <Button onClick={handleSubmit} className="w-full" disabled={checking || !user || pin.length < 4}>
+            {checking ? "Checking…" : "Unlock"}
           </Button>
+          <Button variant="ghost" onClick={() => base44.auth.logout()} className="w-full">Sign out / Switch account</Button>
         </div>
       </div>
     </>
