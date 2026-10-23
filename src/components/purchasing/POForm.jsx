@@ -238,14 +238,16 @@ export default function POForm({ onClose, onSaved, initial }) {
                        <td className="px-4 py-1 w-48 border-r border-border/50">
                         <PartAutocomplete
                           numberMode="supplier"
-                          value={line.supplier_sku || line.part_number}
+                          value={line.supplier_sku || ""}
                           onSelect={(part) => {
                             const items = form.items.map((line, idx) => {
                               if (idx !== i) return line;
                               const updated = {
                                 ...line,
                                 part_number: part.part_number,
-                                supplier_sku: part.supplier_sku || part.oem_number || part.part_number || "",
+                                part_id: part.id,
+                                app_part_number: part.app_part_number || "",
+                                supplier_sku: part.supplier_sku || "",
                                 description: part.description || part.name || "",
                                 unit_cost: part.unit_cost || 0,
                                 quantity: 1
@@ -260,12 +262,12 @@ export default function POForm({ onClose, onSaved, initial }) {
                           onClear={() => {
                             const items = form.items.map((line, idx) => {
                               if (idx !== i) return line;
-                              return { ...line, part_number: "", supplier_sku: "", app_part_number: "", description: "", unit_cost: 0, total: 0 };
+                              return { ...line, part_id: "", part_number: "", supplier_sku: "", app_part_number: "", description: "", unit_cost: 0, total: 0 };
                             });
                             const subtotal = items.reduce((s, l) => s + (Number(l.total) || 0), 0);
                             setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));
                           }}
-                          placeholder="Part #"
+                          placeholder="Supplier part number"
                           className="rounded-sm h-7 text-xs font-mono w-full"
                         />
                       </td>

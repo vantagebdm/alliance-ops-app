@@ -24,12 +24,10 @@ export default function ConvertToPOModal({ quote, onClose, onConverted }) {
       const noSupplier = [];
 
       quoteItems.forEach(item => {
-        const part = parts.find(p =>
-          p.app_part_number === item.part_number ||
-          p.app_part_number === item.app_part_number ||
-          p.part_number === item.part_number ||
-          p.supplier_sku === item.part_number
-        );
+        const part = parts.find(p => item.part_id ? p.id === item.part_id : (
+          (item.part_number && (p.app_part_number === item.part_number || p.part_number === item.part_number || p.supplier_sku === item.part_number)) ||
+          (item.app_part_number && p.app_part_number === item.app_part_number)
+        ));
 
         if (!part) {
           unmatched.push(item);
@@ -37,10 +35,10 @@ export default function ConvertToPOModal({ quote, onClose, onConverted }) {
         }
 
         const supplierName = part.supplier_name || part.preferred_supplier || "";
-        const supplierPartNumber = part.supplier_sku || part.part_number || item.part_number || "";
+        const supplierPartNumber = part.supplier_sku || "";
 
-        if (!supplierName) {
-          noSupplier.push({ item, part });
+        if (!supplierName || !supplierPartNumber) {
+          noSupplier.push({ item, part, reason: !supplierName ? "No supplier assigned to part" : "Supplier Part Number is blank in Parts Master" });
           return;
         }
 
@@ -48,7 +46,9 @@ export default function ConvertToPOModal({ quote, onClose, onConverted }) {
           supplier_name: supplierName,
           supplier_id: part.supplier_id || "",
           part_number: supplierPartNumber,
-          app_part_number: part.app_part_number || item.part_number,
+          supplier_sku: supplierPartNumber,
+          part_id: part.id,
+          app_part_number: part.app_part_number || "",
           description: part.description || part.name || item.description,
           quantity: item.quantity || 1,
           unit_cost: part.unit_cost || 0,
@@ -76,7 +76,7 @@ export default function ConvertToPOModal({ quote, onClose, onConverted }) {
       });
 
       setGroups(groupArray);
-      setUnmatched([...unmatched, ...noSupplier.map(n => ({ ...n.item, _reason: n.part ? "No supplier assigned to part" : "Part not found in catalog" }))]);
+      setUnmatched([...unmatched, ...noSupplier.map(n => ({ ...n.item, _reason: n.reason }))]);
       setLoading(false);
     })();
   }, [quote.id]);

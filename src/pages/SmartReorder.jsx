@@ -72,6 +72,8 @@ export default function SmartReorder() {
       .filter(p => selectedLines[p.id]?.include)
       .map(p => ({
         part_number: p.part_number,
+        part_id: p.id,
+        supplier_sku: p.supplier_sku || "",
         app_part_number: p.app_part_number,
         description: p.name,
         quantity: selectedLines[p.id]?.qty || 1,
@@ -91,7 +93,7 @@ export default function SmartReorder() {
       supplier_name: supplierName,
       status: "draft",
       po_type: "parts",
-      items: lines.map(l => ({ part_number: l.part_number, description: l.description, quantity: l.quantity, unit_cost: l.unit_cost, total: l.total })),
+      items: lines.map(l => ({ part_number: l.part_number, part_id: l.part_id, supplier_sku: l.supplier_sku, app_part_number: l.app_part_number, description: l.description, quantity: l.quantity, unit_cost: l.unit_cost, total: l.total })),
       subtotal,
       gst: subtotal * 0.1,
       total: subtotal * 1.1,

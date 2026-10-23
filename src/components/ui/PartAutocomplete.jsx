@@ -7,7 +7,7 @@ import PartForm from "@/components/parts/PartForm";
 
 export default function PartAutocomplete({ value, onSelect, onChange, onClear, placeholder, className, numberMode = "app" }) {
   const shownNumber = (part) => numberMode === "supplier"
-    ? part.supplier_sku || part.oem_number || part.part_number || ""
+    ? part.supplier_sku || ""
     : part.app_part_number || part.part_number || "";
   const [allSuggestions, setAllSuggestions] = useState([]);
   const [open, setOpen] = useState(false);
@@ -151,7 +151,7 @@ export default function PartAutocomplete({ value, onSelect, onChange, onClear, p
                     onMouseDown={(e) => { e.preventDefault(); handleSelect(item); }}
                     className={`w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground text-sm transition-colors border-b border-border/30 last:border-b-0 ${serviceMode ? "py-2.5" : ""}`}
                   >
-                    <div className="font-mono font-semibold text-primary">{shownNumber(item)}</div>
+                    <div className="font-mono font-semibold text-primary">{shownNumber(item) || "Supplier part number not set"}</div>
                     {serviceMode ? (
                       <div className="text-xs text-foreground/80 mt-1 whitespace-normal break-words leading-snug">
                         {item.description || item.name}{item.supplier_sku ? ` · SKU: ${item.supplier_sku}` : ""}{item.brand ? ` · ${item.brand}` : ""}{item.make ? ` · ${item.make}` : ""}{item.model ? ` · ${item.model}` : ""}

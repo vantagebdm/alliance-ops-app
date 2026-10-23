@@ -31,6 +31,17 @@
           "part_number": {
             "type": "string"
           },
+          "part_id": {
+            "type": "string"
+          },
+          "supplier_sku": {
+            "type": "string",
+            "description": "Supplier Part Number shown on supplier-facing purchase orders"
+          },
+          "app_part_number": {
+            "type": "string",
+            "description": "Internal reference only; not displayed on supplier purchase orders"
+          },
           "description": {
             "type": "string"
           },

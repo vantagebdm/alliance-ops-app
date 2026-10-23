@@ -150,7 +150,10 @@ export default function CategoryReportModal({ onClose }) {
 
       const lines = group.parts
         .map((p) => ({
-          part_number: p.part.part_number || p.part.app_part_number || "",
+          part_number: p.part.part_number || "",
+          part_id: p.part.id,
+          supplier_sku: p.part.supplier_sku || "",
+          app_part_number: p.part.app_part_number || "",
           description: p.part.name || "",
           quantity: Math.max(p.suggestedQty, 1),
           unit_cost: p.unitCost,
