@@ -14,10 +14,14 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
   const today = new Date().toLocaleDateString("en-AU");
 
   const generatePDF = () => {
+    if (lines.some(line => !line.supplier_sku?.trim())) {
+      alert("Fill in the Supplier Part Number in Parts Master before downloading this purchase order.");
+      return;
+    }
     const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const pageW = 210;
     const margin = 14;
-    const colWidths = [22, 25, 78, 14, 24, 24]; // APP#, Part#, Desc, Qty, Cost, Total
+    const colWidths = [40, 85, 14, 24, 19]; // Supplier part number, description, qty, cost, total
     const colX = [margin];
     colWidths.forEach((w, i) => { if (i > 0) colX.push(colX[i - 1] + colWidths[i - 1]); });
 
@@ -64,8 +68,8 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
     doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(7);
-    const headers = ["APP #", "PART #", "DESCRIPTION", "QTY", "UNIT COST", "TOTAL"];
-    const aligns = ["left", "left", "left", "center", "right", "right"];
+    const headers = ["SUPPLIER PART #", "DESCRIPTION", "QTY", "UNIT COST", "TOTAL"];
+    const aligns = ["left", "left", "center", "right", "right"];
     headers.forEach((h, i) => {
       const x = aligns[i] === "right" ? colX[i] + colWidths[i] - 1 : aligns[i] === "center" ? colX[i] + colWidths[i] / 2 : colX[i] + 1;
       doc.text(h, x, y + 5, { align: aligns[i] });
@@ -81,17 +85,14 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
         doc.setFillColor(248, 248, 248);
         doc.rect(margin, y, pageW - margin * 2, rowH, "F");
       }
-      doc.setTextColor(80, 80, 80);
-      doc.text(l.app_part_number || "—", colX[0] + 1, y + 5);
       doc.setTextColor(30, 30, 30);
-      doc.text(l.part_number || "—", colX[1] + 1, y + 5);
-      // Truncate description
+      doc.text(l.supplier_sku || "—", colX[0] + 1, y + 5);
       const desc = (l.description || "").substring(0, 42);
-      doc.text(desc, colX[2] + 1, y + 5);
-      doc.text(String(l.quantity), colX[3] + colWidths[3] / 2, y + 5, { align: "center" });
-      doc.text(`$${(l.unit_cost || 0).toFixed(2)}`, colX[4] + colWidths[4] - 1, y + 5, { align: "right" });
+      doc.text(desc, colX[1] + 1, y + 5);
+      doc.text(String(l.quantity), colX[2] + colWidths[2] / 2, y + 5, { align: "center" });
+      doc.text(`$${(l.unit_cost || 0).toFixed(2)}`, colX[3] + colWidths[3] - 1, y + 5, { align: "right" });
       doc.setFont("helvetica", "bold");
-      doc.text(`$${(l.total || l.quantity * l.unit_cost || 0).toFixed(2)}`, colX[5] + colWidths[5] - 1, y + 5, { align: "right" });
+      doc.text(`$${(l.total || l.quantity * l.unit_cost || 0).toFixed(2)}`, colX[4] + colWidths[4] - 1, y + 5, { align: "right" });
       doc.setFont("helvetica", "normal");
       // bottom border
       doc.setDrawColor(220, 220, 220);
@@ -166,8 +167,7 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
             <table className="w-full mb-4 border-collapse">
               <thead>
                 <tr className="bg-gray-900 text-white text-[9px]">
-                  <th className="text-left px-2 py-1">APP #</th>
-                  <th className="text-left px-2 py-1">Part #</th>
+                  <th className="text-left px-2 py-1">Supplier Part #</th>
                   <th className="text-left px-2 py-1">Description</th>
                   <th className="text-center px-2 py-1">Qty</th>
                   <th className="text-right px-2 py-1">Cost</th>
@@ -177,8 +177,7 @@ export default function ReorderPDFModal({ supplier_name, lines, onClose }) {
               <tbody>
                 {lines.map((l, i) => (
                   <tr key={i} className={i % 2 === 0 ? "bg-gray-50" : "bg-white"}>
-                    <td className="px-2 py-1 text-primary">{l.app_part_number || "—"}</td>
-                    <td className="px-2 py-1">{l.part_number}</td>
+                    <td className="px-2 py-1">{l.supplier_sku || "Supplier part number required"}</td>
                     <td className="px-2 py-1 font-sans">{l.description}</td>
                     <td className="px-2 py-1 text-center">{l.quantity}</td>
                     <td className="px-2 py-1 text-right">${(l.unit_cost || 0).toFixed(2)}</td>

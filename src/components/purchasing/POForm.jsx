@@ -9,6 +9,7 @@ import Autocomplete from "@/components/ui/Autocomplete";
 import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
+import resolveSupplierItems from "@/lib/supplierPartNumbers";
 
 const newLine = () => ({ part_number: "", description: "", supplier_sku: "", quantity: 1, unit_cost: 0, total: 0, company_note: "", line_reference: "" });
 
@@ -32,6 +33,14 @@ export default function POForm({ onClose, onSaved, initial }) {
   };
 
   useEffect(() => { if (!isEdit) loadPreview(poType); }, []);
+  useEffect(() => {
+    if (!initial?.items) return;
+    let active = true;
+    resolveSupplierItems(initial.items).then(items => {
+      if (active) setForm(current => current.items === initial.items ? { ...current, items } : current);
+    });
+    return () => { active = false; };
+  }, [initial]);
   const supplierAC = useAutocomplete("Supplier", "name");
   const partAC = useAutocomplete("Part", "part_number");
 
@@ -222,7 +231,7 @@ export default function POForm({ onClose, onSaved, initial }) {
              <table className="w-full text-sm border-collapse">
                <thead className="bg-[hsl(0,0%,11%)] border-b border-border sticky top-0">
                   <tr>
-                     <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-48 border-r border-border">Part #</th>
+                     <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-48 border-r border-border">Supplier Part #</th>
                      <th className="text-left px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 flex-1 border-r border-border">Description</th>
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-24 border-r border-border">Qty</th>
                      <th className="text-right px-4 py-1 font-heading text-[9px] uppercase tracking-wider text-foreground/50 w-48 border-r border-border">Unit Cost</th>

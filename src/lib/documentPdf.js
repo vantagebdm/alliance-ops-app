@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import resolveSalesItems, { salesPartNumber } from "@/lib/salesPartNumbers";
+import resolveSupplierItems, { supplierPartNumber } from "@/lib/supplierPartNumbers";
 import { PDFDocument } from "pdf-lib";
 import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
@@ -619,7 +620,10 @@ export function generateSalesOrderPDF(order) {
   return doc.output("blob");
 }
 
-export function generatePurchaseOrderPDF(po) {
+export async function generatePurchaseOrderPDF(po) {
+  po = { ...po, items: await resolveSupplierItems(po.items || []) };
+  const missingIndex = po.items.findIndex(item => !supplierPartNumber(item) && (item.part_id || item.part_number || item.app_part_number));
+  if (missingIndex !== -1) throw new Error(`Line ${missingIndex + 1}: enter the Supplier Part Number in Parts Master or on the PO before generating it. APP numbers are for customer documents only.`);
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
   const margin = 18;
@@ -671,7 +675,7 @@ export function generatePurchaseOrderPDF(po) {
     }
     doc.setTextColor(...TEXT_DARK);
     doc.setFontSize(8);
-    doc.text(String(item.supplier_sku || item.part_number || ""), margin + 2, y + 4.5);
+    doc.text(supplierPartNumber(item), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });
@@ -829,7 +833,7 @@ export async function generateAndUploadSalesOrderPDF(order, base44) {
 
 export async function generateAndUploadPurchaseOrderPDF(po, base44) {
   await syncLogosFromDB();
-  const blob = generatePurchaseOrderPDF(po);
+  const blob = await generatePurchaseOrderPDF(po);
   const file = new File([blob], `PO-${po.po_number || "PO"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
   return file_url;
