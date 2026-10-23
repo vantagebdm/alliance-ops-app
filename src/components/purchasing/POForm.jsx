@@ -237,6 +237,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                      <tr className="border-b border-border/50">
                        <td className="px-4 py-1 w-48 border-r border-border/50">
                         <PartAutocomplete
+                          numberMode="supplier"
                           value={line.supplier_sku || line.part_number}
                           onSelect={(part) => {
                             const items = form.items.map((line, idx) => {
@@ -244,7 +245,7 @@ export default function POForm({ onClose, onSaved, initial }) {
                               const updated = {
                                 ...line,
                                 part_number: part.part_number,
-                                supplier_sku: part.supplier_sku || part.app_part_number || "",
+                                supplier_sku: part.supplier_sku || part.oem_number || part.part_number || "",
                                 description: part.description || part.name || "",
                                 unit_cost: part.unit_cost || 0,
                                 quantity: 1

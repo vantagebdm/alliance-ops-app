@@ -10,6 +10,7 @@ import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber, previewDocNumber } from "@/hooks/useDocNumber";
 import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
+import resolveSalesItems from "@/lib/salesPartNumbers";
 import { reduceStockForInvoiceItems } from "@/lib/stockReduction";
 import { format } from "date-fns";
 
@@ -142,6 +143,15 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
     });
   }, []);
 
+  useEffect(() => {
+    if (!invoice?.items) return;
+    let active = true;
+    resolveSalesItems(invoice.items).then(items => {
+      if (active) setForm(f => f.items === invoice.items ? { ...f, items } : f);
+    });
+    return () => { active = false; };
+  }, [invoice]);
+
   const customerAC = useAutocomplete("Customer", "name");
   const companyAC = useAutocomplete("Customer", "company");
   const partAC = useAutocomplete("Part", "part_number", ["app_part_number", "name", "supplier_sku", "oem_number"]);
@@ -207,6 +217,8 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
       payment_terms: order.payment_terms || f.payment_terms,
       items: (order.items || []).map(i => ({
         part_number: i.part_number || "",
+        app_part_number: i.app_part_number || "",
+        part_id: i.part_id || "",
         description: i.description || "",
         quantity: i.quantity || 1,
         unit_price: i.unit_price || 0,
@@ -227,6 +239,8 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
       delivery_address: dispatch.delivery_address || "",
       items: (dispatch.items || []).map(i => ({
         part_number: i.part_number || "",
+        app_part_number: i.app_part_number || "",
+        part_id: i.part_id || "",
         description: i.description || "",
         quantity: i.dispatch_qty || i.ordered_qty || 1,
         unit_price: 0,
@@ -248,6 +262,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
     const items = form.items.map((line, idx) => {
       if (idx !== i) return line;
       const updated = { ...line, [k]: v };
+      if (k === "part_number") { updated.part_id = ""; updated.app_part_number = ""; }
       if (["quantity", "unit_price", "discount"].includes(k)) {
         const qty = Number(updated.quantity) || 0;
         const price = Number(updated.unit_price) || 0;
@@ -299,7 +314,7 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
         subtotal,
         gst: gstAmount,
         total: totalAmount,
-        items: form.items,
+        items: await resolveSalesItems(form.items, { strict: action !== "draft" }),
         invoice_source: source,
       };
       if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
@@ -624,16 +639,16 @@ export default function QuickInvoiceForm({ onClose, onSaved, prefillCustomer, in
                             <span className="text-[10px] font-heading text-blue-400 uppercase tracking-wider">{line._charge}</span>
                           ) : (
                             <PartAutocomplete
-                              value={line.part_number}
+                              value={line.app_part_number || line.part_number}
                               onSelect={(part) => {
-                                const items = form.items.map((l, idx) => idx === i ? { ...l, part_number: part.part_number, description: part.description || part.name || "", unit_price: part.sell_price || 0, total: (l.quantity || 1) * (part.sell_price || 0) } : l);
+                                const items = form.items.map((l, idx) => idx === i ? { ...l, part_id: part.id, app_part_number: part.app_part_number || "", part_number: part.part_number, description: part.description || part.name || "", unit_price: part.sell_price || 0, total: (l.quantity || 1) * (part.sell_price || 0) } : l);
                                 recalc(items);
                               }}
                               onChange={(val) => updateLine(i, "part_number", val)}
                               onClear={() => {
                                 const items = form.items.map((line, idx) => {
                                   if (idx !== i) return line;
-                                  return { ...line, part_number: "", description: "", unit_price: 0, discount: 0, total: 0 };
+                                  return { ...line, part_id: "", app_part_number: "", part_number: "", description: "", unit_price: 0, discount: 0, total: 0 };
                                 });
                                 recalc(items);
                               }}

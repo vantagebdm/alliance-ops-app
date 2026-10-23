@@ -1,8 +1,10 @@
 import { jsPDF } from "jspdf";
 import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
+import resolveSalesItems, { salesPartNumber } from "@/lib/salesPartNumbers";
 
-export function generateInvoicePDF(invoice) {
+export async function generateInvoicePDF(invoice) {
+  invoice = { ...invoice, items: await resolveSalesItems(invoice.items, { strict: true }) };
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
   const margin = 14;
@@ -158,7 +160,7 @@ export function generateInvoicePDF(invoice) {
     }
     doc.setTextColor(30, 30, 30);
     doc.setFontSize(8);
-    doc.text(String(item.app_part_number || item.part_number || ""), margin + 2, y + 4.5);
+    doc.text(salesPartNumber(item), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });
@@ -234,7 +236,7 @@ export function generateInvoicePDF(invoice) {
 
 export async function generateAndUploadInvoicePDF(invoice, base44) {
   await syncLogosFromDB();
-  const blob = generateInvoicePDF(invoice);
+  const blob = await generateInvoicePDF(invoice);
   const file = new File([blob], `Invoice-${invoice.invoice_number || "INV"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
   return file_url;

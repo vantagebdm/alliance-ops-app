@@ -4,6 +4,7 @@ import { postInvoiceToLedger } from "@/lib/accountingLedger";
 import { reduceStockForInvoiceItems } from "@/lib/stockReduction";
 import { previewDocNumber, generateDocNumber } from "@/hooks/useDocNumber";
 import { generateAndUploadInvoicePDF } from "@/lib/invoicePdf";
+import resolveSalesItems, { salesPartNumber } from "@/lib/salesPartNumbers";
 import { X, AlertTriangle, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -102,6 +103,8 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
       return {
         _key: key,
         part_number: item.part_number || "",
+        app_part_number: item.app_part_number || "",
+        part_id: item.part_id || "",
         description: item.description || "",
         ordered_qty: ordered,
         dispatched_qty: dispatched,
@@ -117,6 +120,10 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
     });
 
     setLines(built);
+    let active = true;
+    resolveSalesItems(built).then(resolved => {
+      if (active) setLines(current => current.map((line, index) => ({ ...line, part_id: resolved[index]?.part_id, app_part_number: resolved[index]?.app_part_number })));
+    });
 
     // Warnings
     const allInvoiced = built.every(l => l.available_qty === 0);
@@ -124,6 +131,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
     else if (basis === "dispatched" && built.every(l => l.dispatched_qty === 0)) {
       setWarning("No items have been dispatched yet. Invoice may be premature.");
     } else setWarning(null);
+    return () => { active = false; };
   }, [basis, existingInvoices, order.items]);
 
   const updateLine = (i, k, v) => {
@@ -179,6 +187,8 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
         .filter(l => l._charge ? true : l.invoice_qty > 0)
         .map(l => ({
           part_number: l.part_number,
+          part_id: l.part_id,
+          app_part_number: l.app_part_number,
           description: l.description,
           quantity: l.invoice_qty,
           unit_price: l.unit_price,
@@ -200,7 +210,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
         billing_address: order.delivery_address || "",
         delivery_address: order.delivery_address || "",
         sales_order_reference: order.order_number,
-        items: invoiceItems,
+        items: await resolveSalesItems(invoiceItems, { strict: action !== "draft" }),
         subtotal,
         gst: gstAmount,
         total: totalAmount,
@@ -246,6 +256,8 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
       });
 
       onSaved?.();
+    } catch (error) {
+      alert(error.message);
     } finally {
       setSaving(false);
     }
@@ -411,7 +423,7 @@ export default function InvoiceFromOrderModal({ order, onClose, onSaved }) {
                             )}
                           </td>
                         )}
-                        <td className="px-3 py-2 font-mono text-primary text-[11px]">{line.part_number || (isCharge ? <span className="text-blue-400 text-[10px] font-heading uppercase">{line.description}</span> : "—")}</td>
+                        <td className="px-3 py-2 font-mono text-primary text-[11px]">{salesPartNumber(line) || (isCharge ? <span className="text-blue-400 text-[10px] font-heading uppercase">{line.description}</span> : "APP number required")}</td>
                          <td className="px-3 py-2 max-w-[200px]">
                            {isCharge ? (
                              <input value={line.description} onChange={e => updateLine(i, "description", e.target.value)}

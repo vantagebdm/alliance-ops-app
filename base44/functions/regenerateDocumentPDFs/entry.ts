@@ -1,5 +1,6 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { jsPDF } from 'npm:jspdf@4.0.0';
+import { resolveSalesPartNumbers } from '../../shared/salesPartNumbers.ts';
 
 // Company profile — kept in sync with lib/companyDetails.js defaults
 function getCompanyProfile() {
@@ -128,7 +129,7 @@ function generateInvoicePDF(invoice) {
     }
     doc.setTextColor(30, 30, 30);
     doc.setFontSize(8);
-    doc.text(String(item.part_number || ""), margin + 2, y + 4.5);
+    doc.text(String(item.app_part_number || ""), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });
@@ -198,7 +199,7 @@ function generateInvoicePDF(invoice) {
   return doc.output("blob");
 }
 
-Deno.serve(async (req) => {
+export default async function(req) {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -207,13 +208,20 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Admin access required' }, { status: 403 });
     }
 
+    const { dry_run = false } = await req.json();
     const invoices = await base44.asServiceRole.entities.Invoice.list(null, 500);
+    const allItems = invoices.flatMap(invoice => invoice.items || []);
+    const resolved = await resolveSalesPartNumbers(base44.asServiceRole, allItems);
+    let itemOffset = 0;
     let updated = 0;
     let failed = 0;
 
     for (const invoice of invoices) {
+      const items = (invoice.items || []).map(item => ({ ...item, ...resolved[itemOffset++] }));
       try {
-        const blob = generateInvoicePDF(invoice);
+        if (items.some(item => (item.part_number || item.part_id) && !item.app_part_number)) throw new Error('Missing or ambiguous APP number; PDF was not regenerated');
+        if (dry_run) { updated++; continue; }
+        const blob = generateInvoicePDF({ ...invoice, items });
         const file = new File([blob], `Invoice-${invoice.invoice_number}.pdf`, { type: "application/pdf" });
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
         await base44.asServiceRole.entities.Invoice.update(invoice.id, { pdf_url: file_url });
@@ -228,9 +236,10 @@ Deno.serve(async (req) => {
       success: true,
       updated,
       failed,
-      message: `Regenerated ${updated} PDFs. ${failed} failed.`
+      dry_run,
+      message: dry_run ? `${updated} invoices ready to regenerate; ${failed} need APP number mapping. No PDFs changed.` : `Regenerated ${updated} PDFs. ${failed} failed.`
     });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
-});
+}

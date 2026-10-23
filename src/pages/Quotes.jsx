@@ -25,27 +25,20 @@ export default function Quotes() {
   const handleDownloadPDF = async (e, quote) => {
     e.stopPropagation();
     setDownloadingId(quote.id);
-    await syncLogosFromDB();
-    // Enrich items with app_part_number for legacy quotes
-    let enrichedQuote = quote;
-    const needsLookup = (quote.items || []).some(i => !i.app_part_number && i.part_number);
-    if (needsLookup) {
-      const parts = await base44.entities.Part.list(null, 1000);
-      const enrichedItems = (quote.items || []).map(item => {
-        if (item.app_part_number) return item;
-        const match = parts.find(p => p.part_number === item.part_number || p.supplier_sku === item.part_number);
-        return match ? { ...item, app_part_number: match.app_part_number || item.part_number } : item;
-      });
-      enrichedQuote = { ...quote, items: enrichedItems };
+    try {
+      await syncLogosFromDB();
+      const blob = await generateQuotePDF(quote);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Quote-${quote.quote_number || "QUOTE"}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setDownloadingId(null);
     }
-    const blob = generateQuotePDF(enrichedQuote);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Quote-${quote.quote_number || "QUOTE"}.pdf`;
-    a.click();
-    URL.revokeObjectURL(url);
-    setDownloadingId(null);
   };
 
   const handleSendEmail = async (e, quote) => {
@@ -55,35 +48,16 @@ export default function Quotes() {
       return;
     }
     setSendingId(quote.id);
-    const pdfUrl = await generateAndUploadQuotePDF(quote, base44);
-    const company = getCompanyProfile();
-    const body = `
-<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#ffffff;color:#111;padding:0;border-radius:6px;border:1px solid #e0e0e0;">
-  <div style="background:#000;padding:24px 28px;border-radius:6px 6px 0 0;">
-    <h2 style="color:#fff;font-size:22px;margin:0 0 4px 0;">QUOTATION</h2>
-    <p style="color:#ccc;margin:0;">Quote #${quote.quote_number || ""}</p>
-  </div>
-  <div style="padding:24px 28px;">
-    <p>Dear ${quote.customer_name || "Customer"},</p>
-    <p>Please find your quotation attached. This quote is valid until <strong>${quote.valid_until ? moment(quote.valid_until).format("DD MMM YYYY") : "—"}</strong>.</p>
-    <table style="width:100%;font-size:14px;margin:16px 0;border-collapse:collapse;">
-      <tr><td style="color:#666;padding:5px 0;width:140px;">Quote #:</td><td style="color:#111;font-weight:bold;">${quote.quote_number || ""}</td></tr>
-      <tr><td style="color:#666;padding:5px 0;">Total:</td><td style="color:#111;font-weight:bold;font-size:18px;">$${Number(quote.total || 0).toFixed(2)}</td></tr>
-    </table>
-    <p style="font-size:11px;color:#aaa;margin-top:24px;border-top:1px solid #eee;padding-top:12px;">
-      ${company.trading_name || company.legal_name} | ABN: ${company.abn}<br/>
-      ${company.phone} | ${company.email}
-    </p>
-  </div>
-</div>`;
-    await base44.integrations.Core.SendEmail({
-      to: quote.customer_email,
-      subject: `Quotation ${quote.quote_number || ""} from ${company.trading_name || company.legal_name}`,
-      body,
-    });
-    await base44.entities.Quote.update(quote.id, { status: "sent" });
-    setSendingId(null);
-    load();
+    try {
+      await generateAndUploadQuotePDF(quote, base44);
+      await base44.functions.invoke("sendQuoteEmail", { quote_id: quote.id });
+      await base44.entities.Quote.update(quote.id, { status: "sent" });
+      load();
+    } catch (error) {
+      alert(error.response?.data?.error || error.message);
+    } finally {
+      setSendingId(null);
+    }
   };
 
   const load = async () => {

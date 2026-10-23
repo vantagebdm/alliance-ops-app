@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import resolveSalesItems, { salesPartNumber } from "@/lib/salesPartNumbers";
 import { PDFDocument } from "pdf-lib";
 import { getLogo, syncLogosFromDB } from "@/lib/companyLogos";
 import { getCompanyProfile } from "@/lib/companyDetails";
@@ -71,7 +72,8 @@ function addHeader(doc, pageW, title, docNumber, logoUrl) {
   return bannerTop + bannerH; // return content start Y
 }
 
-export function generateQuotePDF(quote) {
+export async function generateQuotePDF(quote) {
+  quote = { ...quote, items: await resolveSalesItems(quote.items, { strict: true }) };
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageW = 210;
   const margin = 18;
@@ -150,7 +152,7 @@ export function generateQuotePDF(quote) {
     }
     doc.setTextColor(...TEXT_DARK);
     doc.setFontSize(8);
-    doc.text(String(item.app_part_number || item.part_number || ""), margin + 2, y + 4.5);
+    doc.text(salesPartNumber(item), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });
@@ -669,7 +671,7 @@ export function generatePurchaseOrderPDF(po) {
     }
     doc.setTextColor(...TEXT_DARK);
     doc.setFontSize(8);
-    doc.text(String(item.part_number || item.supplier_sku || ""), margin + 2, y + 4.5);
+    doc.text(String(item.supplier_sku || item.part_number || ""), margin + 2, y + 4.5);
     const desc = doc.splitTextToSize(String(item.description || ""), 66);
     doc.text(desc[0], margin + 30, y + 4.5);
     doc.text(String(Number(item.quantity || 0)), margin + 100, y + 4.5, { align: "right" });
@@ -808,26 +810,10 @@ export function generateDispatchPDF(dispatch) {
   return doc.output("blob");
 }
 
-async function enrichQuoteItems(quote, base44) {
-  const needsLookup = (quote.items || []).some(i => !i.app_part_number && i.part_number);
-  if (!needsLookup) return quote;
-  const parts = await base44.entities.Part.list(null, 1000);
-  const enrichedItems = (quote.items || []).map(item => {
-    if (item.app_part_number) return item;
-    const match = parts.find(p =>
-      p.part_number === item.part_number ||
-      p.supplier_sku === item.part_number ||
-      p.app_part_number === item.part_number
-    );
-    return match ? { ...item, app_part_number: match.app_part_number || item.part_number } : item;
-  });
-  return { ...quote, items: enrichedItems };
-}
 
 export async function generateAndUploadQuotePDF(quote, base44) {
   await syncLogosFromDB();
-  const enrichedQuote = await enrichQuoteItems(quote, base44);
-  const blob = generateQuotePDF(enrichedQuote);
+  const blob = await generateQuotePDF(quote);
   const file = new File([blob], `Quote-${quote.quote_number || "QUOTE"}.pdf`, { type: "application/pdf" });
   const { file_url } = await base44.integrations.Core.UploadFile({ file });
   return file_url;

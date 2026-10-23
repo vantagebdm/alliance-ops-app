@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import Autocomplete from "@/components/ui/Autocomplete";
 import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber } from "@/hooks/useDocNumber";
+import resolveSalesItems from "@/lib/salesPartNumbers";
 
 const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0, eta_days: "", eta_comment: "" });
 
@@ -26,6 +27,14 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
     total: 0,
   });
   const [saving, setSaving] = useState(false);
+  useEffect(() => {
+    if (!initial?.items) return;
+    let active = true;
+    resolveSalesItems(initial.items).then(items => {
+      if (active) setForm(f => f.items === initial.items ? { ...f, items } : f);
+    });
+    return () => { active = false; };
+  }, [initial]);
   const customerAC = useAutocomplete("Customer", "name");
   const companyAC = useAutocomplete("Customer", "company");
 
@@ -44,6 +53,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
     const items = form.items.map((line, idx) => {
       if (idx !== i) return line;
       const updated = { ...line, [k]: v };
+      if (k === "app_part_number") { updated.part_id = ""; updated.part_number = ""; }
       if (k === "quantity" || k === "unit_price") {
         updated.total = (Number(updated.quantity) || 0) * (Number(updated.unit_price) || 0);
       }
@@ -75,6 +85,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
           total: Number(l.total) || 0,
         })),
       };
+      data.items = await resolveSalesItems(data.items);
       if (!data.quote_number) data.quote_number = await generateDocNumber("quote");
       if (prefillCustomer?.id) data.customer_id = prefillCustomer.id;
       if (initial?.id) {
@@ -225,7 +236,8 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                              if (isOil) unit_price = part.price_per_litre || 0;
                              const updated = {
                                ...line,
-                               app_part_number: part.app_part_number || part.part_number,
+                               part_id: part.id,
+                               app_part_number: part.app_part_number || "",
                                part_number: part.part_number,
                                description: part.description || part.name || "",
                                part_category: part.category,
@@ -245,7 +257,7 @@ export default function QuoteForm({ onClose, onSaved, initial, prefillCustomer }
                         onClear={() => {
                            const items = form.items.map((line, idx) => {
                              if (idx !== i) return line;
-                             return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "", part_category: "", pricing_basis: "standard", part_price_per_pack: 0, part_price_per_litre: 0, part_commercial_price: 0 };
+                             return { ...line, part_id: "", app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0, eta_days: "", eta_comment: "", part_category: "", pricing_basis: "standard", part_price_per_pack: 0, part_price_per_litre: 0, part_commercial_price: 0 };
                            });
                            recalc(items);
                         }}

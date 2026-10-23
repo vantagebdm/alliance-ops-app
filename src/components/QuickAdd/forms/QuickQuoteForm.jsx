@@ -9,6 +9,7 @@ import Autocomplete from "@/components/ui/Autocomplete";
 import PartAutocomplete from "@/components/ui/PartAutocomplete";
 import { useAutocomplete } from "@/hooks/useAutocomplete";
 import { generateDocNumber } from "@/hooks/useDocNumber";
+import resolveSalesItems from "@/lib/salesPartNumbers";
 
 const newLine = () => ({ app_part_number: "", part_number: "", description: "", quantity: 1, unit_price: 0, total: 0 });
 
@@ -38,6 +39,7 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
     const items = form.items.map((line, idx) => {
       if (idx !== i) return line;
       const updated = { ...line, [k]: v };
+      if (k === "app_part_number") { updated.part_id = ""; updated.part_number = ""; }
       if (k === "quantity" || k === "unit_price") {
         updated.total = (Number(updated.quantity) || 0) * (Number(updated.unit_price) || 0);
       }
@@ -61,6 +63,7 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
       const data = {
         ...form,
         quote_number: quoteNumber,
+        items: await resolveSalesItems(form.items),
       };
       await base44.entities.Quote.create(data);
       onSaved?.();
@@ -190,7 +193,7 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
                         onSelect={(part) => {
                           const items = form.items.map((line, idx) => {
                             if (idx !== i) return line;
-                            const updated = { ...line, app_part_number: part.app_part_number || part.part_number, part_number: part.part_number, description: part.description || part.name || "", unit_price: part.sell_price || 0 };
+                            const updated = { ...line, part_id: part.id, app_part_number: part.app_part_number || "", part_number: part.part_number, description: part.description || part.name || "", unit_price: part.sell_price || 0 };
                             updated.total = (updated.quantity || 1) * (updated.unit_price || 0);
                             return updated;
                           });
@@ -201,7 +204,7 @@ export default function QuickQuoteForm({ onClose, onSaved }) {
                         onClear={() => {
                           const items = form.items.map((line, idx) => {
                             if (idx !== i) return line;
-                            return { ...line, app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0 };
+                            return { ...line, part_id: "", app_part_number: "", part_number: "", description: "", unit_price: 0, total: 0 };
                           });
                           const subtotal = items.reduce((s, l) => s + (Number(l.total) || 0), 0);
                           setForm(f => ({ ...f, items, subtotal, gst: subtotal * 0.1, total: subtotal * 1.1 }));

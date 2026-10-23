@@ -41,6 +41,13 @@
           "part_number": {
             "type": "string"
           },
+          "part_id": {
+            "type": "string"
+          },
+          "app_part_number": {
+            "type": "string",
+            "description": "Customer-facing APP number; supplier identifier stays in part_number for stock and purchasing"
+          },
           "description": {
             "type": "string"
           },

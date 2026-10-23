@@ -60,7 +60,7 @@ export default function TestInvoicePDFGenerator() {
     setGenerating(true);
     try {
       await syncLogosFromDB();
-      const blob = generateInvoicePDF(SAMPLE_INVOICE);
+      const blob = await generateInvoicePDF(SAMPLE_INVOICE);
       const url = URL.createObjectURL(blob);
       setPdfUrl(url);
     } catch (err) {
@@ -74,7 +74,7 @@ export default function TestInvoicePDFGenerator() {
     setDownloading(true);
     try {
       await syncLogosFromDB();
-      const blob = generateInvoicePDF(SAMPLE_INVOICE);
+      const blob = await generateInvoicePDF(SAMPLE_INVOICE);
       const file = new File([blob], `Test-Invoice-${SAMPLE_INVOICE.invoice_number}.pdf`, { type: "application/pdf" });
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       

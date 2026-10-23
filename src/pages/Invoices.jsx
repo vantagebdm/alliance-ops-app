@@ -261,9 +261,14 @@ export default function Invoices() {
 
   const handleViewPdf = async (row) => {
     setPdfLoading(true);
-    const url = await generateAndUploadInvoicePDF(row, base44);
-    setPdfLoading(false);
-    setViewingPdf(url);
+    try {
+      const url = await generateAndUploadInvoicePDF(row, base44);
+      setViewingPdf(url);
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setPdfLoading(false);
+    }
   };
 
   const columns = [
